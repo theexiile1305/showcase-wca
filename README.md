@@ -1,4 +1,6 @@
 [![CircleCI](https://circleci.com/gh/theexiile1305/showcase-wca/tree/master.svg?style=svg)](https://circleci.com/gh/theexiile1305/showcase-wca/tree/master)
+[![Cypress.io tests](https://img.shields.io/badge/cypress.io-tests-green.svg?style=flat-square)](https://cypress.io)
+[![Known Vulnerabilities](https://snyk.io/test/github/theexiile1305/showcase-wca/badge.svg)](https://snyk.io/test/github/theexiile1305/showcase-wca)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
