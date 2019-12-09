@@ -1,6 +1,5 @@
 version: 2.1
 orbs:
-    snyk: snyk/snyk@0.0.8
     cypress: cypress-io/cypress@1
 aliases:
     - &test_environment
@@ -48,12 +47,6 @@ aliases:
     -  &size_stage
         - *attach_workspace_stage
         - run: yarn size
-    - &snyk_stage
-        - *attach_workspace_stage
-        - snyk/scan:
-            fail-on-issues: false
-            monitor-on-build: false
-            severity-threshold: high
     - &cypress_stage
         - *attach_workspace_stage
         - run: yarn install --frozen-lockfile
@@ -61,8 +54,7 @@ aliases:
     - &deploy_docker_stage
         - *attach_workspace_stage
         - run: docker login docker.pkg.github.com -u theexiile1305 -p $TOKEN
-        - run: docker build -t docker.pkg.github.com/theexiile1305/showcase-wca/showcase-wca:latst .
-        - run: docker tag theexiile1305/showcase-wca docker.pkg.github.com/theexiile1305/showcase-wca/showcase-wca:latest
+        - run: docker build -t docker.pkg.github.com/theexiile1305/showcase-wca/showcase-wca:latest .
         - run: docker push docker.pkg.github.com/theexiile1305/showcase-wca/showcase-wca:latest
     - &deploy_firebase_stage
         - *attach_workspace_stage
@@ -81,9 +73,6 @@ jobs:
     size:
         <<: *test_environment
         steps: *size_stage
-    snyk:
-        <<: *test_environment
-        steps: *snyk_stage
     cypress:
         <<: *cypress_enviroment
         steps: *cypress_stage
@@ -107,9 +96,6 @@ workflows:
             - size:
                 requires:
                     - build
-            - snyk:
-                requires:
-                    - build
             - cypress:
                 requires:
                     - build
@@ -119,7 +105,6 @@ workflows:
                     - eslint
                     - size
                     - cypress
-                    - snyk
                 filters:
                     branches:
                         only:
@@ -130,7 +115,6 @@ workflows:
                     - eslint
                     - size
                     - cypress
-                    - snyk
                 filters:
                     branches:
                         only:
