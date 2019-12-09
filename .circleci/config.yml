@@ -1,6 +1,5 @@
 version: 2.1
 orbs:
-    snyk: snyk/snyk@0.0.8
     cypress: cypress-io/cypress@1
 aliases:
     - &test_environment
@@ -48,12 +47,6 @@ aliases:
     -  &size_stage
         - *attach_workspace_stage
         - run: yarn size
-    - &snyk_stage
-        - *attach_workspace_stage
-        - snyk/scan:
-            fail-on-issues: false
-            monitor-on-build: false
-            severity-threshold: high
     - &cypress_stage
         - *attach_workspace_stage
         - run: yarn install --frozen-lockfile
@@ -80,9 +73,6 @@ jobs:
     size:
         <<: *test_environment
         steps: *size_stage
-    snyk:
-        <<: *test_environment
-        steps: *snyk_stage
     cypress:
         <<: *cypress_enviroment
         steps: *cypress_stage
@@ -106,9 +96,6 @@ workflows:
             - size:
                 requires:
                     - build
-            - snyk:
-                requires:
-                    - build
             - cypress:
                 requires:
                     - build
@@ -118,7 +105,6 @@ workflows:
                     - eslint
                     - size
                     - cypress
-                    - snyk
                 filters:
                     branches:
                         only:
@@ -129,7 +115,6 @@ workflows:
                     - eslint
                     - size
                     - cypress
-                    - snyk
                 filters:
                     branches:
                         only:
