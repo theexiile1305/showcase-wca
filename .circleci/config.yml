@@ -61,8 +61,7 @@ aliases:
     - &deploy_docker_stage
         - *attach_workspace_stage
         - run: docker login docker.pkg.github.com -u theexiile1305 -p $TOKEN
-        - run: docker build -t docker.pkg.github.com/theexiile1305/showcase-wca/showcase-wca:latst .
-        - run: docker tag theexiile1305/showcase-wca docker.pkg.github.com/theexiile1305/showcase-wca/showcase-wca:latest
+        - run: docker build -t docker.pkg.github.com/theexiile1305/showcase-wca/showcase-wca:latest .
         - run: docker push docker.pkg.github.com/theexiile1305/showcase-wca/showcase-wca:latest
     - &deploy_firebase_stage
         - *attach_workspace_stage
@@ -120,10 +119,6 @@ workflows:
                     - size
                     - cypress
                     - snyk
-                filters:
-                    branches:
-                        only:
-                            - master
             - deploy_firebase:
                 requires:
                     - test
