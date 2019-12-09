@@ -119,6 +119,10 @@ workflows:
                     - size
                     - cypress
                     - snyk
+                filters:
+                    branches:
+                        only:
+                            - master
             - deploy_firebase:
                 requires:
                     - test
