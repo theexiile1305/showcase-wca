@@ -3,23 +3,24 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^7.1.2",
-    "@types/jest": "^24.0.0",
-    "@types/node": "^12.0.0",
-    "@types/react": "^16.9.0",
-    "@types/react-dom": "^16.9.0",
+    "@types/jest": "24.0.23",
+    "@types/node": "12.12.14",
+    "@types/react": "16.9.14",
+    "@types/react-dom": "16.9.4",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
-    "react-scripts": "3.3.0",
-    "typescript": "~3.7.2"
+    "react-scripts": "3.2.0",
+    "typescript": "3.7.2"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "eslint": "eslint . --max-warnings 5 --ext .js,.jsx,.ts,.tsx",
+    "size": "yarn build && size-limit",
+    "cypress:run": "cypress run --record --key=${CYPRESS_RECORD_KEY}",
+    "ci:cypress-run": "start-server-and-test start http://localhost:3000 cypress:run"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -35,5 +36,28 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "devDependencies": {
+    "@size-limit/preset-app": "^2.2.1",
+    "@typescript-eslint/eslint-plugin": "^2.10.0",
+    "@typescript-eslint/parser": "^2.10.0",
+    "cypress": "^3.7.0",
+    "eslint": "^6.7.2",
+    "eslint-config-airbnb": "^18.0.1",
+    "eslint-config-prettier": "^6.7.0",
+    "eslint-import-resolver-typescript": "^2.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-json": "^2.0.1",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-react": "^7.17.0",
+    "firebase-tools": "^7.9.0",
+    "prettier": "^1.19.1",
+    "start-server-and-test": "^1.10.6"
+  },
+  "size-limit": [
+    {
+      "path": "build/static/**/*.{js,css,svg,woff,woff2,png,ttf,html}"
+    }
+  ]
 }
