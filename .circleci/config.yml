@@ -1,0 +1,137 @@
+version: 2.1
+orbs:
+    snyk: snyk/snyk@0.0.8
+    cypress: cypress-io/cypress@1
+aliases:
+    - &test_environment
+        working_directory: ~/repo
+        docker:
+            - image:   circleci/node:12.9.1-browsers
+    - &cypress_enviroment
+        working_directory: ~/repo
+        docker:
+            - image: cypress/base:10
+    - &docker_environment
+        working_directory: ~/repo
+        machine: true
+    - &restore_cache_stage
+        restore_cache:
+            keys:
+                - v1-dependencies-{{ checksum "yarn.lock" }}
+    - &save_cache_stage
+        save_cache:
+            key: v1-dependencies-{{ checksum "yarn.lock" }}
+            paths:
+                - ~/.cache
+                - ~/.npm
+    - &persist_to_workspace_stage
+        persist_to_workspace:
+            root: .
+            paths:
+                - .
+    - &attach_workspace_stage
+        attach_workspace:
+            at: ~/repo
+    - &build_stage
+        - checkout
+        - *restore_cache_stage
+        - run: yarn install --frozen-lockfile
+        - run: yarn run cypress verify
+        - *save_cache_stage
+        - *persist_to_workspace_stage
+    - &test_stage
+        - *attach_workspace_stage
+        - run: yarn test
+    - &eslint_stage
+        - *attach_workspace_stage
+        - run: yarn eslint
+    -  &size_stage
+        - *attach_workspace_stage
+        - run: yarn size
+    - &snyk_stage
+        - *attach_workspace_stage
+        - snyk/scan:
+            fail-on-issues: false
+            monitor-on-build: false
+            severity-threshold: high
+    - &cypress_stage
+        - *attach_workspace_stage
+        - run: yarn install --frozen-lockfile
+        - run: yarn ci:cypress-run
+    - &deploy_docker_stage
+        - *attach_workspace_stage
+        - run: docker login docker.pkg.github.com -u theexiile1305 -p $TOKEN
+        - run: docker build -t docker.pkg.github.com/theexiile1305/showcase-wca/showcase-wca:latst .
+        - run: docker tag theexiile1305/showcase-wca docker.pkg.github.com/theexiile1305/showcase-wca/showcase-wca:latest
+        - run: docker push docker.pkg.github.com/theexiile1305/showcase-wca/showcase-wca:latest
+    - &deploy_firebase_stage
+        - *attach_workspace_stage
+        - run: yarn build
+        - run: ./node_modules/.bin/firebase deploy --token "$FIREBASE_TOKEN"
+jobs:
+    build:
+        <<: *test_environment
+        steps: *build_stage
+    test:
+        <<: *test_environment
+        steps: *test_stage
+    eslint:
+        <<: *test_environment
+        steps: *eslint_stage
+    size:
+        <<: *test_environment
+        steps: *size_stage
+    snyk:
+        <<: *test_environment
+        steps: *snyk_stage
+    cypress:
+        <<: *cypress_enviroment
+        steps: *cypress_stage
+    deploy_docker:
+        <<: *docker_environment
+        steps: *deploy_docker_stage
+    deploy_firebase:
+        <<: *test_environment
+        steps: *deploy_firebase_stage
+workflows:
+    version: 2.1
+    build_test_deploy:
+        jobs:
+            - build
+            - test:
+                requires:
+                    - build
+            - eslint:
+                requires:
+                    - build
+            - size:
+                requires:
+                    - build
+            - snyk:
+                requires:
+                    - build
+            - cypress:
+                requires:
+                    - build
+            - deploy_docker:
+                requires:
+                    - test
+                    - eslint
+                    - size
+                    - cypress
+                    - snyk
+                filters:
+                    branches:
+                        only:
+                            - master
+            - deploy_firebase:
+                requires:
+                    - test
+                    - eslint
+                    - size
+                    - cypress
+                    - snyk
+                filters:
+                    branches:
+                        only:
+                            - master
