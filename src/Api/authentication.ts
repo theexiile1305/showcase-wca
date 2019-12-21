@@ -35,7 +35,7 @@ export const signInWithEmailPassword = (email: string, password: string) => (
   firebase.auth().signInWithEmailAndPassword(email, password)
     .then((result) => {
       dispatch(saveUserData(result.user));
-      dispatch(openSnackbar('You have been successfully signed in.'));
+      dispatch(openSnackbar('You\'ve been successfully signed in.'));
       dispatch(clearUILoading());
     })
     .catch((error) => {
@@ -51,8 +51,25 @@ export const signOut = () => (
 ): void => {
   firebase.auth().signOut()
     .then(() => {
-      dispatch(openSnackbar('You have been successfully signed out.'));
+      dispatch(openSnackbar('You\'ve been successfully signed out.'));
       dispatch(logoutUser());
     })
     .catch((error) => dispatch(openSnackbar(error.message)));
+};
+
+export const resetPassword = (email: string) => (
+  dispatch: (
+    arg0: SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction
+  ) => void,
+): void => {
+  dispatch(setUILoading());
+  firebase.auth().sendPasswordResetEmail(email)
+    .then(() => {
+      dispatch(openSnackbar('You\'ve successfully reseted your password.'));
+      dispatch(clearUILoading());
+    })
+    .catch((error) => {
+      dispatch(openSnackbar(error.message));
+      dispatch(clearUILoading());
+    });
 };
