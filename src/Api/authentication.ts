@@ -8,6 +8,24 @@ import {
 } from 'src/Store/user/UserActions';
 import firebase from './firebase';
 
+export const signUpWithEmailPassword = (email: string, password: string) => (
+  dispatch: (
+    arg0: SetUILoadingAction | SetUIStopLoadingAction | SaveUserAction | OpenSnackbarAction
+  ) => void,
+): void => {
+  dispatch(setUILoading());
+  firebase.auth().createUserWithEmailAndPassword(email, password)
+    .then((result) => {
+      dispatch(saveUserData(result.user));
+      dispatch(openSnackbar('You have been successfully signed up.'));
+      dispatch(clearUILoading());
+    })
+    .catch((error) => {
+      dispatch(openSnackbar(error.message));
+      dispatch(clearUILoading());
+    });
+};
+
 export const signInWithEmailPassword = (email: string, password: string) => (
   dispatch: (
     arg0: SetUILoadingAction | SetUIStopLoadingAction | SaveUserAction | OpenSnackbarAction
