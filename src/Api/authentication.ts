@@ -8,7 +8,7 @@ import {
 } from 'src/Store/user/UserActions';
 import firebase from './firebase';
 
-export const signUpWithEmailPassword = (email: string, password: string) => (
+export const signUpWithEmailPassword = (email: string, password: string, redirect: () => void) => (
   dispatch: (
     arg0: SetUILoadingAction | SetUIStopLoadingAction | SaveUserAction | OpenSnackbarAction
   ) => void,
@@ -19,6 +19,7 @@ export const signUpWithEmailPassword = (email: string, password: string) => (
       dispatch(saveUserData(result.user));
       dispatch(openSnackbar('You have been successfully signed up.'));
       dispatch(clearUILoading());
+      redirect();
     })
     .catch((error) => {
       dispatch(openSnackbar(error.message));
@@ -26,7 +27,7 @@ export const signUpWithEmailPassword = (email: string, password: string) => (
     });
 };
 
-export const signInWithEmailPassword = (email: string, password: string) => (
+export const signInWithEmailPassword = (email: string, password: string, redirect: () => void) => (
   dispatch: (
     arg0: SetUILoadingAction | SetUIStopLoadingAction | SaveUserAction | OpenSnackbarAction
   ) => void,
@@ -37,6 +38,7 @@ export const signInWithEmailPassword = (email: string, password: string) => (
       dispatch(saveUserData(result.user));
       dispatch(openSnackbar('You\'ve been successfully signed in.'));
       dispatch(clearUILoading());
+      redirect();
     })
     .catch((error) => {
       dispatch(openSnackbar(error.message));
@@ -57,7 +59,7 @@ export const signOut = () => (
     .catch((error) => dispatch(openSnackbar(error.message)));
 };
 
-export const resetPassword = (email: string) => (
+export const resetPassword = (email: string, redirect: () => void) => (
   dispatch: (
     arg0: SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction
   ) => void,
@@ -67,6 +69,7 @@ export const resetPassword = (email: string) => (
     .then(() => {
       dispatch(openSnackbar('You\'ve successfully reseted your password.'));
       dispatch(clearUILoading());
+      redirect();
     })
     .catch((error) => {
       dispatch(openSnackbar(error.message));

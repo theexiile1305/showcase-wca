@@ -8,6 +8,8 @@ import {
 } from '@material-ui/core';
 import { faUnlock } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { HOME } from 'src/Routes';
+import { useHistory } from 'react-router-dom';
 
 
 const ResetPassword: React.FC = () => {
@@ -16,12 +18,13 @@ const ResetPassword: React.FC = () => {
   const loading = useSelector((state: ApplicationState) => state.ui.loading);
 
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const [email, setEmail] = useState('');
 
   const handleResetPassword = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
-    dispatch(resetPassword(email));
+    dispatch(resetPassword(email, () => history.push(HOME)));
   };
 
   return (

@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import {
   Grid, Avatar, Typography, TextField, CircularProgress, Button,
 } from '@material-ui/core';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import style from 'src/Styles';
 import { signUpWithEmailPassword } from 'src/Api/authentication';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
-import { SIGN_IN } from 'src/Routes';
+import { SIGN_IN, HOME } from 'src/Routes';
 import { ApplicationState } from 'src/Store/ApplicationState';
 
 const SignUp: React.FC = () => {
@@ -17,13 +17,14 @@ const SignUp: React.FC = () => {
   const loading = useSelector((state: ApplicationState) => state.ui.loading);
 
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
-    dispatch(signUpWithEmailPassword(email, password));
+    dispatch(signUpWithEmailPassword(email, password, () => history.push(HOME)));
   };
 
   return (

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   Typography, Avatar, Grid, TextField, Button, CircularProgress,
@@ -8,7 +8,7 @@ import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import style from 'src/Styles';
 import { ApplicationState } from 'src/Store/ApplicationState';
-import { SIGN_UP, RESET_PASSWORD } from 'src/Routes';
+import { SIGN_UP, RESET_PASSWORD, HOME } from 'src/Routes';
 import { signInWithEmailPassword } from 'src/Api/authentication';
 
 const SignIn: React.FC = () => {
@@ -17,13 +17,14 @@ const SignIn: React.FC = () => {
   const loading = useSelector((state: ApplicationState) => state.ui.loading);
 
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
-    dispatch(signInWithEmailPassword(email, password));
+    dispatch(signInWithEmailPassword(email, password, () => history.push(HOME)));
   };
 
   return (
