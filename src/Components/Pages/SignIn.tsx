@@ -46,7 +46,9 @@ const SignIn: React.FC = () => {
             label="Enter Email"
             className={classes.textField}
             value={email}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>): void => setEmail(event.target.value)}
+            onChange={
+              (event: React.ChangeEvent<HTMLInputElement>): void => setEmail(event.target.value)
+            }
           />
           <TextField
             variant="outlined"
@@ -58,7 +60,9 @@ const SignIn: React.FC = () => {
             label="Enter Password"
             className={classes.textField}
             value={password}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>): void => setPassword(event.target.value)}
+            onChange={
+              (event: React.ChangeEvent<HTMLInputElement>): void => setPassword(event.target.value)
+            }
           />
           <Button
             type="submit"
@@ -79,7 +83,9 @@ const SignIn: React.FC = () => {
                 <Link to={RESET_PASSWORD}>Forgot Password?</Link>
               </Grid>
               <Grid item xs>
-                <Link to={SIGN_UP}>Don't have an account? Sign Up</Link>
+                <Link to={SIGN_UP}>
+                  {'Don\'t have an account? Sign Up'}
+                </Link>
               </Grid>
             </Grid>
           </small>

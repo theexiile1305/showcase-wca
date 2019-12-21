@@ -27,7 +27,9 @@ export const signInWithEmailPassword = (email: string, password: string) => (
 };
 
 export const signOut = () => (
-  dispatch: (arg0: OpenSnackbarAction | LogoutUserAction) => void,
+  dispatch: (
+    arg0: OpenSnackbarAction | LogoutUserAction
+  ) => void,
 ): void => {
   firebase.auth().signOut()
     .then(() => {

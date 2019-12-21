@@ -22,12 +22,14 @@ const Navbar: React.FC = () => {
 
   const isAuthenticated = useSelector((state: ApplicationState) => state.user.isAuthenticated);
 
+  const handleSignOut = () => dispatch(signOut());
+
   const renderAuthenticated = (): React.ReactFragment => (
     <>
       <Button color="inherit" component={Link} to={DOCUMENTS} startIcon={<FontAwesomeIcon icon={faFile} />}>Documents</Button>
       <Button color="inherit" component={Link} to={IDENTITIES} startIcon={<FontAwesomeIcon icon={faUserFriends} />}>Identities</Button>
       <Button color="inherit" component={Link} to={DEBUG} startIcon={<FontAwesomeIcon icon={faBug} />}>Debug</Button>
-      <Button color="inherit" component={Link} to={HOME} onClick={() => dispatch(signOut())} startIcon={<FontAwesomeIcon icon={faSignOutAlt} />}>Logout</Button>
+      <Button color="inherit" component={Link} to={HOME} onClick={handleSignOut} startIcon={<FontAwesomeIcon icon={faSignOutAlt} />}>Logout</Button>
     </>
   );
 
