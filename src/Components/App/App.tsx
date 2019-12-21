@@ -1,48 +1,41 @@
 import React from 'react';
-import { Switch, Route } from 'react-router';
-import store from 'src/Store';
-import { HashRouter } from 'react-router-dom';
+import { Switch, Route, BrowserRouter } from 'react-router-dom';
+import 'src/Assets/App.css';
 import { Provider } from 'react-redux';
-import { makeStyles, createStyles } from '@material-ui/styles';
+import store from 'src/Store';
+import {
+  HOME, SIGN_IN, SIGN_UP, DOCUMENTS, IDENTITIES, DEBUG,
+} from 'src/Routes';
 import Navbar from '../Layout/Navbar';
+import Footer from '../Layout/Footer';
 import Home from '../Pages/Home';
 import SignUp from '../Pages/SignUp';
-import Login from '../Pages/Login';
-import './App.css';
-import Footer from '../Layout/Footer';
+import SignIn from '../Pages/SignIn';
 import Documents from '../Pages/Documents';
 import Debug from '../Pages/Debug';
 import Identities from '../Pages/Identities';
+import SimpleSnackbar from '../Layout/SimpleSnackbar';
 
-const useStyles = makeStyles(() => createStyles({
-  root: {
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: '100vh',
-  },
-}));
-
-const App: React.FC = () => {
-  const classes = useStyles();
-
-  return (
-    <Provider store={store}>
-      <HashRouter>
-        <div className={classes.root}>
-          <Navbar />
+const App: React.FC = () => (
+  <Provider store={store}>
+    <BrowserRouter>
+      <div className="main">
+        <Navbar />
+        <div className="container">
           <Switch>
-            <Route exact path="/" component={Home} />
-            <Route exact path="/login" component={Login} />
-            <Route exact path="/signup" component={SignUp} />
-            <Route exact path="/documents" component={Documents} />
-            <Route exact path="/identities" component={Identities} />
-            <Route exact path="/debug" component={Debug} />
+            <Route exact path={HOME} component={Home} />
+            <Route exact path={SIGN_IN} component={SignIn} />
+            <Route exact path={SIGN_UP} component={SignUp} />
+            <Route exact path={DOCUMENTS} component={Documents} />
+            <Route exact path={IDENTITIES} component={Identities} />
+            <Route exact path={DEBUG} component={Debug} />
           </Switch>
-          <Footer />
         </div>
-      </HashRouter>
-    </Provider>
-  );
-};
+        <SimpleSnackbar />
+        <Footer />
+      </div>
+    </BrowserRouter>
+  </Provider>
+);
 
 export default App;
