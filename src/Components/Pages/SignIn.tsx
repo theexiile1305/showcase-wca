@@ -71,7 +71,7 @@ const SignIn: React.FC = () => {
             className={classes.button}
             disabled={loading}
           >
-        Login
+        Sign In
             {loading && (
               <CircularProgress size={30} className={classes.progress} />
             )}
