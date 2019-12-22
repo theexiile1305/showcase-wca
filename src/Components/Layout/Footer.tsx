@@ -1,20 +1,11 @@
 import React from 'react';
-import {
-  makeStyles, createStyles, Theme, Typography, Container, Link,
-} from '@material-ui/core';
+import { Typography, Container, Link } from '@material-ui/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
-
-const useStyles = makeStyles((theme: Theme) => createStyles({
-  footer: {
-    padding: theme.spacing(3, 2),
-    marginTop: 'auto',
-    backgroundColor: theme.palette.type === 'dark' ? theme.palette.grey[800] : theme.palette.grey[200],
-  },
-}));
+import style from 'src/Styles';
 
 const Footer: React.FC = () => {
-  const classes = useStyles();
+  const classes = style();
 
   const renderContribution = (): React.ReactFragment => (
     <Typography variant="body1">
