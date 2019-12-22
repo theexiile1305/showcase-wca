@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import {
-  Grid, Avatar, Typography, TextField, CircularProgress, Button,
-} from '@material-ui/core';
 import { Link, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import style from 'src/Styles';
-import { signUpWithEmailPassword } from 'src/Api/authentication';
+import {
+  Typography, Avatar, Grid, TextField, Button, CircularProgress,
+} from '@material-ui/core';
+import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
-import { SIGN_IN, HOME } from 'src/Routes';
+import style from 'src/Styles';
 import { ApplicationState } from 'src/Store/ApplicationState';
+import { SIGN_UP, RESET_PASSWORD, HOME } from 'src/Routes';
+import { signInWithEmailPassword } from 'src/Api/authentication';
 
-const SignUp: React.FC = () => {
+const SignIn: React.FC = () => {
   const classes = style();
 
   const loading = useSelector((state: ApplicationState) => state.ui.loading);
@@ -24,17 +24,17 @@ const SignUp: React.FC = () => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
-    dispatch(signUpWithEmailPassword(email, password, () => history.push(HOME)));
+    dispatch(signInWithEmailPassword(email, password, () => history.push(HOME)));
   };
 
   return (
     <Grid container className={classes.form}>
       <Grid item sm>
         <Avatar className={classes.avatar}>
-          <FontAwesomeIcon icon={faUserPlus} />
+          <FontAwesomeIcon icon={faSignInAlt} />
         </Avatar>
         <Typography variant="h4" className={classes.pageTitle}>
-          Create a new Account to continue
+          Login into your Account to continue
         </Typography>
         <form noValidate onSubmit={handleSubmit}>
           <TextField
@@ -72,7 +72,7 @@ const SignUp: React.FC = () => {
             className={classes.button}
             disabled={loading}
           >
-        Sign Up
+        Sign In
             {loading && (
               <CircularProgress size={30} className={classes.progress} />
             )}
@@ -80,10 +80,12 @@ const SignUp: React.FC = () => {
           <br />
           <small>
             <Grid container>
-              <Grid item xs />
               <Grid item xs>
-                <Link to={SIGN_IN}>
-                  {'You\'ve already an account? Sign In'}
+                <Link to={RESET_PASSWORD}>Forgot Password?</Link>
+              </Grid>
+              <Grid item xs>
+                <Link to={SIGN_UP}>
+                  {'Don\'t have an account? Sign Up'}
                 </Link>
               </Grid>
             </Grid>
@@ -94,4 +96,4 @@ const SignUp: React.FC = () => {
   );
 };
 
-export default SignUp;
+export default SignIn;
