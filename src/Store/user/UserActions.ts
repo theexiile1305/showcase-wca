@@ -24,7 +24,6 @@ export const saveUserData: ActionCreator<SaveUserAction> = (user: firebase.User)
   user: {
     uid: user.uid,
     email: user.email,
-    displayName: user.displayName,
   },
 });
 
