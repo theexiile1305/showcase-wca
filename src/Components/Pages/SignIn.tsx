@@ -28,15 +28,19 @@ const SignIn: React.FC = () => {
   };
 
   return (
-    <Grid container className={classes.form}>
-      <Grid item sm>
-        <Avatar className={classes.avatar}>
-          <FontAwesomeIcon icon={faSignInAlt} />
-        </Avatar>
-        <Typography variant="h4" className={classes.pageTitle}>
+    <form noValidate onSubmit={handleSubmit}>
+      <Grid container spacing={3} className={classes.form}>
+        <Grid item xs={12}>
+          <Avatar className={classes.avatar}>
+            <FontAwesomeIcon icon={faSignInAlt} />
+          </Avatar>
+        </Grid>
+        <Grid item xs={12}>
+          <Typography variant="h4">
           Login into your Account to continue
-        </Typography>
-        <form noValidate onSubmit={handleSubmit}>
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
           <TextField
             variant="outlined"
             required
@@ -45,12 +49,13 @@ const SignIn: React.FC = () => {
             name="email"
             type="email"
             label="Enter Email"
-            className={classes.textField}
             value={email}
             onChange={
               (event: React.ChangeEvent<HTMLInputElement>): void => setEmail(event.target.value)
             }
           />
+        </Grid>
+        <Grid item xs={12}>
           <TextField
             variant="outlined"
             required
@@ -59,40 +64,38 @@ const SignIn: React.FC = () => {
             name="password"
             type="password"
             label="Enter Password"
-            className={classes.textField}
             value={password}
             onChange={
               (event: React.ChangeEvent<HTMLInputElement>): void => setPassword(event.target.value)
             }
           />
+        </Grid>
+        <Grid item xs={12}>
           <Button
             type="submit"
             variant="contained"
             color="primary"
-            className={classes.button}
             disabled={loading}
           >
-        Sign In
+          Sign In
             {loading && (
               <CircularProgress size={30} className={classes.progress} />
             )}
           </Button>
-          <br />
-          <small>
-            <Grid container>
-              <Grid item xs>
-                <Link to={RESET_PASSWORD}>Forgot Password?</Link>
-              </Grid>
-              <Grid item xs>
-                <Link to={SIGN_UP}>
-                  {'Don\'t have an account? Sign Up'}
-                </Link>
-              </Grid>
-            </Grid>
-          </small>
-        </form>
+        </Grid>
+        <Grid
+          container
+          direction="row"
+          justify="space-between"
+          alignItems="center"
+        >
+          <Link to={RESET_PASSWORD}>Forgot Password?</Link>
+          <Link to={SIGN_UP}>
+            {'Don\'t have an account? Sign Up'}
+          </Link>
+        </Grid>
       </Grid>
-    </Grid>
+    </form>
   );
 };
 

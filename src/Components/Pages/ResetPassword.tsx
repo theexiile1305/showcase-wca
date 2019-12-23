@@ -22,21 +22,25 @@ const ResetPassword: React.FC = () => {
 
   const [email, setEmail] = useState('');
 
-  const handleResetPassword = (event: React.FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     dispatch(resetPassword(email, () => history.push(HOME)));
   };
 
   return (
-    <Grid container className={classes.form}>
-      <Grid item sm>
-        <Avatar className={classes.avatar}>
-          <FontAwesomeIcon icon={faUnlock} />
-        </Avatar>
-        <Typography variant="h4" className={classes.pageTitle}>
+    <form noValidate onSubmit={handleSubmit}>
+      <Grid container spacing={3} className={classes.form}>
+        <Grid item xs={12}>
+          <Avatar className={classes.avatar}>
+            <FontAwesomeIcon icon={faUnlock} />
+          </Avatar>
+        </Grid>
+        <Grid item xs={12}>
+          <Typography variant="h4">
           Reset your password to continue
-        </Typography>
-        <form noValidate onSubmit={handleResetPassword}>
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
           <TextField
             variant="outlined"
             required
@@ -45,17 +49,17 @@ const ResetPassword: React.FC = () => {
             name="email"
             type="email"
             label="Enter Email"
-            className={classes.textField}
             value={email}
             onChange={
               (event: React.ChangeEvent<HTMLInputElement>): void => setEmail(event.target.value)
             }
           />
+        </Grid>
+        <Grid item xs={12}>
           <Button
             type="submit"
             variant="contained"
             color="primary"
-            className={classes.button}
             disabled={loading}
           >
         Reset your Password
@@ -63,9 +67,9 @@ const ResetPassword: React.FC = () => {
               <CircularProgress size={30} className={classes.progress} />
             )}
           </Button>
-        </form>
+        </Grid>
       </Grid>
-    </Grid>
+    </form>
   );
 };
 

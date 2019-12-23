@@ -3,47 +3,19 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core';
 const style = makeStyles((theme: Theme) => createStyles({
   form: {
     textAlign: 'center',
-  },
-  image: {
-    margin: theme.spacing(1),
-  },
-  pageTitle: {
-    marign: theme.spacing(1),
-  },
-  textField: {
-    margin: theme.spacing(1),
-  },
-  button: {
-    mariginTop: theme.spacing(1),
-    position: 'relative',
-  },
-  customError: {
-    margin: theme.spacing(1),
-    fontSize: '0.8rem',
-    color: 'red',
+    maxWidth: '600px',
   },
   progress: {
     position: 'absolute',
   },
   avatar: {
-    marign: theme.spacing(2),
     backgroundColor: theme.palette.secondary.main,
     display: 'inline-flex',
   },
-  invisibleSeparator: {
-    border: 'none',
-    margin: 4,
-  },
-  visibleSeparator: {
-    width: '100%',
-    borderBottom: '1px solid rgba(0,0,0,0.1)',
-    marginBottom: theme.spacing(1),
-  },
   paper: {
-    padding: theme.spacing(1),
-  },
-  menuButton: {
-    marginRight: theme.spacing(2),
+    padding: theme.spacing(2),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
   },
   navbarTitle: {
     flexGrow: 1,
