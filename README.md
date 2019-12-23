@@ -1,6 +1,9 @@
 [![CircleCI](https://circleci.com/gh/theexiile1305/showcase-wca/tree/master.svg?style=svg)](https://circleci.com/gh/theexiile1305/showcase-wca/tree/master)
 [![Cypress.io tests](https://img.shields.io/badge/cypress.io-tests-green.svg?style=flat-square)](https://cypress.io)
-[![Known Vulnerabilities](https://snyk.io/test/github/theexiile1305/showcase-wca/badge.svg)](https://snyk.io/test/github/theexiile1305/showcase-wca)
+![Codecov](https://img.shields.io/codecov/c/github/theexiile1305/showcase-wca)
+![David](https://img.shields.io/david/theexiile1305/showcase-wca)
+![GitHub](https://img.shields.io/github/license/theexiile1305/showcase-wca)
+![Website](https://img.shields.io/website?url=https%3A%2F%2Fshowcase-wca.web.app%2F)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
