@@ -8,10 +8,12 @@ body {
 }
 .main {
   display: flex;
+  flex-grow: 1;
   flex-direction: column;
   min-height: 100vh;
 }
 .container {
+  padding: 20px;
   margin: auto;
   max-width: 1200px;
 }

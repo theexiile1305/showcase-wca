@@ -43,7 +43,7 @@ const Navbar: React.FC = () => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu" component={Link} to={HOME}>
+        <IconButton edge="start" color="inherit" aria-label="menu" component={Link} to={HOME}>
           <FontAwesomeIcon icon={faBars} />
         </IconButton>
         <Typography variant="h6" className={classes.navbarTitle}>Showcase Web Cryptography API</Typography>
