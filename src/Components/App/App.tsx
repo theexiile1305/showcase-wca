@@ -4,7 +4,7 @@ import 'src/Assets/App.css';
 import { Provider } from 'react-redux';
 import store from 'src/Store';
 import {
-  HOME, SIGN_IN, SIGN_UP, DOCUMENTS, IDENTITIES, DEBUG, RESET_PASSWORD,
+  HOME, SIGN_IN, SIGN_UP, DOCUMENTS, IDENTITIES, DEBUG, RESET_PASSWORD, USER,
 } from 'src/Routes';
 import Navbar from '../Layout/Navbar';
 import Footer from '../Layout/Footer';
@@ -14,6 +14,7 @@ import SignIn from '../Pages/SignIn';
 import Documents from '../Pages/Documents';
 import Debug from '../Pages/Debug';
 import Identities from '../Pages/Identities';
+import User from '../Pages/User';
 import SimpleSnackbar from '../Layout/SimpleSnackbar';
 import ResetPassword from '../Pages/ResetPassword';
 
@@ -30,6 +31,7 @@ const App: React.FC = () => (
             <Route exact path={RESET_PASSWORD} component={ResetPassword} />
             <Route exact path={DOCUMENTS} component={Documents} />
             <Route exact path={IDENTITIES} component={Identities} />
+            <Route exact path={USER} component={User} />
             <Route exact path={DEBUG} component={Debug} />
           </Switch>
         </div>
