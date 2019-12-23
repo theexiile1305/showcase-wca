@@ -12,7 +12,7 @@ body {
   min-height: 100vh;
 }
 .container {
-  margin: 80px auto;
+  margin: auto;
   max-width: 1200px;
 }
 .nav-container {
