@@ -16,7 +16,7 @@ const Footer: React.FC = () => {
       {' on '}
       <Link color="inherit" href="https://circleci.com/gh/theexiile1305/showcase-wca/tree/master">CircleCI</Link>
       {' - Please report all issues on '}
-      <Link color="inherit" href="https://github.com/theexiile1305/showcase-wca/issues">Github</Link>
+      <Link color="inherit" href="https://github.com/theexiile1305/showcase-wca/issues">GitHub</Link>
     </Typography>
   );
 
