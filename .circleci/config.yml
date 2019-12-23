@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
     cypress: cypress-io/cypress@1
+    codecov: codecov/codecov@1.0.5
 aliases:
     - &test_environment
         working_directory: ~/repo
@@ -41,6 +42,8 @@ aliases:
     - &test_stage
         - *attach_workspace_stage
         - run: yarn test
+        - codecov/upload:
+            file: coverage/*.json
     - &eslint_stage
         - *attach_workspace_stage
         - run: yarn eslint
