@@ -5,7 +5,7 @@ import {
 import { Link, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import style from 'src/Styles';
-import { signUpWithEmailPassword } from 'src/Api/authentication';
+import { signUp } from 'src/Api/authentication';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import { SIGN_IN, HOME } from 'src/Routes';
@@ -24,7 +24,7 @@ const SignUp: React.FC = () => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
-    dispatch(signUpWithEmailPassword(email, password, () => history.push(HOME)));
+    dispatch(signUp(email, password, () => history.push(HOME)));
   };
 
   return (
