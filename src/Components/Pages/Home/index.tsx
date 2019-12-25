@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLink } from '@fortawesome/free-solid-svg-icons';
 import {
-  Grid, Paper, Typography, IconButton,
+  Grid, Paper, Typography, Button,
 } from '@material-ui/core';
 import {
   IDENTITIES, DOCUMENTS, DEBUG, USER,
@@ -14,15 +14,17 @@ import style from 'src/Styles';
 const Home: React.FC = () => {
   const classes = style();
 
-  const renderLink = (link: string): React.ReactFragment => (
-    <IconButton
+  const renderLink = (link: string, title: string): React.ReactFragment => (
+    <Button
       color="primary"
-      size="small"
       component={Link}
       to={link}
+      startIcon={
+        <FontAwesomeIcon icon={faLink} />
+      }
     >
-      <FontAwesomeIcon icon={faLink} />
-    </IconButton>
+      {title}
+    </Button>
   );
 
   const renderPaper = (
@@ -30,10 +32,11 @@ const Home: React.FC = () => {
   ): React.ReactFragment => (
     <Grid item xs={size}>
       <Paper className={classes.paper}>
-        <Typography variant="h5" component="h3" color="primary">
-          {title}
-          {link ? renderLink(link) : (<></>)}
-        </Typography>
+        {link ? renderLink(link, title) : (
+          <Typography variant="h5" component="h3" color="primary">
+            {title}
+          </Typography>
+        )}
         <Typography component="p">{text}</Typography>
       </Paper>
     </Grid>
