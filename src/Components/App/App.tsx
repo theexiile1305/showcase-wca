@@ -6,6 +6,8 @@ import store from 'src/Store';
 import {
   HOME, SIGN_IN, SIGN_UP, DOCUMENTS, IDENTITIES, DEBUG, RESET_PASSWORD, USER,
 } from 'src/Routes';
+import verifyAuth from 'src/Api/verifyAuth';
+import AuthRoute from 'src/Routes/AuthRoute';
 import Navbar from '../Layout/Navbar';
 import Footer from '../Layout/Footer';
 import Home from '../Pages/Home';
@@ -18,28 +20,32 @@ import User from '../Pages/User';
 import SimpleSnackbar from '../Layout/SimpleSnackbar';
 import ResetPassword from '../Pages/ResetPassword';
 
-const App: React.FC = () => (
-  <Provider store={store}>
-    <BrowserRouter>
-      <div className="main">
-        <Navbar />
-        <div className="container">
-          <Switch>
-            <Route exact path={HOME} component={Home} />
-            <Route exact path={SIGN_IN} component={SignIn} />
-            <Route exact path={SIGN_UP} component={SignUp} />
-            <Route exact path={RESET_PASSWORD} component={ResetPassword} />
-            <Route exact path={DOCUMENTS} component={Documents} />
-            <Route exact path={IDENTITIES} component={Identities} />
-            <Route exact path={USER} component={User} />
-            <Route exact path={DEBUG} component={Debug} />
-          </Switch>
+const App: React.FC = () => {
+  verifyAuth();
+
+  return (
+    <Provider store={store}>
+      <BrowserRouter>
+        <div className="main">
+          <Navbar />
+          <div className="container">
+            <Switch>
+              <Route exact path={HOME} component={Home} />
+              <Route exact path={SIGN_IN} component={SignIn} />
+              <Route exact path={SIGN_UP} component={SignUp} />
+              <Route exact path={RESET_PASSWORD} component={ResetPassword} />
+              <AuthRoute exact path={DOCUMENTS} component={Documents} />
+              <AuthRoute exact path={IDENTITIES} component={Identities} />
+              <AuthRoute exact path={USER} component={User} />
+              <AuthRoute exact path={DEBUG} component={Debug} />
+            </Switch>
+          </div>
+          <SimpleSnackbar />
+          <Footer />
         </div>
-        <SimpleSnackbar />
-        <Footer />
-      </div>
-    </BrowserRouter>
-  </Provider>
-);
+      </BrowserRouter>
+    </Provider>
+  );
+};
 
 export default App;
