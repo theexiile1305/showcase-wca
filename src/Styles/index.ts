@@ -17,6 +17,11 @@ const style = makeStyles((theme: Theme) => createStyles({
     textAlign: 'center',
     color: theme.palette.text.secondary,
   },
+  paperUser: {
+    padding: theme.spacing(2),
+    textAlign: 'left',
+    color: theme.palette.text.secondary,
+  },
   navbarTitle: {
     flexGrow: 1,
   },
