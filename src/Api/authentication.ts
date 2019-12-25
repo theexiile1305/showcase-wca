@@ -3,18 +3,20 @@ import {
   setUILoading, clearUILoading, openSnackbar,
   SetUILoadingAction, SetUIStopLoadingAction, OpenSnackbarAction,
 } from 'src/Store/ui/UIActions';
+import { Dispatch } from 'react';
 import {
   saveUserData, SaveUserAction, logoutUser, LogoutUserAction,
 } from 'src/Store/user/UserActions';
 import firebase from './firebase';
 
-export const signUpWithEmailPassword = (email: string, password: string, redirect: () => void) => (
-  dispatch: (
-    arg0: SetUILoadingAction | SetUIStopLoadingAction | SaveUserAction | OpenSnackbarAction
-  ) => void,
+export const signUp = (email: string, password: string, redirect: () => void) => (
+  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | SaveUserAction
+  | OpenSnackbarAction>,
 ): void => {
   dispatch(setUILoading());
-  firebase.auth().createUserWithEmailAndPassword(email, password)
+  firebase
+    .auth()
+    .createUserWithEmailAndPassword(email, password)
     .then((result) => {
       dispatch(saveUserData(result.user));
       dispatch(openSnackbar('You have been successfully signed up.'));
@@ -28,12 +30,13 @@ export const signUpWithEmailPassword = (email: string, password: string, redirec
 };
 
 export const signInWithEmailPassword = (email: string, password: string, redirect: () => void) => (
-  dispatch: (
-    arg0: SetUILoadingAction | SetUIStopLoadingAction | SaveUserAction | OpenSnackbarAction
-  ) => void,
+  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | SaveUserAction
+  | OpenSnackbarAction>,
 ): void => {
   dispatch(setUILoading());
-  firebase.auth().signInWithEmailAndPassword(email, password)
+  firebase
+    .auth()
+    .signInWithEmailAndPassword(email, password)
     .then((result) => {
       dispatch(saveUserData(result.user));
       dispatch(openSnackbar('You\'ve been successfully signed in.'));
@@ -47,11 +50,11 @@ export const signInWithEmailPassword = (email: string, password: string, redirec
 };
 
 export const signOut = () => (
-  dispatch: (
-    arg0: OpenSnackbarAction | LogoutUserAction
-  ) => void,
+  dispatch: Dispatch<OpenSnackbarAction | LogoutUserAction>,
 ): void => {
-  firebase.auth().signOut()
+  firebase
+    .auth()
+    .signOut()
     .then(() => {
       dispatch(openSnackbar('You\'ve been successfully signed out.'));
       dispatch(logoutUser());
@@ -60,12 +63,12 @@ export const signOut = () => (
 };
 
 export const resetPassword = (email: string, redirect: () => void) => (
-  dispatch: (
-    arg0: SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction
-  ) => void,
+  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction>,
 ): void => {
   dispatch(setUILoading());
-  firebase.auth().sendPasswordResetEmail(email)
+  firebase
+    .auth()
+    .sendPasswordResetEmail(email)
     .then(() => {
       dispatch(openSnackbar('You\'ve successfully reseted your password.'));
       dispatch(clearUILoading());
