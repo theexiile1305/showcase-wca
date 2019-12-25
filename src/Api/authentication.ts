@@ -55,6 +55,7 @@ export const signInWithEmailPassword = (email: string, password: string, redirec
       return result.user;
     })
     .then((user) => {
+      localStorage.setItem('isAuthenticated', 'true');
       dispatch(saveUserData(user));
       dispatch(openSnackbar('You\'ve been successfully signed in.'));
       dispatch(clearUILoading());
@@ -73,6 +74,7 @@ export const signOut = () => (
     .auth()
     .signOut()
     .then(() => {
+      localStorage.removeItem('isAuthenticated');
       dispatch(openSnackbar('You\'ve been successfully signed out.'));
       dispatch(logoutUser());
     })
