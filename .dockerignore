@@ -1,6 +1,9 @@
 .git
 .github
+.circleci
 .idea
+coverage
+cypress
 node_modules
 build
 README.md
