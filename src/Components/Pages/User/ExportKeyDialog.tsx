@@ -18,6 +18,7 @@ const ExportKeyDialog: React.FC = () => {
   const handleExportKey = (event: React.MouseEvent<HTMLElement>): void => {
     event.preventDefault();
     dispatch(exportKey(password));
+    dispatch(closeDialog(DialogType.EXPORT_KEY));
   };
 
   return (

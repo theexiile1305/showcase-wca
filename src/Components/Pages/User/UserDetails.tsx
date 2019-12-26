@@ -50,7 +50,7 @@ const UserDetails: React.FC = () => {
             color="primary"
             onClick={(): OpenDialogAction => dispatch(openDialog(DialogType.CHANGE_PASSWORD))}
           >
-            Export Key
+            Change Password
           </Button>
           <Button
             size="small"

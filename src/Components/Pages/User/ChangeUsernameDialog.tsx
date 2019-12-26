@@ -35,7 +35,7 @@ const ChangeUsernameDialog: React.FC = () => {
   return (
     <Dialog onClose={(): CloseDialogAction => dispatch(closeDialog())} aria-labelledby="customized-dialog-title" open={openChangeUsername}>
       <DialogTitle id="customized-dialog-title">
-          Delete Account
+          Change Username
       </DialogTitle>
       <DialogContent dividers>
         <DialogContentText>
@@ -50,7 +50,7 @@ const ChangeUsernameDialog: React.FC = () => {
               id="username"
               name="username"
               type="text"
-              label="Enter Username"
+              label="Enter new Username"
               value={username}
               onChange={
                 (event: React.ChangeEvent<HTMLInputElement>): void => setUsername(event.target.value)

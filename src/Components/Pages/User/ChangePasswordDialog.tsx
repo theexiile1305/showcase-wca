@@ -29,12 +29,13 @@ const ChangePasswordDialog: React.FC = () => {
   const handlePasswordChange = (event: React.MouseEvent<HTMLElement>): void => {
     event.preventDefault();
     dispatch(changePassword(email, currentPassword, newPassword, () => history.push(HOME)));
+    dispatch(closeDialog(DialogType.CHANGE_PASSWORD));
   };
 
   return (
     <Dialog onClose={(): CloseDialogAction => dispatch(closeDialog())} aria-labelledby="customized-dialog-title" open={openChangePassword}>
       <DialogTitle id="customized-dialog-title">
-          Delete Account
+          Change Password
       </DialogTitle>
       <DialogContent dividers>
         <DialogContentText>
@@ -77,7 +78,7 @@ const ChangePasswordDialog: React.FC = () => {
         <Button onClick={(): CloseDialogAction => dispatch(closeDialog(DialogType.CHANGE_PASSWORD))} color="primary">
             Cancel
         </Button>
-        <Button color="primary" onClick={(event): void => dispatch(handlePasswordChange(event))}>
+        <Button color="primary" onClick={(event): void => handlePasswordChange(event)}>
             Confirm
         </Button>
       </DialogActions>

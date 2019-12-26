@@ -29,12 +29,13 @@ const ChangeEmailDialog: React.FC = () => {
   const handleChangeEmail = (event: React.MouseEvent<HTMLElement>): void => {
     event.preventDefault();
     dispatch(changeEmail(currentEmail, password, newEmail, () => history.push(HOME)));
+    dispatch(closeDialog(DialogType.CHANGE_EMAIL));
   };
 
   return (
     <Dialog onClose={(): CloseDialogAction => dispatch(closeDialog())} aria-labelledby="customized-dialog-title" open={openChangeEmail}>
       <DialogTitle id="customized-dialog-title">
-          Delete Account
+          Change Email
       </DialogTitle>
       <DialogContent dividers>
         <DialogContentText>
@@ -77,7 +78,7 @@ const ChangeEmailDialog: React.FC = () => {
         <Button onClick={(): CloseDialogAction => dispatch(closeDialog(DialogType.CHANGE_EMAIL))} color="primary">
             Cancel
         </Button>
-        <Button color="primary" onClick={(event): void => dispatch(handleChangeEmail(event))}>
+        <Button color="primary" onClick={(event): void => handleChangeEmail(event)}>
             Confirm
         </Button>
       </DialogActions>
