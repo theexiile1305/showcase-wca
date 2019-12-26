@@ -1,46 +1,71 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   Button, Card, CardActions, CardContent, Typography,
 } from '@material-ui/core';
 import { ApplicationState } from 'src/Store/ApplicationState';
+import { openDialog, OpenDialogAction } from 'src/Store/ui/UIActions';
+import DialogType from 'src/Models/DialogType';
+import ChangeUsernameDialog from './ChangeUsernameDialog';
+import ChangeEmailDialog from './ChangeEmailDialog';
+import ChangePasswordDialog from './ChangePasswordDialog';
+import DeleteAccountDialog from './DeleteAccountDialog';
 
 const UserDetails: React.FC = () => {
-  // const loading = useSelector((state: ApplicationState) => state.ui.loading);
+  const dispatch = useDispatch();
+
   const user = useSelector((state: ApplicationState) => state.user.user);
 
-  // const dispatch = useDispatch();
-
-  const handleEdit = () => {
-    console.log(1);
-  };
-
-  const deleteAccount = () => {
-
-  };
-
   return (
-    <Card>
-      <CardContent>
-        <Typography gutterBottom variant="h5" component="h2" color="primary">
+    <>
+      <Card>
+        <CardContent>
+          <Typography gutterBottom variant="h5" component="h2" color="primary">
             User Details
-        </Typography>
-        <Typography component="p" variant="body2" color="textSecondary">
-          {`Username: ${user?.displayName}`}
-        </Typography>
-        <Typography component="p" variant="body2" color="textSecondary">
-          {`E-Mail: ${user?.email}`}
-        </Typography>
-      </CardContent>
-      <CardActions>
-        <Button size="small" color="primary" onClick={handleEdit}>
-            Change Account
-        </Button>
-        <Button size="small" color="primary" onClick={deleteAccount}>
+          </Typography>
+          <Typography component="p" variant="body2" color="textSecondary">
+            {`Username: ${user?.displayName}`}
+          </Typography>
+          <Typography component="p" variant="body2" color="textSecondary">
+            {`E-Mail: ${user?.email}`}
+          </Typography>
+        </CardContent>
+        <CardActions>
+          <Button
+            size="small"
+            color="primary"
+            onClick={(): OpenDialogAction => dispatch(openDialog(DialogType.CHANGE_USERNAME))}
+          >
+            Change Username
+          </Button>
+          <Button
+            size="small"
+            color="primary"
+            onClick={(): OpenDialogAction => dispatch(openDialog(DialogType.CHANGE_EMAIL))}
+          >
+            Change E-Mail
+          </Button>
+          <Button
+            size="small"
+            color="primary"
+            onClick={(): OpenDialogAction => dispatch(openDialog(DialogType.CHANGE_PASSWORD))}
+          >
+            Export Key
+          </Button>
+          <Button
+            size="small"
+            color="primary"
+            onClick={(): OpenDialogAction => dispatch(openDialog(DialogType.DELETE_ACCOUNT))}
+          >
             Delete Account
-        </Button>
-      </CardActions>
-    </Card>
+          </Button>
+        </CardActions>
+      </Card>
+      <ChangeUsernameDialog />
+      <ChangeEmailDialog />
+      <ChangePasswordDialog />
+      <DeleteAccountDialog />
+    </>
   );
 };
 

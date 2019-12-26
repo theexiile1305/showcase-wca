@@ -1,6 +1,9 @@
 import { createStyles, makeStyles, Theme } from '@material-ui/core';
 
 const style = makeStyles((theme: Theme) => createStyles({
+  center: {
+    textAlign: 'center',
+  },
   form: {
     textAlign: 'center',
     maxWidth: '600px',
