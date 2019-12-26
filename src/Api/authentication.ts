@@ -100,61 +100,68 @@ export const resetPassword = (email: string, redirect: () => void) => (
     });
 };
 
-export const changeDisplayName = (email: string, password: string, displayName: string) => (
-  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction>,
+export const changeDisplayName = (
+  email: string | undefined, password: string, displayName: string, redirect: () => void,
+) => (
+  dispatch: Dispatch<OpenSnackbarAction | LogoutUserAction>,
 ): void => {
-  dispatch(setUILoading());
+  if (email === undefined) {
+    throw new Error('Could not change the username. Try it again!');
+  }
   firebase.auth().signInWithEmailAndPassword(email, password)
     .then(() => {
       const user = firebase.auth().currentUser;
       if (user != null) {
         user.updateProfile({ displayName });
         dispatch(openSnackbar('You\'ve successfully changed your username.'));
-        dispatch(clearUILoading());
+        dispatch(logoutUser());
+        redirect();
       }
     })
-    .catch((error) => {
-      dispatch(openSnackbar(error.message));
-      dispatch(clearUILoading());
-    });
+    .catch((error) => dispatch(openSnackbar(error.message)));
 };
 
-export const changeEmail = (email: string, password: string, newEmail: string) => (
-  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction>,
+export const changeEmail = (
+  email: string | undefined, password: string, newEmail: string, redirect: () => void,
+) => (
+  dispatch: Dispatch<OpenSnackbarAction | LogoutUserAction>,
 ): void => {
-  dispatch(setUILoading());
+  if (email === undefined) {
+    throw new Error('Could not change the username. Try it again!');
+  }
   firebase.auth().signInWithEmailAndPassword(email, password)
     .then(() => {
       const user = firebase.auth().currentUser;
       if (user != null) {
         user.updateEmail(newEmail);
+        user.sendEmailVerification();
         dispatch(openSnackbar('You\'ve successfully changed your email.'));
-        dispatch(clearUILoading());
+        dispatch(logoutUser());
+        redirect();
       }
     })
-    .catch((error) => {
-      dispatch(openSnackbar(error.message));
-      dispatch(clearUILoading());
-    });
+    .catch((error) => dispatch(openSnackbar(error.message)));
 };
 
-export const changePassword = (email: string, password: string, newPassword: string) => (
-  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction>,
+export const changePassword = (
+  email: string | undefined, password: string, newPassword: string, redirect: () => void,
+) => (
+  dispatch: Dispatch<OpenSnackbarAction | LogoutUserAction>,
 ): void => {
-  dispatch(setUILoading());
+  if (email === undefined) {
+    throw new Error('Could not change the username. Try it again!');
+  }
   firebase.auth().signInWithEmailAndPassword(email, password)
     .then(() => {
       const user = firebase.auth().currentUser;
       if (user != null) {
         user.updatePassword(newPassword);
         dispatch(openSnackbar('You\'ve successfully changed your password.'));
-        dispatch(clearUILoading());
+        dispatch(logoutUser());
+        redirect();
       }
     })
-    .catch((error) => {
-      dispatch(openSnackbar(error.message));
-      dispatch(clearUILoading());
-    });
+    .catch((error) => dispatch(openSnackbar(error.message)));
 };
 
 export const deleteAccount = (email: string, password: string, redirect: () => void) => (
