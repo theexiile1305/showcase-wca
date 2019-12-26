@@ -9,6 +9,8 @@ import {
 } from 'src/Store/user/UserActions';
 import firebase from './firebase';
 
+export const isAuthenticated = (): boolean => localStorage.getItem('isAuthenticated') === 'true';
+
 export const signUp = (
   displayName: string, email: string, password: string, redirect: () => void,
 ) => (
@@ -55,7 +57,6 @@ export const signInWithEmailPassword = (email: string, password: string, redirec
       return result.user;
     })
     .then((user) => {
-      localStorage.setItem('isAuthenticated', 'true');
       dispatch(saveUserData(user));
       dispatch(openSnackbar('You\'ve been successfully signed in.'));
       dispatch(clearUILoading());
@@ -74,7 +75,6 @@ export const signOut = () => (
     .auth()
     .signOut()
     .then(() => {
-      localStorage.setItem('isAuthenticated', 'false');
       dispatch(openSnackbar('You\'ve been successfully signed out.'));
       dispatch(logoutUser());
     })
@@ -114,7 +114,7 @@ export const changeDisplayName = (
       if (user != null) {
         user.updateProfile({ displayName });
         dispatch(openSnackbar('You\'ve successfully changed your username.'));
-        signOut();
+        dispatch(logoutUser());
         redirect();
       }
     })
@@ -136,7 +136,7 @@ export const changeEmail = (
         user.updateEmail(newEmail);
         user.sendEmailVerification();
         dispatch(openSnackbar('You\'ve successfully changed your email.'));
-        signOut();
+        dispatch(logoutUser());
         redirect();
       }
     })
@@ -157,7 +157,7 @@ export const changePassword = (
       if (user != null) {
         user.updatePassword(newPassword);
         dispatch(openSnackbar('You\'ve successfully changed your password.'));
-        signOut();
+        dispatch(logoutUser());
         redirect();
       }
     })
@@ -176,7 +176,7 @@ export const deleteAccount = (email: string, password: string, redirect: () => v
         user.delete();
         dispatch(openSnackbar('You\'ve successfully deleted your account.'));
         dispatch(logoutUser());
-        signOut();
+        dispatch(logoutUser());
         redirect();
       }
     })

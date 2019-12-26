@@ -22,6 +22,7 @@ export type UserActions =
 export const saveUserData: ActionCreator<SaveUserAction> = (user: firebase.User) => {
   let currentUser = null;
   if (user) {
+    localStorage.setItem('isAuthenticated', 'true');
     currentUser = {
       uid: user.uid,
       email: user.email,
@@ -35,6 +36,9 @@ export const saveUserData: ActionCreator<SaveUserAction> = (user: firebase.User)
   };
 };
 
-export const logoutUser: ActionCreator<LogoutUserAction> = () => ({
-  type: UserAction.LOGOUT_USER,
-});
+export const logoutUser: ActionCreator<LogoutUserAction> = () => {
+  localStorage.setItem('isAuthenticated', 'false');
+  return {
+    type: UserAction.LOGOUT_USER,
+  };
+};
