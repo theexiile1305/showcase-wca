@@ -8,7 +8,7 @@ export enum UserAction {
 
 export interface SaveUserAction extends Action {
   type: UserAction.SAVE_USER;
-  user: MUser;
+  user: MUser | null;
 }
 
 export interface LogoutUserAction extends Action {
@@ -19,15 +19,21 @@ export type UserActions =
   | SaveUserAction
   | LogoutUserAction;
 
-export const saveUserData: ActionCreator<SaveUserAction> = (user: firebase.User) => ({
-  type: UserAction.SAVE_USER,
-  user: {
-    uid: user.uid,
-    email: user.email,
-    displayName: user.displayName,
-    emailVerified: user.emailVerified,
-  },
-});
+export const saveUserData: ActionCreator<SaveUserAction> = (user: firebase.User) => {
+  let currentUser = null;
+  if (user) {
+    currentUser = {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName,
+      emailVerified: user.emailVerified,
+    };
+  }
+  return {
+    type: UserAction.SAVE_USER,
+    user: currentUser,
+  };
+};
 
 export const logoutUser: ActionCreator<LogoutUserAction> = () => ({
   type: UserAction.LOGOUT_USER,

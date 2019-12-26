@@ -74,7 +74,7 @@ export const signOut = () => (
     .auth()
     .signOut()
     .then(() => {
-      localStorage.removeItem('isAuthenticated');
+      localStorage.setItem('isAuthenticated', 'false');
       dispatch(openSnackbar('You\'ve been successfully signed out.'));
       dispatch(logoutUser());
     })
@@ -114,7 +114,7 @@ export const changeDisplayName = (
       if (user != null) {
         user.updateProfile({ displayName });
         dispatch(openSnackbar('You\'ve successfully changed your username.'));
-        dispatch(logoutUser());
+        signOut();
         redirect();
       }
     })
@@ -136,7 +136,7 @@ export const changeEmail = (
         user.updateEmail(newEmail);
         user.sendEmailVerification();
         dispatch(openSnackbar('You\'ve successfully changed your email.'));
-        dispatch(logoutUser());
+        signOut();
         redirect();
       }
     })
@@ -157,7 +157,7 @@ export const changePassword = (
       if (user != null) {
         user.updatePassword(newPassword);
         dispatch(openSnackbar('You\'ve successfully changed your password.'));
-        dispatch(logoutUser());
+        signOut();
         redirect();
       }
     })
@@ -176,7 +176,7 @@ export const deleteAccount = (email: string, password: string, redirect: () => v
         user.delete();
         dispatch(openSnackbar('You\'ve successfully deleted your account.'));
         dispatch(logoutUser());
-        dispatch(clearUILoading());
+        signOut();
         redirect();
       }
     })
