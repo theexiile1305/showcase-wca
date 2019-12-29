@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import style from 'src/Styles';
 import { ApplicationState } from 'src/Store/ApplicationState';
 import { SIGN_UP, RESET_PASSWORD, HOME } from 'src/Routes';
-import { signInWithEmailPassword } from 'src/Api/authentication';
+import { signInWithEmailPassword } from 'src/Api/firebase/authentication';
 
 const SignIn: React.FC = () => {
   const classes = style();

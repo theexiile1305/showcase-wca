@@ -6,7 +6,7 @@ import store from 'src/Store';
 import {
   HOME, SIGN_IN, SIGN_UP, DOCUMENTS, IDENTITIES, DEBUG, RESET_PASSWORD, USER,
 } from 'src/Routes';
-import verifyAuth from 'src/Api/verifyAuth';
+import verifyAuth from 'src/Api/firebase/verifyAuth';
 import AuthRoute from 'src/Routes/AuthRoute';
 import Navbar from '../Layout/Navbar';
 import Footer from '../Layout/Footer';

@@ -12,7 +12,7 @@ import style from 'src/Styles';
 import {
   SIGN_IN, SIGN_UP, DOCUMENTS, IDENTITIES, DEBUG, HOME, USER,
 } from 'src/Routes';
-import { signOut } from 'src/Api/authentication';
+import { signOut } from 'src/Api/firebase/authentication';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 const Navbar: React.FC = () => {

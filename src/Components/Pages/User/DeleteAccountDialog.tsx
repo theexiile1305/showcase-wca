@@ -5,7 +5,7 @@ import {
   Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, DialogContentText, Grid,
 } from '@material-ui/core';
 import { ApplicationState } from 'src/Store/ApplicationState';
-import { deleteAccount } from 'src/Api/authentication';
+import { deleteAccount } from 'src/Api/firebase/authentication';
 import { HOME } from 'src/Routes';
 import { closeDialog, CloseDialogAction } from 'src/Store/ui/UIActions';
 import DialogType from 'src/Models/DialogType';

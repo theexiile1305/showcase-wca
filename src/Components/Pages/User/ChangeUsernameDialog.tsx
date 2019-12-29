@@ -5,7 +5,7 @@ import {
 } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { ApplicationState } from 'src/Store/ApplicationState';
-import { changeDisplayName } from 'src/Api/authentication';
+import { changeDisplayName } from 'src/Api/firebase/authentication';
 import { closeDialog, CloseDialogAction } from 'src/Store/ui/UIActions';
 import DialogType from 'src/Models/DialogType';
 import { HOME } from 'src/Routes';

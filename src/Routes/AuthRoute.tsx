@@ -1,6 +1,6 @@
 import React from 'react';
 import { Redirect, Route, RouteProps } from 'react-router-dom';
-import { isAuthenticated } from 'src/Api/authentication';
+import { isAuthenticated } from 'src/Api/firebase/authentication';
 import { SIGN_IN } from '.';
 
 export type AuthRouteProps = RouteProps

@@ -5,7 +5,7 @@ import {
 import { Link, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import style from 'src/Styles';
-import { signUp } from 'src/Api/authentication';
+import { signUp } from 'src/Api/firebase/authentication';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import { SIGN_IN, HOME } from 'src/Routes';

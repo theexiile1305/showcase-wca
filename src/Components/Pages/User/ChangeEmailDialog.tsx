@@ -4,7 +4,7 @@ import {
   Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, DialogContentText, Grid,
 } from '@material-ui/core';
 import { ApplicationState } from 'src/Store/ApplicationState';
-import { changeEmail } from 'src/Api/authentication';
+import { changeEmail } from 'src/Api/firebase/authentication';
 import { closeDialog, CloseDialogAction } from 'src/Store/ui/UIActions';
 import DialogType from 'src/Models/DialogType';
 import { useHistory } from 'react-router-dom';
