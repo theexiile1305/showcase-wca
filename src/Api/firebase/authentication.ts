@@ -7,7 +7,13 @@ import { Dispatch } from 'react';
 import {
   saveUserData, SaveUserAction, logoutUser, LogoutUserAction,
 } from 'src/Store/user/UserActions';
-import firebase from './firebase';
+import {
+  saveSymmetricKey, SaveSymmetricKeyAction, saveRSAOAEPKeyPair, SaveRSAOAPKeyPairAction,
+  saveRSAPSSKeyPair, SaveRSAPSSKeyPairAction, removeSymmetricKey, RemoveSymmetricKeyAction,
+  removeRSAOAEPKeyPair, RemoveRSAOAPKeyPairAction, removeRSAPSSKeyPair, RemoveRSAPSSKeyPairAction,
+} from 'src/Store/wca/WCAActions';
+import firebase from '.';
+import { generateSymmetricKey, generateRSAOAPKeyPair, generateRSAPSSKeyPair } from '../wca';
 
 export const isAuthenticated = (): boolean => localStorage.getItem('isAuthenticated') === 'true';
 
@@ -44,6 +50,7 @@ export const signUp = (
 
 export const signInWithEmailPassword = (email: string, password: string, redirect: () => void) => (
   dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | SaveUserAction
+  | SaveSymmetricKeyAction | SaveRSAOAPKeyPairAction | SaveRSAPSSKeyPairAction
   | OpenSnackbarAction>,
 ): void => {
   dispatch(setUILoading());
@@ -56,8 +63,11 @@ export const signInWithEmailPassword = (email: string, password: string, redirec
       }
       return result.user;
     })
-    .then((user) => {
+    .then(async (user) => {
       dispatch(saveUserData(user));
+      dispatch(saveSymmetricKey(await generateSymmetricKey(password)));
+      dispatch(saveRSAOAEPKeyPair(await generateRSAOAPKeyPair()));
+      dispatch(saveRSAPSSKeyPair(await generateRSAPSSKeyPair()));
       dispatch(openSnackbar('You\'ve been successfully signed in.'));
       dispatch(clearUILoading());
       redirect();
@@ -69,12 +79,16 @@ export const signInWithEmailPassword = (email: string, password: string, redirec
 };
 
 export const signOut = () => (
-  dispatch: Dispatch<OpenSnackbarAction | LogoutUserAction>,
+  dispatch: Dispatch<OpenSnackbarAction | RemoveSymmetricKeyAction | RemoveRSAOAPKeyPairAction
+  | RemoveRSAPSSKeyPairAction | LogoutUserAction>,
 ): void => {
   firebase
     .auth()
     .signOut()
     .then(() => {
+      dispatch(removeSymmetricKey());
+      dispatch(removeRSAOAEPKeyPair());
+      dispatch(removeRSAPSSKeyPair());
       dispatch(openSnackbar('You\'ve been successfully signed out.'));
       dispatch(logoutUser());
     })
