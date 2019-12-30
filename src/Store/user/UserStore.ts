@@ -1,4 +1,4 @@
-import { MUser } from '../../Models/MUser';
+import { MUser } from '../../Models/User';
 
 export interface UserStore {
   user: MUser | null;

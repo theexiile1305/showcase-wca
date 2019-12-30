@@ -1,5 +1,5 @@
 import { Action, ActionCreator } from 'redux';
-import { MUser } from 'src/Models/MUser';
+import { MUser } from 'src/Models/User';
 
 export enum UserAction {
   SAVE_USER = '@@wca/SAVE_USER',
