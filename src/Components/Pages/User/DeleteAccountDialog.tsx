@@ -70,7 +70,7 @@ const DeleteAccountDialog: React.FC = () => {
         <Button onClick={(): CloseDialogAction => dispatch(closeDialog(DialogType.DELETE_ACCOUNT))} color="primary">
             Cancel
         </Button>
-        <Button color="primary" onClick={(event): void => dispatch(handleDeleteAccount(event))}>
+        <Button color="primary" onClick={(event): void => handleDeleteAccount(event)}>
             Confirm
         </Button>
       </DialogActions>
