@@ -14,7 +14,9 @@ const ChangeUsernameDialog: React.FC = () => {
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const openChangeUsername = useSelector((state: ApplicationState) => state.ui.dialog === DialogType.CHANGE_USERNAME);
+  const openChangeUsername = useSelector(
+    (state: ApplicationState) => state.ui.dialog === DialogType.CHANGE_USERNAME,
+  );
   const email = useSelector((state: ApplicationState) => {
     const currentUser = state.user.user;
     if (currentUser && currentUser.email) {
@@ -33,7 +35,11 @@ const ChangeUsernameDialog: React.FC = () => {
   };
 
   return (
-    <Dialog onClose={(): CloseDialogAction => dispatch(closeDialog())} aria-labelledby="customized-dialog-title" open={openChangeUsername}>
+    <Dialog
+      onClose={(): CloseDialogAction => dispatch(closeDialog())}
+      aria-labelledby="customized-dialog-title"
+      open={openChangeUsername}
+    >
       <DialogTitle id="customized-dialog-title">
           Change Username
       </DialogTitle>
@@ -52,9 +58,9 @@ const ChangeUsernameDialog: React.FC = () => {
               type="text"
               label="Enter new Username"
               value={username}
-              onChange={
-                (event: React.ChangeEvent<HTMLInputElement>): void => setUsername(event.target.value)
-              }
+              onChange={(
+                event: React.ChangeEvent<HTMLInputElement>,
+              ): void => setUsername(event.target.value)}
             />
           </Grid>
           <Grid item xs={12}>
@@ -67,18 +73,24 @@ const ChangeUsernameDialog: React.FC = () => {
               type="password"
               label="Enter Password"
               value={password}
-              onChange={
-                (event: React.ChangeEvent<HTMLInputElement>): void => setPassword(event.target.value)
-              }
+              onChange={(
+                event: React.ChangeEvent<HTMLInputElement>,
+              ): void => setPassword(event.target.value)}
             />
           </Grid>
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={(): CloseDialogAction => dispatch(closeDialog(DialogType.CHANGE_USERNAME))} color="primary">
+        <Button
+          onClick={(): CloseDialogAction => dispatch(closeDialog(DialogType.CHANGE_USERNAME))}
+          color="primary"
+        >
             Cancel
         </Button>
-        <Button color="primary" onClick={(event): void => handleChangeUsernameAccount(event)}>
+        <Button
+          color="primary"
+          onClick={(event): void => handleChangeUsernameAccount(event)}
+        >
             Confirm
         </Button>
       </DialogActions>

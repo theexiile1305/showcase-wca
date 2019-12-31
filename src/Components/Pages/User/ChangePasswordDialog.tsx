@@ -14,7 +14,9 @@ const ChangePasswordDialog: React.FC = () => {
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const openChangePassword = useSelector((state: ApplicationState) => state.ui.dialog === DialogType.CHANGE_PASSWORD);
+  const openChangePassword = useSelector(
+    (state: ApplicationState) => state.ui.dialog === DialogType.CHANGE_PASSWORD,
+  );
 
   const email = useSelector((state: ApplicationState) => {
     const currentUser = state.user.user;
@@ -33,7 +35,11 @@ const ChangePasswordDialog: React.FC = () => {
   };
 
   return (
-    <Dialog onClose={(): CloseDialogAction => dispatch(closeDialog())} aria-labelledby="customized-dialog-title" open={openChangePassword}>
+    <Dialog
+      onClose={(): CloseDialogAction => dispatch(closeDialog())}
+      aria-labelledby="customized-dialog-title"
+      open={openChangePassword}
+    >
       <DialogTitle id="customized-dialog-title">
           Change Password
       </DialogTitle>
@@ -52,9 +58,9 @@ const ChangePasswordDialog: React.FC = () => {
               type="password"
               label="Enter current Password"
               value={currentPassword}
-              onChange={
-                (event: React.ChangeEvent<HTMLInputElement>): void => setCurrentPassword(event.target.value)
-              }
+              onChange={(
+                event: React.ChangeEvent<HTMLInputElement>,
+              ): void => setCurrentPassword(event.target.value)}
             />
           </Grid>
           <Grid item xs={12}>
@@ -67,18 +73,24 @@ const ChangePasswordDialog: React.FC = () => {
               type="password"
               label="Enter new Password"
               value={newPassword}
-              onChange={
-                (event: React.ChangeEvent<HTMLInputElement>): void => setNewPassword(event.target.value)
-              }
+              onChange={(
+                event: React.ChangeEvent<HTMLInputElement>,
+              ): void => setNewPassword(event.target.value)}
             />
           </Grid>
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={(): CloseDialogAction => dispatch(closeDialog(DialogType.CHANGE_PASSWORD))} color="primary">
+        <Button
+          onClick={(): CloseDialogAction => dispatch(closeDialog(DialogType.CHANGE_PASSWORD))}
+          color="primary"
+        >
             Cancel
         </Button>
-        <Button color="primary" onClick={(event): void => handlePasswordChange(event)}>
+        <Button
+          color="primary"
+          onClick={(event): void => handlePasswordChange(event)}
+        >
             Confirm
         </Button>
       </DialogActions>

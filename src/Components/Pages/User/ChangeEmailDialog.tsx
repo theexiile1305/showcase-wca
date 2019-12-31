@@ -14,7 +14,9 @@ const ChangeEmailDialog: React.FC = () => {
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const openChangeEmail = useSelector((state: ApplicationState) => state.ui.dialog === DialogType.CHANGE_EMAIL);
+  const openChangeEmail = useSelector(
+    (state: ApplicationState) => state.ui.dialog === DialogType.CHANGE_EMAIL,
+  );
 
   const currentEmail = useSelector((state: ApplicationState) => {
     const currentUser = state.user.user;
@@ -33,7 +35,11 @@ const ChangeEmailDialog: React.FC = () => {
   };
 
   return (
-    <Dialog onClose={(): CloseDialogAction => dispatch(closeDialog())} aria-labelledby="customized-dialog-title" open={openChangeEmail}>
+    <Dialog
+      onClose={(): CloseDialogAction => dispatch(closeDialog())}
+      aria-labelledby="customized-dialog-title"
+      open={openChangeEmail}
+    >
       <DialogTitle id="customized-dialog-title">
           Change Email
       </DialogTitle>
@@ -52,9 +58,9 @@ const ChangeEmailDialog: React.FC = () => {
               type="email"
               label="Enter new Email"
               value={newEmail}
-              onChange={
-                (event: React.ChangeEvent<HTMLInputElement>): void => setNewEmail(event.target.value)
-              }
+              onChange={(
+                event: React.ChangeEvent<HTMLInputElement>,
+              ): void => setNewEmail(event.target.value)}
             />
           </Grid>
           <Grid item xs={12}>
@@ -67,18 +73,24 @@ const ChangeEmailDialog: React.FC = () => {
               type="password"
               label="Enter Password"
               value={password}
-              onChange={
-                (event: React.ChangeEvent<HTMLInputElement>): void => setPassword(event.target.value)
-              }
+              onChange={(
+                event: React.ChangeEvent<HTMLInputElement>,
+              ): void => setPassword(event.target.value)}
             />
           </Grid>
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={(): CloseDialogAction => dispatch(closeDialog(DialogType.CHANGE_EMAIL))} color="primary">
+        <Button
+          onClick={(): CloseDialogAction => dispatch(closeDialog(DialogType.CHANGE_EMAIL))}
+          color="primary"
+        >
             Cancel
         </Button>
-        <Button color="primary" onClick={(event): void => handleChangeEmail(event)}>
+        <Button
+          color="primary"
+          onClick={(event): void => handleChangeEmail(event)}
+        >
             Confirm
         </Button>
       </DialogActions>

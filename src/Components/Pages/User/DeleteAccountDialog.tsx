@@ -14,7 +14,9 @@ const DeleteAccountDialog: React.FC = () => {
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const openDeleteAccount = useSelector((state: ApplicationState) => state.ui.dialog === DialogType.DELETE_ACCOUNT);
+  const openDeleteAccount = useSelector(
+    (state: ApplicationState) => state.ui.dialog === DialogType.DELETE_ACCOUNT,
+  );
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -25,7 +27,11 @@ const DeleteAccountDialog: React.FC = () => {
   };
 
   return (
-    <Dialog onClose={(): CloseDialogAction => dispatch(closeDialog())} aria-labelledby="customized-dialog-title" open={openDeleteAccount}>
+    <Dialog
+      onClose={(): CloseDialogAction => dispatch(closeDialog())}
+      aria-labelledby="customized-dialog-title"
+      open={openDeleteAccount}
+    >
       <DialogTitle id="customized-dialog-title">
           Delete Account
       </DialogTitle>
@@ -44,9 +50,9 @@ const DeleteAccountDialog: React.FC = () => {
               type="email"
               label="Enter Email"
               value={email}
-              onChange={
-                (event: React.ChangeEvent<HTMLInputElement>): void => setEmail(event.target.value)
-              }
+              onChange={(
+                event: React.ChangeEvent<HTMLInputElement>,
+              ): void => setEmail(event.target.value)}
             />
           </Grid>
           <Grid item xs={12}>
@@ -59,18 +65,24 @@ const DeleteAccountDialog: React.FC = () => {
               type="password"
               label="Enter Password"
               value={password}
-              onChange={
-                (event: React.ChangeEvent<HTMLInputElement>): void => setPassword(event.target.value)
-              }
+              onChange={(
+                event: React.ChangeEvent<HTMLInputElement>,
+              ): void => setPassword(event.target.value)}
             />
           </Grid>
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={(): CloseDialogAction => dispatch(closeDialog(DialogType.DELETE_ACCOUNT))} color="primary">
+        <Button
+          onClick={(): CloseDialogAction => dispatch(closeDialog(DialogType.DELETE_ACCOUNT))}
+          color="primary"
+        >
             Cancel
         </Button>
-        <Button color="primary" onClick={(event): void => handleDeleteAccount(event)}>
+        <Button
+          color="primary"
+          onClick={(event): void => handleDeleteAccount(event)}
+        >
             Confirm
         </Button>
       </DialogActions>
