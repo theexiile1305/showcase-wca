@@ -7,13 +7,11 @@ import { Dispatch } from 'react';
 import {
   saveUserData, SaveUserAction, logoutUser, LogoutUserAction,
 } from 'src/Store/user/UserActions';
-import {
-  saveSymmetricKey, SaveSymmetricKeyAction, saveRSAOAEPKeyPair, SaveRSAOAPKeyPairAction,
-  saveRSAPSSKeyPair, SaveRSAPSSKeyPairAction, removeSymmetricKey, RemoveSymmetricKeyAction,
-  removeRSAOAEPKeyPair, RemoveRSAOAPKeyPairAction, removeRSAPSSKeyPair, RemoveRSAPSSKeyPairAction,
-} from 'src/Store/wca/WCAActions';
 import firebase from '.';
-import { generateSymmetricKey, generateRSAOAPKeyPair, generateRSAPSSKeyPair } from '../wca';
+import { setupKeys, encryptTextWithAES } from '../wca';
+import { removeKeyStorage } from '../localforage';
+
+const fb = firebase.auth();
 
 export const isAuthenticated = (): boolean => localStorage.getItem('isAuthenticated') === 'true';
 
@@ -24,10 +22,9 @@ export const signUp = (
   | OpenSnackbarAction>,
 ): void => {
   dispatch(setUILoading());
-  firebase.auth().languageCode = 'en';
-  firebase
-    .auth()
-    .createUserWithEmailAndPassword(email, password)
+  setupKeys()
+    .then(() => encryptTextWithAES(password))
+    .then((encryptedPassword) => fb.createUserWithEmailAndPassword(email, encryptedPassword))
     .then(() => {
       const user = firebase.auth().currentUser;
       if (user) {
@@ -50,13 +47,11 @@ export const signUp = (
 
 export const signInWithEmailPassword = (email: string, password: string, redirect: () => void) => (
   dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | SaveUserAction
-  | SaveSymmetricKeyAction | SaveRSAOAPKeyPairAction | SaveRSAPSSKeyPairAction
   | OpenSnackbarAction>,
 ): void => {
   dispatch(setUILoading());
-  firebase
-    .auth()
-    .signInWithEmailAndPassword(email, password)
+  encryptTextWithAES(password)
+    .then((encryptedPassword) => fb.signInWithEmailAndPassword(email, encryptedPassword))
     .then((result) => {
       if (!result.user?.emailVerified) {
         throw new Error('Please verify your e-mail adress in order to sign in.');
@@ -65,9 +60,6 @@ export const signInWithEmailPassword = (email: string, password: string, redirec
     })
     .then(async (user) => {
       dispatch(saveUserData(user));
-      dispatch(saveSymmetricKey(await generateSymmetricKey(password)));
-      dispatch(saveRSAOAEPKeyPair(await generateRSAOAPKeyPair()));
-      dispatch(saveRSAPSSKeyPair(await generateRSAPSSKeyPair()));
       dispatch(openSnackbar('You\'ve been successfully signed in.'));
       dispatch(clearUILoading());
       redirect();
@@ -79,16 +71,10 @@ export const signInWithEmailPassword = (email: string, password: string, redirec
 };
 
 export const signOut = () => (
-  dispatch: Dispatch<OpenSnackbarAction | RemoveSymmetricKeyAction | RemoveRSAOAPKeyPairAction
-  | RemoveRSAPSSKeyPairAction | LogoutUserAction>,
+  dispatch: Dispatch<OpenSnackbarAction | LogoutUserAction>,
 ): void => {
-  firebase
-    .auth()
-    .signOut()
+  fb.signOut()
     .then(() => {
-      dispatch(removeSymmetricKey());
-      dispatch(removeRSAOAEPKeyPair());
-      dispatch(removeRSAPSSKeyPair());
       dispatch(openSnackbar('You\'ve been successfully signed out.'));
       dispatch(logoutUser());
     })
@@ -99,11 +85,9 @@ export const resetPassword = (email: string, redirect: () => void) => (
   dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction>,
 ): void => {
   dispatch(setUILoading());
-  firebase.auth().languageCode = 'en';
-  firebase
-    .auth()
-    .sendPasswordResetEmail(email)
+  fb.sendPasswordResetEmail(email)
     .then(() => {
+      // TODO: key handling --> what happen ?
       dispatch(openSnackbar('You\'ve successfully reseted your password.'));
       dispatch(clearUILoading());
       redirect();
@@ -122,7 +106,8 @@ export const changeDisplayName = (
   if (email === undefined) {
     throw new Error('Could not change the username. Try it again!');
   }
-  firebase.auth().signInWithEmailAndPassword(email, password)
+  encryptTextWithAES(password)
+    .then((encryptedPassword) => fb.signInWithEmailAndPassword(email, encryptedPassword))
     .then(() => {
       const user = firebase.auth().currentUser;
       if (user != null) {
@@ -143,7 +128,8 @@ export const changeEmail = (
   if (email === undefined) {
     throw new Error('Could not change the username. Try it again!');
   }
-  firebase.auth().signInWithEmailAndPassword(email, password)
+  encryptTextWithAES(password)
+    .then((encryptedPassword) => fb.signInWithEmailAndPassword(email, encryptedPassword))
     .then(() => {
       const user = firebase.auth().currentUser;
       if (user != null) {
@@ -165,11 +151,14 @@ export const changePassword = (
   if (email === undefined) {
     throw new Error('Could not change the username. Try it again!');
   }
-  firebase.auth().signInWithEmailAndPassword(email, password)
-    .then(() => {
+  encryptTextWithAES(password)
+    .then((encryptedPassword) => fb.signInWithEmailAndPassword(email, encryptedPassword))
+    .then(() => encryptTextWithAES(newPassword))
+    .then((encryptedNewPassword) => {
       const user = firebase.auth().currentUser;
       if (user != null) {
-        user.updatePassword(newPassword);
+        user.updatePassword(encryptedNewPassword);
+        // TODO: key handling --> key dervation ?
         dispatch(openSnackbar('You\'ve successfully changed your password.'));
         dispatch(logoutUser());
         redirect();
@@ -183,11 +172,13 @@ export const deleteAccount = (email: string, password: string, redirect: () => v
   | LogoutUserAction>,
 ): void => {
   dispatch(setUILoading());
-  firebase.auth().signInWithEmailAndPassword(email, password)
+  encryptTextWithAES(password)
+    .then((encryptedPassword) => fb.signInWithEmailAndPassword(email, encryptedPassword))
     .then(() => {
       const user = firebase.auth().currentUser;
       if (user != null) {
         user.delete();
+        removeKeyStorage();
         dispatch(openSnackbar('You\'ve successfully deleted your account.'));
         dispatch(logoutUser());
         dispatch(logoutUser());
