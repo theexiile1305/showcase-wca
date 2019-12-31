@@ -23,7 +23,7 @@ const User: React.FC = () => {
       </Grid>
       <Grid item xs={4} sm container>
         <Grid item xs container direction="column" spacing={2}>
-          <Grid item xs spacing={1}>
+          <Grid item xs container spacing={1}>
             <UserDetails />
           </Grid>
           <Grid item xs>
