@@ -1,7 +1,6 @@
 import React from 'react';
 import { Typography, Container, Link } from '@material-ui/core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart } from '@fortawesome/free-solid-svg-icons';
+import FavoriteIcon from '@material-ui/icons/Favorite';
 import style from 'src/Styles';
 
 const Footer: React.FC = () => {
@@ -10,7 +9,7 @@ const Footer: React.FC = () => {
   const renderContribution = (): React.ReactFragment => (
     <Typography variant="body1">
       {'Built with '}
-      <FontAwesomeIcon color="red" icon={faHeart} />
+      <FavoriteIcon htmlColor="#FF0000" fontSize="inherit" />
       {' by '}
       <Link color="inherit" href="https://reactjs.org/">React</Link>
       {' on '}

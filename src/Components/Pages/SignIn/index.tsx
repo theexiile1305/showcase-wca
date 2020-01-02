@@ -4,8 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import {
   Typography, Avatar, Grid, TextField, Button, CircularProgress,
 } from '@material-ui/core';
-import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import style from 'src/Styles';
 import { ApplicationState } from 'src/Store/ApplicationState';
 import { SIGN_UP, RESET_PASSWORD, HOME } from 'src/Routes';
@@ -32,7 +31,7 @@ const SignIn: React.FC = () => {
       <Grid container spacing={3} className={classes.form}>
         <Grid item xs={12}>
           <Avatar className={classes.avatar}>
-            <FontAwesomeIcon icon={faSignInAlt} />
+            <ArrowForwardIcon />
           </Avatar>
         </Grid>
         <Grid item xs={12}>
