@@ -6,8 +6,7 @@ import { resetPassword } from 'src/Api/firebase/authentication';
 import {
   Grid, Avatar, TextField, Typography, Button, CircularProgress,
 } from '@material-ui/core';
-import { faUnlock } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import LockOpenIcon from '@material-ui/icons/LockOpen';
 import { HOME } from 'src/Routes';
 import { useHistory } from 'react-router-dom';
 
@@ -32,7 +31,7 @@ const ResetPassword: React.FC = () => {
       <Grid container spacing={3} className={classes.form}>
         <Grid item xs={12}>
           <Avatar className={classes.avatar}>
-            <FontAwesomeIcon icon={faUnlock} />
+            <LockOpenIcon />
           </Avatar>
         </Grid>
         <Grid item xs={12}>

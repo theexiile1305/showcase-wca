@@ -6,8 +6,7 @@ import { Link, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import style from 'src/Styles';
 import { signUp } from 'src/Api/firebase/authentication';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import { SIGN_IN, HOME } from 'src/Routes';
 import { ApplicationState } from 'src/Store/ApplicationState';
 
@@ -33,7 +32,7 @@ const SignUp: React.FC = () => {
       <Grid container spacing={3} className={classes.form}>
         <Grid item xs={12}>
           <Avatar className={classes.avatar}>
-            <FontAwesomeIcon icon={faUserPlus} />
+            <PersonAddIcon />
           </Avatar>
         </Grid>
         <Grid item xs={12}>

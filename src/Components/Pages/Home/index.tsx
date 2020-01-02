@@ -1,10 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLink } from '@fortawesome/free-solid-svg-icons';
 import {
   Grid, Paper, Typography, Button,
 } from '@material-ui/core';
+import LinkIcon from '@material-ui/icons/Link';
 import {
   IDENTITIES, DOCUMENTS, DEBUG, USER,
 } from 'src/Routes';
@@ -20,7 +19,7 @@ const Home: React.FC = () => {
       component={Link}
       to={link}
       startIcon={
-        <FontAwesomeIcon icon={faLink} />
+        <LinkIcon />
       }
     >
       {title}
