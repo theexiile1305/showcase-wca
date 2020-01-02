@@ -54,7 +54,7 @@ export const setupKeys = async (
     generateSymmetricFingerprint(keys[2]),
   ]);
   const vec = window.crypto.getRandomValues(new Uint8Array(16));
-  saveKeyStorage({
+  await saveKeyStorage({
     rsaOAEP: {
       publicKey: keys[0].publicKey,
       privateKey: keys[0].privateKey,
