@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import style from 'src/Styles';
 import { ApplicationState } from 'src/Store/ApplicationState';
-import { resetPassword } from 'src/Api/authentication';
+import { resetPassword } from 'src/Api/firebase/authentication';
 import {
   Grid, Avatar, TextField, Typography, Button, CircularProgress,
 } from '@material-ui/core';

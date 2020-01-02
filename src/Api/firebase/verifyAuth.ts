@@ -1,6 +1,6 @@
 import store from 'src/Store';
 import { saveUserData } from 'src/Store/user/UserActions';
-import firebase from './firebase';
+import firebase from '.';
 
 const verifyAuth = (): void => {
   firebase

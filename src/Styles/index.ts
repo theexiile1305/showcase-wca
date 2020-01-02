@@ -1,6 +1,9 @@
 import { createStyles, makeStyles, Theme } from '@material-ui/core';
 
 const style = makeStyles((theme: Theme) => createStyles({
+  center: {
+    textAlign: 'center',
+  },
   form: {
     textAlign: 'center',
     maxWidth: '600px',
@@ -15,6 +18,11 @@ const style = makeStyles((theme: Theme) => createStyles({
   paper: {
     padding: theme.spacing(2),
     textAlign: 'center',
+    color: theme.palette.text.secondary,
+  },
+  paperUser: {
+    padding: theme.spacing(2),
+    textAlign: 'left',
     color: theme.palette.text.secondary,
   },
   navbarTitle: {

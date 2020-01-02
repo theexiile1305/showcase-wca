@@ -1,6 +1,5 @@
-import { MUser } from '../../Models/MUser';
+import { MUser } from '../../Models/User';
 
 export interface UserStore {
-  isAuthenticated: boolean;
   user: MUser | null;
 }

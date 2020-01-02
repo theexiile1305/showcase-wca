@@ -1,19 +1,18 @@
 import React from 'react';
 import {
-  AppBar, Toolbar, Button, IconButton, Typography,
+  AppBar, Toolbar, IconButton, Typography, Tooltip,
 } from '@material-ui/core';
 import { Link } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBug, faBars, faFile, faSignInAlt, faSignOutAlt, faUserFriends, faUser, faUserPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import style from 'src/Styles';
-import { ApplicationState } from 'src/Store/ApplicationState';
 import {
   SIGN_IN, SIGN_UP, DOCUMENTS, IDENTITIES, DEBUG, HOME, USER,
 } from 'src/Routes';
-import { signOut } from 'src/Api/authentication';
+import { signOut } from 'src/Api/firebase/authentication';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 const Navbar: React.FC = () => {
@@ -21,39 +20,19 @@ const Navbar: React.FC = () => {
 
   const dispatch = useDispatch();
 
-  const isAuthenticated = useSelector((state: ApplicationState) => state.user.isAuthenticated);
-
   const renderButton = (
     name: string, icon: IconProp, link: string, clickAction?: () => void,
   ): React.ReactFragment => (
-    <Button
-      color="inherit"
-      component={Link}
-      to={link}
-      onClick={clickAction}
-      startIcon={
+    <Tooltip title={name}>
+      <IconButton
+        color="inherit"
+        component={Link}
+        to={link}
+        onClick={clickAction}
+      >
         <FontAwesomeIcon icon={icon} />
-      }
-    >
-      {name}
-    </Button>
-  );
-
-  const renderAuthenticated = (): React.ReactFragment => (
-    <>
-      {renderButton('Documents', faFile, DOCUMENTS)}
-      {renderButton('Identities', faUserFriends, IDENTITIES)}
-      {renderButton('User', faUser, USER)}
-      {renderButton('Debug', faBug, DEBUG)}
-      {renderButton('Logout', faSignOutAlt, HOME, () => dispatch(signOut()))}
-    </>
-  );
-
-  const renderNotAuthenticated = (): React.ReactFragment => (
-    <>
-      {renderButton('Sign Up', faUserPlus, SIGN_UP)}
-      {renderButton('Sign In', faSignInAlt, SIGN_IN)}
-    </>
+      </IconButton>
+    </Tooltip>
   );
 
   return (
@@ -65,7 +44,13 @@ const Navbar: React.FC = () => {
         <Typography variant="h6" className={classes.navbarTitle}>
           Showcase Web Cryptography API
         </Typography>
-        {isAuthenticated ? renderAuthenticated() : renderNotAuthenticated()}
+        {renderButton('Documents', faFile, DOCUMENTS)}
+        {renderButton('Identities', faUserFriends, IDENTITIES)}
+        {renderButton('User', faUser, USER)}
+        {renderButton('Debug', faBug, DEBUG)}
+        {renderButton('Sign Up', faUserPlus, SIGN_UP)}
+        {renderButton('Sign In', faSignInAlt, SIGN_IN)}
+        {renderButton('Logout', faSignOutAlt, HOME, () => dispatch(signOut()))}
       </Toolbar>
     </AppBar>
   );

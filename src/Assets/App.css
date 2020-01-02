@@ -27,3 +27,9 @@ a {
   text-decoration: none;
   border-bottom: dotted 1px;
 }
+
+.codeBlock {
+  word-break: break-word;
+  white-space: pre-wrap;
+  -moz-white-space: pre-wrap;  
+}

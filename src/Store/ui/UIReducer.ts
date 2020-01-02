@@ -1,10 +1,11 @@
 import { Reducer } from 'redux';
 import { UIStore } from './UIStore';
-import { UIAction, UIActions } from './UIActions';
+import { UIAction, UIActions, closeDialog } from './UIActions';
 
 const initialState: UIStore = {
   loading: false,
   snackbar: null,
+  dialog: null,
 };
 
 const UIReducer: Reducer<UIStore> = (state: UIStore = initialState, action: UIActions) => {
@@ -28,6 +29,19 @@ const UIReducer: Reducer<UIStore> = (state: UIStore = initialState, action: UIAc
       return {
         ...state,
         snackbar: null,
+      };
+    case UIAction.OPEN_DIALOG:
+      if (state.dialog) {
+        closeDialog(state.dialog);
+      }
+      return {
+        ...state,
+        dialog: action.dialog,
+      };
+    case UIAction.CLOSE_DIALOG:
+      return {
+        ...state,
+        dialog: null,
       };
     default:
       return state;
