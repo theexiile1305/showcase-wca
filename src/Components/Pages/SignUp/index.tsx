@@ -5,7 +5,7 @@ import {
 import { Link, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import style from 'src/Styles';
-import { signUp } from 'src/Api/authentication';
+import { signUp } from 'src/Api/firebase/authentication';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import { SIGN_IN, HOME } from 'src/Routes';
@@ -19,12 +19,13 @@ const SignUp: React.FC = () => {
   const dispatch = useDispatch();
   const history = useHistory();
 
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
-    dispatch(signUp(email, password, () => history.push(HOME)));
+    dispatch(signUp(username, email, password, () => history.push(HOME)));
   };
 
   return (
@@ -39,6 +40,21 @@ const SignUp: React.FC = () => {
           <Typography variant="h4">
           Create a new Account to continue
           </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            variant="outlined"
+            required
+            fullWidth
+            id="username"
+            name="username"
+            type="text"
+            label="Enter Username"
+            value={username}
+            onChange={
+              (event: React.ChangeEvent<HTMLInputElement>): void => setUsername(event.target.value)
+            }
+          />
         </Grid>
         <Grid item xs={12}>
           <TextField
