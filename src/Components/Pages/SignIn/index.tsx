@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-  Typography, Avatar, Grid, TextField, Button, CircularProgress,
+  Typography, Grid, TextField, Button, CircularProgress,
 } from '@material-ui/core';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import style from 'src/Styles';
 import { ApplicationState } from 'src/Store/ApplicationState';
 import { SIGN_UP, RESET_PASSWORD, HOME } from 'src/Routes';
@@ -29,11 +28,6 @@ const SignIn: React.FC = () => {
   return (
     <form noValidate onSubmit={handleSubmit}>
       <Grid container spacing={3} className={classes.form}>
-        <Grid item xs={12}>
-          <Avatar className={classes.avatar}>
-            <ArrowForwardIcon />
-          </Avatar>
-        </Grid>
         <Grid item xs={12}>
           <Typography variant="h4">
           Login into your Account to continue

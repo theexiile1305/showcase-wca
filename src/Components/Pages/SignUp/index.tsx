@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import {
-  Grid, Avatar, Typography, TextField, CircularProgress, Button,
+  Grid, Typography, TextField, CircularProgress, Button,
 } from '@material-ui/core';
 import { Link, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import style from 'src/Styles';
 import { signUp } from 'src/Api/firebase/authentication';
-import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import { SIGN_IN, HOME } from 'src/Routes';
 import { ApplicationState } from 'src/Store/ApplicationState';
 
@@ -30,11 +29,6 @@ const SignUp: React.FC = () => {
   return (
     <form noValidate onSubmit={handleSubmit}>
       <Grid container spacing={3} className={classes.form}>
-        <Grid item xs={12}>
-          <Avatar className={classes.avatar}>
-            <PersonAddIcon />
-          </Avatar>
-        </Grid>
         <Grid item xs={12}>
           <Typography variant="h4">
           Create a new Account to continue

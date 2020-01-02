@@ -4,9 +4,8 @@ import style from 'src/Styles';
 import { ApplicationState } from 'src/Store/ApplicationState';
 import { resetPassword } from 'src/Api/firebase/authentication';
 import {
-  Grid, Avatar, TextField, Typography, Button, CircularProgress,
+  Grid, TextField, Typography, Button, CircularProgress,
 } from '@material-ui/core';
-import LockOpenIcon from '@material-ui/icons/LockOpen';
 import { HOME } from 'src/Routes';
 import { useHistory } from 'react-router-dom';
 
@@ -29,11 +28,6 @@ const ResetPassword: React.FC = () => {
   return (
     <form noValidate onSubmit={handleSubmit}>
       <Grid container spacing={3} className={classes.form}>
-        <Grid item xs={12}>
-          <Avatar className={classes.avatar}>
-            <LockOpenIcon />
-          </Avatar>
-        </Grid>
         <Grid item xs={12}>
           <Typography variant="h4">
           Reset your password to continue
