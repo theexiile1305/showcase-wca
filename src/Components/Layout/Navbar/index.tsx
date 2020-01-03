@@ -50,7 +50,7 @@ const Navbar: React.FC = () => {
         </Typography>
         {renderButton('Documents', <InsertDriveFileIcon />, DOCUMENTS)}
         {renderButton('Identities', <PeopleIcon />, IDENTITIES)}
-        {renderButton('User', <SettingsIcon />, USER)}
+        {renderButton('User Management', <SettingsIcon />, USER)}
         {renderButton('Debug', <BugReportIcon />, DEBUG)}
         {renderButton('Sign Up', <PersonAddIcon />, SIGN_UP)}
         {renderButton('Sign In', <ArrowForwardIcon />, SIGN_IN)}
