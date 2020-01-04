@@ -15,8 +15,6 @@ body {
 .container {
   padding: 20px;
   margin: auto;
-  min-width: min(1200px, 100%);
-  max-width: 1200px;
 }
 .nav-container {
   margin: auto;
