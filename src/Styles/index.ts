@@ -36,6 +36,9 @@ const style = makeStyles((theme: Theme) => createStyles({
   snackbar: {
     backgroundColor: theme.palette.primary.main,
   },
+  input: {
+    display: 'none',
+  },
 }));
 
 export default style;
