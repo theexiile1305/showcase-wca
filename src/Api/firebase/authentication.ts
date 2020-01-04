@@ -26,7 +26,7 @@ export const signUp = (
     .then(() => encryptTextWithAES(password))
     .then((encryptedPassword) => fb.createUserWithEmailAndPassword(email, encryptedPassword))
     .then(() => {
-      const user = firebase.auth().currentUser;
+      const user = fb.currentUser;
       if (user) {
         user.updateProfile({ displayName });
         user.sendEmailVerification();
@@ -109,7 +109,7 @@ export const changeDisplayName = (
   encryptTextWithAES(password)
     .then((encryptedPassword) => fb.signInWithEmailAndPassword(email, encryptedPassword))
     .then(() => {
-      const user = firebase.auth().currentUser;
+      const user = fb.currentUser;
       if (user != null) {
         user.updateProfile({ displayName });
         dispatch(openSnackbar('You\'ve successfully changed your username.'));
@@ -131,7 +131,7 @@ export const changeEmail = (
   encryptTextWithAES(password)
     .then((encryptedPassword) => fb.signInWithEmailAndPassword(email, encryptedPassword))
     .then(() => {
-      const user = firebase.auth().currentUser;
+      const user = fb.currentUser;
       if (user != null) {
         user.updateEmail(newEmail);
         user.sendEmailVerification();
@@ -155,7 +155,7 @@ export const changePassword = (
     .then((encryptedPassword) => fb.signInWithEmailAndPassword(email, encryptedPassword))
     .then(() => encryptTextWithAES(newPassword))
     .then((encryptedNewPassword) => {
-      const user = firebase.auth().currentUser;
+      const user = fb.currentUser;
       if (user != null) {
         user.updatePassword(encryptedNewPassword);
         // TODO: key handling --> key dervation ?
@@ -180,7 +180,7 @@ export const deleteAccount = (
   encryptTextWithAES(password)
     .then((encryptedPassword) => fb.signInWithEmailAndPassword(email, encryptedPassword))
     .then(() => {
-      const user = firebase.auth().currentUser;
+      const user = fb.currentUser;
       if (user != null) {
         user.delete();
         removeKeyStorage();
