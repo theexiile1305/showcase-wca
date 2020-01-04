@@ -42,6 +42,7 @@ const ResetPassword: React.FC = () => {
             name="email"
             type="email"
             label="Enter Email"
+            autoComplete="email"
             value={email}
             onChange={
               (event: React.ChangeEvent<HTMLInputElement>): void => setEmail(event.target.value)

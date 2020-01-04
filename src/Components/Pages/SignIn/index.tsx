@@ -42,6 +42,7 @@ const SignIn: React.FC = () => {
             name="email"
             type="email"
             label="Enter Email"
+            autoComplete="email"
             value={email}
             onChange={
               (event: React.ChangeEvent<HTMLInputElement>): void => setEmail(event.target.value)
@@ -57,6 +58,7 @@ const SignIn: React.FC = () => {
             name="password"
             type="password"
             label="Enter Password"
+            autoComplete="password"
             value={password}
             onChange={
               (event: React.ChangeEvent<HTMLInputElement>): void => setPassword(event.target.value)
