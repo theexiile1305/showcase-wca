@@ -23,6 +23,7 @@
     "react-scripts": "3.3.0",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
+    "source-map-explorer": "^2.2.1",
     "typescript": "3.7.4"
   },
   "scripts": {
@@ -33,7 +34,8 @@
     "eslint": "eslint . --max-warnings 5 --ext .js,.jsx,.ts,.tsx",
     "size": "yarn build && size-limit",
     "cypress:run": "cypress run --record --key=${CYPRESS_RECORD_KEY}",
-    "ci:cypress-run": "start-server-and-test start http://localhost:3000 cypress:run"
+    "ci:cypress-run": "start-server-and-test start http://localhost:3000 cypress:run",
+    "analyze": "source-map-explorer 'build/static/js/*.js'"
   },
   "eslintConfig": {
     "extends": "react-app"
