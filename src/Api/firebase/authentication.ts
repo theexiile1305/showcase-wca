@@ -7,11 +7,9 @@ import { Dispatch } from 'react';
 import {
   saveUserData, SaveUserAction, logoutUser, LogoutUserAction,
 } from 'src/Store/user/UserActions';
-import firebase from '.';
 import { setupKeys, encryptTextWithAES } from '../wca';
 import { removeKeyStorage } from '../localforage';
-
-const fb = firebase.auth();
+import { auth } from './firebase';
 
 export const isAuthenticated = (): boolean => localStorage.getItem('isAuthenticated') === 'true';
 
@@ -24,9 +22,9 @@ export const signUp = (
   dispatch(setUILoading());
   setupKeys()
     .then(() => encryptTextWithAES(password))
-    .then((encryptedPassword) => fb.createUserWithEmailAndPassword(email, encryptedPassword))
+    .then((encryptedPassword) => auth.createUserWithEmailAndPassword(email, encryptedPassword))
     .then(() => {
-      const user = fb.currentUser;
+      const user = auth.currentUser;
       if (user) {
         user.updateProfile({ displayName });
         user.sendEmailVerification();
@@ -51,7 +49,7 @@ export const signInWithEmailPassword = (email: string, password: string, redirec
 ): void => {
   dispatch(setUILoading());
   encryptTextWithAES(password)
-    .then((encryptedPassword) => fb.signInWithEmailAndPassword(email, encryptedPassword))
+    .then((encryptedPassword) => auth.signInWithEmailAndPassword(email, encryptedPassword))
     .then((result) => {
       if (!result.user?.emailVerified) {
         throw new Error('Please verify your e-mail adress in order to sign in.');
@@ -73,7 +71,7 @@ export const signInWithEmailPassword = (email: string, password: string, redirec
 export const signOut = () => (
   dispatch: Dispatch<OpenSnackbarAction | LogoutUserAction>,
 ): void => {
-  fb.signOut()
+  auth.signOut()
     .then(() => {
       dispatch(openSnackbar('You\'ve been successfully signed out.'));
       dispatch(logoutUser());
@@ -85,7 +83,7 @@ export const resetPassword = (email: string, redirect: () => void) => (
   dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction>,
 ): void => {
   dispatch(setUILoading());
-  fb.sendPasswordResetEmail(email)
+  auth.sendPasswordResetEmail(email)
     .then(() => {
       // TODO: key handling --> what happen ?
       dispatch(openSnackbar('You\'ve successfully reseted your password.'));
@@ -107,9 +105,9 @@ export const changeDisplayName = (
     throw new Error('Could not change the username. Try it again!');
   }
   encryptTextWithAES(password)
-    .then((encryptedPassword) => fb.signInWithEmailAndPassword(email, encryptedPassword))
+    .then((encryptedPassword) => auth.signInWithEmailAndPassword(email, encryptedPassword))
     .then(() => {
-      const user = fb.currentUser;
+      const user = auth.currentUser;
       if (user != null) {
         user.updateProfile({ displayName });
         dispatch(openSnackbar('You\'ve successfully changed your username.'));
@@ -129,9 +127,9 @@ export const changeEmail = (
     throw new Error('Could not change the username. Try it again!');
   }
   encryptTextWithAES(password)
-    .then((encryptedPassword) => fb.signInWithEmailAndPassword(email, encryptedPassword))
+    .then((encryptedPassword) => auth.signInWithEmailAndPassword(email, encryptedPassword))
     .then(() => {
-      const user = fb.currentUser;
+      const user = auth.currentUser;
       if (user != null) {
         user.updateEmail(newEmail);
         user.sendEmailVerification();
@@ -152,10 +150,10 @@ export const changePassword = (
     throw new Error('Could not change the username. Try it again!');
   }
   encryptTextWithAES(password)
-    .then((encryptedPassword) => fb.signInWithEmailAndPassword(email, encryptedPassword))
+    .then((encryptedPassword) => auth.signInWithEmailAndPassword(email, encryptedPassword))
     .then(() => encryptTextWithAES(newPassword))
     .then((encryptedNewPassword) => {
-      const user = fb.currentUser;
+      const user = auth.currentUser;
       if (user != null) {
         user.updatePassword(encryptedNewPassword);
         // TODO: key handling --> key dervation ?
@@ -178,9 +176,9 @@ export const deleteAccount = (
   }
   dispatch(setUILoading());
   encryptTextWithAES(password)
-    .then((encryptedPassword) => fb.signInWithEmailAndPassword(email, encryptedPassword))
+    .then((encryptedPassword) => auth.signInWithEmailAndPassword(email, encryptedPassword))
     .then(() => {
-      const user = fb.currentUser;
+      const user = auth.currentUser;
       if (user != null) {
         user.delete();
         removeKeyStorage();

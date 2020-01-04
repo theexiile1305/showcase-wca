@@ -6,11 +6,9 @@ import {
 import {
   saveDocuments, SaveDocumentAction, removeDocument, RemoveDocumentAction,
 } from 'src/Store/documents/DocumentActions';
-import firebase from 'firebase';
 import saveData from '../saveData';
 import { decryptDataWithAES, encryptDataWithAES } from '../wca';
-
-const storage = firebase.storage().ref();
+import { storage } from './firebase';
 
 const blobToArrayBuffer = (
   data: Blob,
