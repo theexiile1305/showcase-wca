@@ -14,27 +14,25 @@ const SimpleSnackbar: React.FC = () => {
   const snackbar = useSelector((state: ApplicationState) => state.ui.snackbar);
 
   return (
-    <div>
-      <Snackbar
-        className={classes.snackbar}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-        open={!!snackbar}
-        autoHideDuration={6000}
-        onClose={handleClose}
-        ContentProps={{ 'aria-describedby': 'message-id' }}
-        message={(<span id="message-id">{snackbar?.message}</span>)}
-        action={[
-          <IconButton
-            key="close"
-            aria-label="close"
-            color="inherit"
-            onClick={handleClose}
-          >
-            <CloseIcon />
-          </IconButton>,
-        ]}
-      />
-    </div>
+    <Snackbar
+      className={classes.snackbar}
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+      open={!!snackbar}
+      autoHideDuration={6000}
+      onClose={handleClose}
+      ContentProps={{ 'aria-describedby': 'message-id' }}
+      message={(<span id="message-id">{snackbar?.message}</span>)}
+      action={[
+        <IconButton
+          key="close"
+          aria-label="close"
+          color="inherit"
+          onClick={handleClose}
+        >
+          <CloseIcon />
+        </IconButton>,
+      ]}
+    />
   );
 };
 

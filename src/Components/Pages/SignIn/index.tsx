@@ -1,19 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import {
-  Typography, Avatar, Grid, TextField, Button, CircularProgress,
+  Typography, Grid, TextField, Button,
 } from '@material-ui/core';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import style from 'src/Styles';
-import { ApplicationState } from 'src/Store/ApplicationState';
 import { SIGN_UP, RESET_PASSWORD, HOME } from 'src/Routes';
 import { signInWithEmailPassword } from 'src/Api/firebase/authentication';
 
 const SignIn: React.FC = () => {
   const classes = style();
-
-  const loading = useSelector((state: ApplicationState) => state.ui.loading);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -30,11 +26,6 @@ const SignIn: React.FC = () => {
     <form noValidate onSubmit={handleSubmit}>
       <Grid container spacing={3} className={classes.form}>
         <Grid item xs={12}>
-          <Avatar className={classes.avatar}>
-            <ArrowForwardIcon />
-          </Avatar>
-        </Grid>
-        <Grid item xs={12}>
           <Typography variant="h4">
           Login into your Account to continue
           </Typography>
@@ -48,6 +39,7 @@ const SignIn: React.FC = () => {
             name="email"
             type="email"
             label="Enter Email"
+            autoComplete="email"
             value={email}
             onChange={
               (event: React.ChangeEvent<HTMLInputElement>): void => setEmail(event.target.value)
@@ -63,6 +55,7 @@ const SignIn: React.FC = () => {
             name="password"
             type="password"
             label="Enter Password"
+            autoComplete="password"
             value={password}
             onChange={
               (event: React.ChangeEvent<HTMLInputElement>): void => setPassword(event.target.value)
@@ -74,12 +67,8 @@ const SignIn: React.FC = () => {
             type="submit"
             variant="contained"
             color="primary"
-            disabled={loading}
           >
           Sign In
-            {loading && (
-              <CircularProgress size={30} className={classes.progress} />
-            )}
           </Button>
         </Grid>
         <Grid

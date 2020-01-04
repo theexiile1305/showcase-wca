@@ -1,6 +1,5 @@
 import React from 'react';
-import { Avatar, Grid, Typography } from '@material-ui/core';
-import PeopleIcon from '@material-ui/icons/People';
+import { Grid, Typography } from '@material-ui/core';
 import style from 'src/Styles';
 import UserDetails from './UserDetails';
 import RSAOAEP from './RSAOAEP';
@@ -12,11 +11,6 @@ const User: React.FC = () => {
 
   return (
     <Grid container alignItems="center" spacing={2}>
-      <Grid item xs={12} className={classes.center}>
-        <Avatar className={classes.avatar}>
-          <PeopleIcon />
-        </Avatar>
-      </Grid>
       <Grid item xs={12} className={classes.center}>
         <Typography variant="h4">User Management</Typography>
       </Grid>
