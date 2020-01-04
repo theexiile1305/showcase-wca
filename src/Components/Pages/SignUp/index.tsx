@@ -1,18 +1,15 @@
 import React, { useState } from 'react';
 import {
-  Grid, Typography, TextField, CircularProgress, Button,
+  Grid, Typography, TextField, Button,
 } from '@material-ui/core';
 import { Link, useHistory } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import style from 'src/Styles';
 import { signUp } from 'src/Api/firebase/authentication';
 import { SIGN_IN, HOME } from 'src/Routes';
-import { ApplicationState } from 'src/Store/ApplicationState';
 
 const SignUp: React.FC = () => {
   const classes = style();
-
-  const loading = useSelector((state: ApplicationState) => state.ui.loading);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -87,12 +84,8 @@ const SignUp: React.FC = () => {
             type="submit"
             variant="contained"
             color="primary"
-            disabled={loading}
           >
         Sign Up
-            {loading && (
-              <CircularProgress size={30} className={classes.progress} />
-            )}
           </Button>
         </Grid>
         <Grid
