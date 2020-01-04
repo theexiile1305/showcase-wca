@@ -40,7 +40,7 @@ export const signUp = (
       redirect();
     })
     .catch((error) => {
-      dispatch(openSnackbar(error));
+      dispatch(openSnackbar(error.message));
       dispatch(clearUILoading());
     });
 };
