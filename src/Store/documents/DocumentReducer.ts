@@ -6,7 +6,6 @@ const initialState: DocumentStore = {
   documents: [],
 };
 
-// TODO change AnyAction to DocumentsAction
 const DocumentReducer: Reducer<DocumentStore> = (
   state: DocumentStore = initialState, action: AnyAction,
 ) => {
@@ -19,7 +18,7 @@ const DocumentReducer: Reducer<DocumentStore> = (
     case DocumentAction.REMOVE_DOCUMENT:
       return {
         ...state,
-        documents: state.documents.filter((item) => item.id !== action.id),
+        documents: state.documents.filter((item) => item.filename !== action.filename),
       };
     default:
       return state;

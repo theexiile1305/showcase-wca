@@ -12,19 +12,28 @@ export interface SaveDocumentAction extends Action {
 }
 export interface RemoveDocumentAction extends Action {
   type: DocumentAction.REMOVE_DOCUMENT;
-  id: string;
+  filename: string;
 }
 
 export type DocumentActions =
   | SaveDocumentAction
   | RemoveDocumentAction;
 
-export const saveDocuments: ActionCreator<SaveDocumentAction> = (documents: Document[]) => ({
-  type: DocumentAction.SAVE_DOCUMENTS,
-  documents,
-});
+export const saveDocuments: ActionCreator<SaveDocumentAction> = (
+  listResult: firebase.storage.ListResult,
+) => {
+  const documents = listResult.items.map((reference) => {
+    const document: Document = { id: reference.fullPath, filename: reference.name };
+    return document;
+  });
 
-export const removeDocument: ActionCreator<RemoveDocumentAction> = (id: string) => ({
+  return {
+    type: DocumentAction.SAVE_DOCUMENTS,
+    documents,
+  };
+};
+
+export const removeDocument: ActionCreator<RemoveDocumentAction> = (filename: string) => ({
   type: DocumentAction.REMOVE_DOCUMENT,
-  id,
+  filename,
 });
