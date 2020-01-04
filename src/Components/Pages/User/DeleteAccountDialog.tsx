@@ -17,13 +17,19 @@ const DeleteAccountDialog: React.FC = () => {
   const openDeleteAccount = useSelector(
     (state: ApplicationState) => state.ui.dialog === DialogType.DELETE_ACCOUNT,
   );
+  const email = useSelector((state: ApplicationState) => {
+    const currentUser = state.user.user;
+    if (currentUser && currentUser.email) {
+      return currentUser.email;
+    }
+    return undefined;
+  });
 
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleDeleteAccount = (event: React.MouseEvent<HTMLElement>): void => {
     event.preventDefault();
-    dispatch(deleteAccount('email', 'password', () => history.push(HOME)));
+    dispatch(deleteAccount(email, password, () => history.push(HOME)));
   };
 
   return (
@@ -40,21 +46,6 @@ const DeleteAccountDialog: React.FC = () => {
             To delete your account, please enter your email and password.
         </DialogContentText>
         <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <TextField
-              variant="outlined"
-              required
-              fullWidth
-              id="email"
-              name="email"
-              type="email"
-              label="Enter Email"
-              value={email}
-              onChange={(
-                event: React.ChangeEvent<HTMLInputElement>,
-              ): void => setEmail(event.target.value)}
-            />
-          </Grid>
           <Grid item xs={12}>
             <TextField
               variant="outlined"

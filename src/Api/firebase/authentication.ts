@@ -40,7 +40,7 @@ export const signUp = (
       redirect();
     })
     .catch((error) => {
-      dispatch(openSnackbar(error.message));
+      dispatch(openSnackbar(error));
       dispatch(clearUILoading());
     });
 };
@@ -167,10 +167,15 @@ export const changePassword = (
     .catch((error) => dispatch(openSnackbar(error.message)));
 };
 
-export const deleteAccount = (email: string, password: string, redirect: () => void) => (
+export const deleteAccount = (
+  email: string | undefined, password: string, redirect: () => void,
+) => (
   dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction
   | LogoutUserAction>,
 ): void => {
+  if (email === undefined) {
+    throw new Error('Could not delete the acount. Try it again!');
+  }
   dispatch(setUILoading());
   encryptTextWithAES(password)
     .then((encryptedPassword) => fb.signInWithEmailAndPassword(email, encryptedPassword))
