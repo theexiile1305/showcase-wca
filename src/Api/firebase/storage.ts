@@ -5,6 +5,7 @@ import {
 } from 'src/Store/ui/UIActions';
 import {
   saveDocuments, SaveDocumentAction, removeDocument, RemoveDocumentAction,
+  saveSingleDocument, SaveSingleDocumentAction,
 } from 'src/Store/documents/DocumentActions';
 import saveData from '../saveData';
 import { decryptDataWithAES, encryptDataWithAES } from '../wca';
@@ -22,7 +23,8 @@ const blobToArrayBuffer = (
 export const uploadDocuments = (
   userID: string, files: FileList,
 ) => async (
-  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction>,
+  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction
+  | SaveSingleDocumentAction>,
 ): Promise<void> => {
   dispatch(setUILoading());
   for (let index = 0; index < files.length; index += 1) {
@@ -37,13 +39,15 @@ export const uploadDocuments = (
           contentType: type,
           customMetadata: { lastModified: lastModified.toString() },
         })
-        .on('state_changed', null, () => {
-          dispatch(openSnackbar('You\'ve unsuccessfully uploaded the file(s).'));
-          dispatch(clearUILoading());
-        }, () => {
-          dispatch(openSnackbar('You\'ve successfully uploaded the file(s).'));
-          dispatch(clearUILoading());
-        }));
+        .on('state_changed', null,
+          () => dispatch(openSnackbar('You\'ve unsuccessfully uploaded the file(s).')),
+          () => dispatch(openSnackbar('You\'ve successfully uploaded the file(s).'))))
+      .then(() => dispatch(saveSingleDocument(name, ref.fullPath)))
+      .then(() => dispatch(clearUILoading()))
+      .catch((error) => {
+        dispatch(openSnackbar(error.message));
+        dispatch(clearUILoading());
+      });
   }
 };
 

@@ -1,9 +1,17 @@
 import { Reducer, AnyAction } from 'redux';
+import { Document } from 'src/Models/Document';
 import { DocumentStore } from './DocumentStore';
 import { DocumentAction } from './DocumentActions';
 
 const initialState: DocumentStore = {
   documents: [],
+};
+
+const addUniqueDocument = (
+  documents: Document[], document: Document,
+): Document[] => {
+  const updated = documents.filter((item) => item.filename !== document.filename);
+  return [...updated, document];
 };
 
 const DocumentReducer: Reducer<DocumentStore> = (
@@ -14,6 +22,11 @@ const DocumentReducer: Reducer<DocumentStore> = (
       return {
         ...state,
         documents: action.documents,
+      };
+    case DocumentAction.SAVE_SINGLE_DOCUMENT:
+      return {
+        ...state,
+        documents: addUniqueDocument(state.documents, action.document).sort(),
       };
     case DocumentAction.REMOVE_DOCUMENT:
       return {
