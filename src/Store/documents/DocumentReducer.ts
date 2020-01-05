@@ -1,17 +1,26 @@
 import { Reducer, AnyAction } from 'redux';
 import { Document } from 'src/Models/Document';
+import { SharedPublicKeys } from 'src/Models/SharedPublicKeys';
 import { DocumentStore } from './DocumentStore';
 import { DocumentAction } from './DocumentActions';
 
 const initialState: DocumentStore = {
   documents: [],
+  sharedPublicKeys: [],
 };
 
 const addUniqueDocument = (
-  documents: Document[], document: Document,
+  array: Document[], element: Document,
 ): Document[] => {
-  const updated = documents.filter((item) => item.filename !== document.filename);
-  return [...updated, document];
+  const updated = array.filter((item) => item.filename !== element.filename);
+  return [...updated, element];
+};
+
+const addUniqueSharedPublicKeys = (
+  array: SharedPublicKeys[], element: SharedPublicKeys,
+): SharedPublicKeys[] => {
+  const updated = array.filter((item) => item.userID !== element.userID);
+  return [...updated, element];
 };
 
 const DocumentReducer: Reducer<DocumentStore> = (
@@ -32,6 +41,16 @@ const DocumentReducer: Reducer<DocumentStore> = (
       return {
         ...state,
         documents: state.documents.filter((item) => item.filename !== action.filename),
+      };
+    case DocumentAction.SAVE_SHARED_PUBLIC_KEYS:
+      return {
+        ...state,
+        sharedPublicKeys: addUniqueSharedPublicKeys(state.sharedPublicKeys, action.sharedPublicKeys),
+      };
+    case DocumentAction.REMOVE_SHARED_PUBLIC_KEYS:
+      return {
+        ...state,
+        sharedPublicKeys: state.sharedPublicKeys.filter((item) => item.userID !== action.userID),
       };
     default:
       return state;
