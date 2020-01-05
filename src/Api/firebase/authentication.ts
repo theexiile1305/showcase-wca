@@ -10,6 +10,7 @@ import {
 import { setupKeys, encryptTextWithAES } from '../wca';
 import { removeKeyStorage } from '../localforage';
 import { auth } from './firebase';
+import { shareRSAPublicKeys, deleteSharedPublicKeys } from './storage';
 
 export const isAuthenticated = (): boolean => localStorage.getItem('isAuthenticated') === 'true';
 
@@ -27,6 +28,7 @@ export const signUp = (
       const user = auth.currentUser;
       if (user) {
         user.updateProfile({ displayName });
+        shareRSAPublicKeys(user.uid);
         user.sendEmailVerification();
         dispatch(openSnackbar('Please verify your e-mail adress in order to sign in.'));
       }
@@ -180,6 +182,7 @@ export const deleteAccount = (
     .then(() => {
       const user = auth.currentUser;
       if (user != null) {
+        deleteSharedPublicKeys(user.uid);
         user.delete();
         removeKeyStorage();
         dispatch(openSnackbar('You\'ve successfully deleted your account.'));
