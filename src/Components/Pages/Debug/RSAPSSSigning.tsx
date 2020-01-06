@@ -4,21 +4,33 @@ import {
 } from '@material-ui/core';
 import style from 'src/Styles';
 import { signTextWithRSAPSS } from 'src/Api/wca';
+import { openSnackbar } from 'src/Store/ui/UIActions';
+import { useDispatch } from 'react-redux';
 
 const RSAPSSSigning: React.FC = () => {
   const classes = style();
 
+  const dispatch = useDispatch();
+
   const [message, setMessage] = useState();
   const [signature, setSignature] = useState();
+  const [defaultValue, setDefaultValue] = useState(' ');
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = (
+    event: React.FormEvent<HTMLFormElement>,
+  ): void => {
     event.preventDefault();
-    signTextWithRSAPSS(message).then((text) => setSignature(text));
+    signTextWithRSAPSS(message)
+      .then((text) => {
+        setDefaultValue('');
+        setSignature(text);
+      })
+      .catch(() => dispatch(openSnackbar('Please double check your input!')));
   };
 
   return (
     <Card className={classes.debugForm}>
-      <form noValidate onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <CardContent>
           <Grid container spacing={2}>
             <Grid item xs={12}>
@@ -36,7 +48,7 @@ const RSAPSSSigning: React.FC = () => {
                 id="rsa-pss-signing-message"
                 name="rsa-pss-signing-message"
                 type="text"
-                defaultValue="Please enter your message, which should be signed."
+                placeholder="Please enter your message, which should be signed."
                 variant="outlined"
                 value={message}
                 onChange={(
@@ -50,6 +62,8 @@ const RSAPSSSigning: React.FC = () => {
                 fullWidth
                 disabled
                 rows="2"
+                label="Signature"
+                defaultValue={defaultValue}
                 id="rsa-pss-signing-signature"
                 name="rsa-pss-signing-signature"
                 type="text"
