@@ -5,13 +5,18 @@ import {
 import style from 'src/Styles';
 import { encryptTextWithRSAOAEP } from 'src/Api/wca';
 import { getKeyStorage } from 'src/Api/localforage';
+import { useDispatch } from 'react-redux';
+import { openSnackbar } from 'src/Store/ui/UIActions';
 
 const RSAOAEPEncryption: React.FC = () => {
   const classes = style();
 
+  const dispatch = useDispatch();
+
   const [publicKey, setPublicKey] = useState();
   const [plaintext, setPlaintext] = useState();
   const [ciphertext, setCiphertext] = useState();
+  const [defaultValue, setDefaultValue] = useState(' ');
 
   useEffect(() => {
     getKeyStorage()
@@ -19,14 +24,21 @@ const RSAOAEPEncryption: React.FC = () => {
       .then((rsaOAEP) => setPublicKey(rsaOAEP.publicKey));
   }, []);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = (
+    event: React.FormEvent<HTMLFormElement>,
+  ): void => {
     event.preventDefault();
-    encryptTextWithRSAOAEP(plaintext, publicKey).then((text) => setCiphertext(text));
+    encryptTextWithRSAOAEP(plaintext, publicKey)
+      .then((text) => {
+        setDefaultValue('');
+        setCiphertext(text);
+      })
+      .catch(() => dispatch(openSnackbar('Please double check your input!')));
   };
 
   return (
     <Card className={classes.debugForm}>
-      <form noValidate onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <CardContent>
           <Grid container spacing={2}>
             <Grid item xs={12}>
@@ -44,7 +56,7 @@ const RSAOAEPEncryption: React.FC = () => {
                 id="rsa-oaep-encryption-plaintext"
                 name="rsa-oaep-encryption-plaintext"
                 type="text"
-                defaultValue="Please enter the data, which should be encrypted."
+                placeholder="Please enter the data, which should be encrypted."
                 variant="outlined"
                 value={plaintext}
                 onChange={(
@@ -58,6 +70,8 @@ const RSAOAEPEncryption: React.FC = () => {
                 fullWidth
                 disabled
                 rows="5"
+                label="Ciphertext"
+                defaultValue={defaultValue}
                 id="rsa-oaep-encryption-ciphertext"
                 name="rsa-oaep-encryption-ciphertext"
                 type="text"
