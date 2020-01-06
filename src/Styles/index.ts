@@ -8,6 +8,9 @@ const style = makeStyles((theme: Theme) => createStyles({
     textAlign: 'center',
     maxWidth: '600px',
   },
+  debugForm: {
+    textAlign: 'center',
+  },
   progress: {
     position: 'absolute',
   },
