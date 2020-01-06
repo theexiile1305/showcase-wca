@@ -1,4 +1,4 @@
-import { arrayBufferToString } from './utils';
+import { arrayBufferToString, stringToArrayBuffer } from './utils';
 import { wca } from './config';
 
 const PEM_PUBLIC_HEADER = '-----BEGIN PUBLIC KEY-----';
@@ -6,7 +6,26 @@ const PEM_PUBLIC_FOOTER = '-----END PUBLIC KEY-----';
 const PEM_PRIVATE_HEADER = '-----BEGIN PRIVATE KEY-----';
 const PEM_PRIVATE_FOOTER = '-----END PRIVATE KEY-----';
 
-const exporCryptoKey = (
+const importCryptoKey = (
+  cryptoKey: string, format: 'spki' | 'pkcs8', algorithm: string, keyUsages: string[],
+): PromiseLike<CryptoKey> => {
+  const content = cryptoKey.substring(
+    PEM_PUBLIC_HEADER.length, cryptoKey.length - PEM_PUBLIC_FOOTER.length,
+  );
+  const binary = window.atob(content);
+  const key = stringToArrayBuffer(binary);
+  return wca.importKey(format, key, { name: algorithm, hash: 'SHA-512' }, true, keyUsages);
+};
+
+export const importRSAOAEPPublicCryptoKey = (
+  cryptoKey: string,
+): PromiseLike<CryptoKey> => importCryptoKey(cryptoKey, 'spki', 'RSA-OAEP', ['encrypt']);
+
+export const importRSAPSSPublicCryptoKey = (
+  cryptoKey: string,
+): PromiseLike<CryptoKey> => importCryptoKey(cryptoKey, 'spki', 'RSA-PSS', ['sign', 'verify']);
+
+const exportCryptoKey = (
   cryptoKey: CryptoKey, format: 'spki' | 'pkcs8', header: string, footer: string,
 ): PromiseLike<string> => wca
   .exportKey(format, cryptoKey)
@@ -16,11 +35,11 @@ const exporCryptoKey = (
 
 export const exportPublicCryptoKey = (
   cryptoKey: CryptoKey,
-): PromiseLike<string> => exporCryptoKey(cryptoKey, 'spki', PEM_PUBLIC_HEADER, PEM_PUBLIC_FOOTER);
+): PromiseLike<string> => exportCryptoKey(cryptoKey, 'spki', PEM_PUBLIC_HEADER, PEM_PUBLIC_FOOTER);
 
 export const exportPrivateCryptoKey = (
   cryptoKey: CryptoKey,
-): PromiseLike<string> => exporCryptoKey(cryptoKey, 'pkcs8', PEM_PRIVATE_HEADER, PEM_PRIVATE_FOOTER);
+): PromiseLike<string> => exportCryptoKey(cryptoKey, 'pkcs8', PEM_PRIVATE_HEADER, PEM_PRIVATE_FOOTER);
 
 export const exportSymmetricCryptoKey = (
   cryptoKey: CryptoKey,

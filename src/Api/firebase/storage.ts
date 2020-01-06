@@ -5,10 +5,17 @@ import {
 } from 'src/Store/ui/UIActions';
 import {
   saveDocuments, SaveDocumentAction, removeDocument, RemoveDocumentAction,
+  saveSingleDocument, SaveSingleDocumentAction, saveSharedPublicKeys, SaveSharedPublicKeysAction,
+  removeSharedPublicKeys, RemoveSharedPublicKeysAction,
 } from 'src/Store/documents/DocumentActions';
+import { SharedPublicKey } from 'src/Models/SharedPublicKey';
+import { SharedPublicKeys } from 'src/Models/SharedPublicKeys';
 import saveData from '../saveData';
-import { decryptDataWithAES, encryptDataWithAES } from '../wca';
 import { storage } from './firebase';
+import { exportPublicCryptoKey, importRSAOAEPPublicCryptoKey, exportSymmetricCryptoKey } from '../wca/pemManagement';
+import { encryptDataWithAES, decryptDataWithAES, encryptTextWithRSAOAEP } from '../wca';
+import { getKeyStorage } from '../localforage';
+import { arrayBufferToString } from '../wca/utils';
 
 const blobToArrayBuffer = (
   data: Blob,
@@ -22,13 +29,14 @@ const blobToArrayBuffer = (
 export const uploadDocuments = (
   userID: string, files: FileList,
 ) => async (
-  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction>,
+  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction
+  | SaveSingleDocumentAction>,
 ): Promise<void> => {
   dispatch(setUILoading());
   for (let index = 0; index < files.length; index += 1) {
     const file = files[index];
     const { name, type, lastModified } = file;
-    const ref = storage.child(`${userID}/documents/${name}`);
+    const ref = storage.child(`documents/${userID}/${name}`);
     blobToArrayBuffer(file)
       .then((arrayBuffer) => encryptDataWithAES(arrayBuffer))
       .then((arrayBuffer) => new Blob([arrayBuffer], { type }))
@@ -37,20 +45,43 @@ export const uploadDocuments = (
           contentType: type,
           customMetadata: { lastModified: lastModified.toString() },
         })
-        .on('state_changed', null, () => {
-          dispatch(openSnackbar('You\'ve unsuccessfully uploaded the file(s).'));
-          dispatch(clearUILoading());
-        }, () => {
-          dispatch(openSnackbar('You\'ve successfully uploaded the file(s).'));
-          dispatch(clearUILoading());
-        }));
+        .on('state_changed', null,
+          () => dispatch(openSnackbar('You\'ve unsuccessfully uploaded the file(s).')),
+          () => dispatch(openSnackbar('You\'ve successfully uploaded the file(s).'))))
+      .then(() => dispatch(saveSingleDocument(name, ref.fullPath)))
+      .then(() => dispatch(clearUILoading()))
+      .catch((error) => {
+        dispatch(openSnackbar(error.message));
+        dispatch(clearUILoading());
+      });
   }
+};
+
+const shareRSAPublicKey = async (
+  userID: string, filename: string, publicKey: CryptoKey, fingerprint: string,
+): Promise<void> => {
+  const ref = storage.child(`publicKeys/${userID}/${filename}`);
+  await exportPublicCryptoKey(publicKey)
+    .then((pem) => new Blob([pem], { type: 'application/x-pem-file ' }))
+    .then((blob) => ref
+      .put(blob, {
+        contentType: 'application/x-pem-file ',
+        customMetadata: { fingerprint },
+      }));
+};
+
+export const shareRSAPublicKeys = async (
+  userID: string,
+): Promise<void> => {
+  const keys = await getKeyStorage();
+  await shareRSAPublicKey(userID, 'rsaOAEP.pem', keys.rsaOAEP.publicKey, keys.rsaOAEP.publicKeyFingerprint);
+  await shareRSAPublicKey(userID, 'rsaPSS.pem', keys.rsaPSS.publicKey, keys.rsaPSS.publicKeyFingerprint);
 };
 
 export const downloadDocument = (
   userID: string, filename: string,
 ): void => {
-  const ref = storage.child(`${userID}/documents/${filename}`);
+  const ref = storage.child(`documents/${userID}/${filename}`);
   ref
     .getDownloadURL()
     .then((url) => fetch(url))
@@ -60,6 +91,19 @@ export const downloadDocument = (
     .then((blob) => saveData(blob, filename));
 };
 
+export const deleteSharedPublicKeys = (
+  userID: string,
+) => (
+  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction
+  | RemoveSharedPublicKeysAction>,
+): void => {
+  dispatch(setUILoading());
+  const ref = storage.child(`publicKey/${userID}/`);
+  ref.delete()
+    .then(() => dispatch(removeSharedPublicKeys(userID)))
+    .then(() => dispatch(clearUILoading()));
+};
+
 export const deleteDocument = (
   userID: string, filename: string,
 ) => (
@@ -67,7 +111,7 @@ export const deleteDocument = (
   | RemoveDocumentAction>,
 ): void => {
   dispatch(setUILoading());
-  const ref = storage.child(`${userID}/documents/${filename}`);
+  const ref = storage.child(`documents/${userID}/${filename}`);
   ref.delete()
     .then(() => {
       dispatch(removeDocument(filename));
@@ -80,6 +124,51 @@ export const deleteDocument = (
     });
 };
 
+const getSharedPublicKey = async (
+  reference: firebase.storage.Reference, type: string,
+): Promise<SharedPublicKey> => {
+  const key = reference.child(type);
+  const downloadURL: string = await key.getDownloadURL();
+  const fingerprint: string = await key
+    .getMetadata()
+    .then((metadata) => metadata.customMetadata.fingerprint);
+  const sharedSinglePublicKey = { downloadURL, fingerprint };
+  return Promise.resolve(sharedSinglePublicKey);
+};
+
+const getSharedPublicKeys = async (
+  folder: firebase.storage.Reference,
+): Promise<SharedPublicKeys> => {
+  const result = await Promise.all([
+    getSharedPublicKey(folder, 'rsaOAEP.pem'),
+    getSharedPublicKey(folder, 'rsaPSS.pem'),
+  ]);
+  const sharedSinglePublicKeys = {
+    userID: folder.name,
+    rsaOAEP: result[0],
+    rsaPSS: result[1],
+  };
+  return sharedSinglePublicKeys;
+};
+
+export const listSharedPublicKeys = (
+) => async (
+  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction
+  | SaveSharedPublicKeysAction>,
+): Promise<void> => {
+  dispatch(setUILoading());
+  const ref = storage.child('publicKeys/');
+  ref.listAll()
+    .then((result) => result.prefixes.map(
+      async (folder) => dispatch(saveSharedPublicKeys(await getSharedPublicKeys(folder))),
+    ))
+    .then(() => dispatch(clearUILoading()))
+    .catch((error) => {
+      dispatch(openSnackbar(error.message));
+      dispatch(clearUILoading());
+    });
+};
+
 export const listAllDocuments = (
   userID: string,
 ) => (
@@ -87,7 +176,7 @@ export const listAllDocuments = (
   | SaveDocumentAction>,
 ): void => {
   dispatch(setUILoading());
-  const ref = storage.child(`${userID}/documents/`);
+  const ref = storage.child(`documents/${userID}/`);
   ref.listAll()
     .then((result) => {
       dispatch(saveDocuments(result));
@@ -95,6 +184,59 @@ export const listAllDocuments = (
     })
     .catch((error) => {
       dispatch(openSnackbar(error.message));
+      dispatch(clearUILoading());
+    });
+};
+
+export const exchangeKey = (
+  userID: string, exchangeUserID: string, url: string,
+) => async (
+  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction>,
+): Promise<void> => {
+  dispatch(setUILoading());
+  const ref = storage.child(`exchange/${exchangeUserID}/${userID}/aesCBC.json`);
+  const aesCBCWrapper = await getKeyStorage()
+    .then((keyStorage) => keyStorage.aesCBC);
+  const aesCBC = await exportSymmetricCryptoKey(aesCBCWrapper.key)
+    .then((jsonWebKey) => JSON.stringify(jsonWebKey));
+  const publicKey = fetch(url)
+    .then((response) => response.text())
+    .then((text) => importRSAOAEPPublicCryptoKey(text));
+  Promise.all([aesCBC, publicKey])
+    .then((promises) => encryptTextWithRSAOAEP(promises[0], promises[1]))
+    .then((text) => new Blob([text], { type: 'application/json' }))
+    .then((blob) => ref
+      .put(blob, {
+        contentType: 'application/json',
+        customMetadata: {
+          fingerprint: aesCBCWrapper.fingerprint,
+          iv: arrayBufferToString(aesCBCWrapper.iv),
+        },
+      })
+      .on('state_changed', null,
+        () => dispatch(openSnackbar('You\'ve unsuccessfully shared your AES-CBC key.')),
+        () => dispatch(openSnackbar('You\'ve successfully shared your AES-CBC key.'))))
+    .then(() => dispatch(clearUILoading()))
+    .catch((error) => {
+      dispatch(openSnackbar(error.message));
+      dispatch(clearUILoading());
+    });
+};
+
+export const deleteExchangeKey = (
+  userID: string, exchangeUserID: string,
+) => async (
+  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction>,
+): Promise<void> => {
+  dispatch(setUILoading());
+  const ref = storage.child(`exchange/${exchangeUserID}/${userID}/aesCBC.json`);
+  ref.delete()
+    .then(() => {
+      dispatch(openSnackbar('You\'ve successfully deleted the exchanged key.'));
+      dispatch(clearUILoading());
+    })
+    .catch(() => {
+      dispatch(openSnackbar('You\'ve already deleted the exchanged key.'));
       dispatch(clearUILoading());
     });
 };
