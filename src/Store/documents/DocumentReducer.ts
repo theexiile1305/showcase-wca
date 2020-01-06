@@ -45,7 +45,9 @@ const DocumentReducer: Reducer<DocumentStore> = (
     case DocumentAction.SAVE_SHARED_PUBLIC_KEYS:
       return {
         ...state,
-        sharedPublicKeys: addUniqueSharedPublicKeys(state.sharedPublicKeys, action.sharedPublicKeys),
+        sharedPublicKeys: addUniqueSharedPublicKeys(
+          state.sharedPublicKeys, action.sharedPublicKeys,
+        ),
       };
     case DocumentAction.REMOVE_SHARED_PUBLIC_KEYS:
       return {
