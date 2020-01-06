@@ -61,7 +61,7 @@ const RSAPSSSigning: React.FC = () => {
                 multiline
                 fullWidth
                 disabled
-                rows="2"
+                rows="5"
                 label="Signature"
                 defaultValue={defaultValue}
                 id="rsa-pss-signing-signature"

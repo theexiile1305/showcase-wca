@@ -68,7 +68,7 @@ const RSAPSSVerifying: React.FC = () => {
                 multiline
                 required
                 fullWidth
-                rows="2"
+                rows="5"
                 id="rsa-pss-verifying-signature"
                 name="rsa-pss-verifying-signature"
                 type="text"
