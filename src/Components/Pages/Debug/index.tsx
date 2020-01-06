@@ -6,7 +6,7 @@ import AESCBCDecryption from './AESCBCDecryption';
 import RSAOAEPEncryption from './RSAOAEPEncryption';
 import RSAOAEPDecryption from './RSAOAEPDecryption';
 import RSAPSSSigning from './RSAPSSSigning';
-import RSAPSSVerifing from './RSAPSSVerifing';
+import RSAPSSVerifying from './RSAPSSVerifying';
 
 const Debug: React.FC = () => {
   const classes = style();
@@ -32,7 +32,7 @@ const Debug: React.FC = () => {
         <RSAPSSSigning />
       </Grid>
       <Grid item xs={6}>
-        <RSAPSSVerifing />
+        <RSAPSSVerifying />
       </Grid>
     </Grid>
   );

@@ -41,9 +41,9 @@ const RSAOAEPEncryption: React.FC = () => {
                 fullWidth
                 rows="5"
                 label="Plaintext"
-                id="plaintext"
-                name="plaintext"
-                type="plaintext"
+                id="rsa-oaep-encryption-plaintext"
+                name="rsa-oaep-encryption-plaintext"
+                type="text"
                 defaultValue="Please enter the data, which should be encrypted."
                 variant="outlined"
                 value={plaintext}
@@ -58,9 +58,9 @@ const RSAOAEPEncryption: React.FC = () => {
                 fullWidth
                 disabled
                 rows="5"
-                id="ciphertext"
-                name="ciphertext"
-                type="ciphertext"
+                id="rsa-oaep-encryption-ciphertext"
+                name="rsa-oaep-encryption-ciphertext"
+                type="text"
                 variant="outlined"
                 value={ciphertext}
               />

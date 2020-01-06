@@ -8,7 +8,7 @@ import style from 'src/Styles';
 import { verifyTextWithRSAPSS } from 'src/Api/wca';
 import { getKeyStorage } from 'src/Api/localforage';
 
-const RSAPSSVerifing: React.FC = () => {
+const RSAPSSVerifying: React.FC = () => {
   const classes = style();
 
   const [publicKey, setPublicKey] = useState();
@@ -43,9 +43,9 @@ const RSAPSSVerifing: React.FC = () => {
                 required
                 fullWidth
                 rows="5"
-                id="message"
-                name="message"
-                type="v"
+                id="rsa-pss-verifying-message"
+                name="rsa-pss-verifyingmessage"
+                type="text"
                 defaultValue="Please enter your message, which should be verified."
                 variant="outlined"
                 value={message}
@@ -60,9 +60,9 @@ const RSAPSSVerifing: React.FC = () => {
                 required
                 fullWidth
                 rows="2"
-                id="signature"
-                name="signature"
-                type="signature"
+                id="rsa-pss-verifying-signature"
+                name="rsa-pss-verifying-signature"
+                type="text"
                 defaultValue="Please enter your signature."
                 variant="outlined"
                 value={signature}
@@ -94,4 +94,4 @@ const RSAPSSVerifing: React.FC = () => {
   );
 };
 
-export default RSAPSSVerifing;
+export default RSAPSSVerifying;

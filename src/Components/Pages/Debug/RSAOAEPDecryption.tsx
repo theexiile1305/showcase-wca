@@ -33,9 +33,9 @@ const RSAOAEPDecryption: React.FC = () => {
                 fullWidth
                 rows="5"
                 label="Ciphertext"
-                id="ciphertext"
-                name="ciphertext"
-                type="ciphertext"
+                id="rsa-oaep-decryption-ciphertext"
+                name="rsa-oaep-decryption-ciphertext"
+                type="text"
                 defaultValue="Please enter the data, which should be decrypted."
                 variant="outlined"
                 value={ciphertext}
@@ -50,9 +50,9 @@ const RSAOAEPDecryption: React.FC = () => {
                 fullWidth
                 disabled
                 rows="5"
-                id="plaintext"
-                name="plaintext"
-                type="plaintext"
+                id="rsa-oaep-decryption-plaintext"
+                name="rsa-oaep-decryption-plaintext"
+                type="text"
                 variant="outlined"
                 value={plaintext}
               />

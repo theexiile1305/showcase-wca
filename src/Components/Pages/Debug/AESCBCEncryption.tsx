@@ -33,9 +33,9 @@ const AESCBCEncryption: React.FC = () => {
                 fullWidth
                 rows="5"
                 label="Plaintext"
-                id="plaintext"
-                name="plaintext"
-                type="plaintext"
+                id="aes-cbc-encryption-plaintext"
+                name="aes-cbc-encryption-plaintext"
+                type="text"
                 defaultValue="Please enter the data, which should be encrypted."
                 variant="outlined"
                 value={plaintext}
@@ -50,9 +50,9 @@ const AESCBCEncryption: React.FC = () => {
                 fullWidth
                 disabled
                 rows="5"
-                id="ciphertext"
-                name="ciphertext"
-                type="ciphertext"
+                id="aes-cbc-encryption-ciphertext"
+                name="aes-cbc-encryption-ciphertext"
+                type="text"
                 variant="outlined"
                 value={ciphertext}
               />

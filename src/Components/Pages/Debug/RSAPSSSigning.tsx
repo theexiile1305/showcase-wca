@@ -33,9 +33,9 @@ const RSAPSSSigning: React.FC = () => {
                 fullWidth
                 rows="5"
                 label="Message"
-                id="message"
-                name="message"
-                type="v"
+                id="rsa-pss-signing-message"
+                name="rsa-pss-signing-message"
+                type="text"
                 defaultValue="Please enter your message, which should be signed."
                 variant="outlined"
                 value={message}
@@ -50,9 +50,9 @@ const RSAPSSSigning: React.FC = () => {
                 fullWidth
                 disabled
                 rows="2"
-                id="signature"
-                name="signature"
-                type="signature"
+                id="rsa-pss-signing-signature"
+                name="rsa-pss-signing-signature"
+                type="text"
                 variant="outlined"
                 value={signature}
               />
