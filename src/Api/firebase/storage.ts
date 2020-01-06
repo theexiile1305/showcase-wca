@@ -12,9 +12,10 @@ import { SharedPublicKey } from 'src/Models/SharedPublicKey';
 import { SharedPublicKeys } from 'src/Models/SharedPublicKeys';
 import saveData from '../saveData';
 import { storage } from './firebase';
-import { exportPublicCryptoKey } from '../wca/pemManagement';
-import { encryptDataWithAES, decryptDataWithAES } from '../wca';
+import { exportPublicCryptoKey, importRSAOAEPPublicCryptoKey, exportSymmetricCryptoKey } from '../wca/pemManagement';
+import { encryptDataWithAES, decryptDataWithAES, encryptTextWithRSAOAEP } from '../wca';
 import { getKeyStorage } from '../localforage';
+import { arrayBufferToString } from '../wca/utils';
 
 const blobToArrayBuffer = (
   data: Blob,
@@ -178,12 +179,64 @@ export const listAllDocuments = (
   const ref = storage.child(`documents/${userID}/`);
   ref.listAll()
     .then((result) => {
-      console.log(result);
       dispatch(saveDocuments(result));
       dispatch(clearUILoading());
     })
     .catch((error) => {
       dispatch(openSnackbar(error.message));
+      dispatch(clearUILoading());
+    });
+};
+
+export const exchangeKey = (
+  userID: string, exchangeUserID: string, url: string,
+) => async (
+  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction>,
+): Promise<void> => {
+  dispatch(setUILoading());
+  const ref = storage.child(`exchange/${exchangeUserID}/${userID}/aesCBC.json`);
+  const aesCBCWrapper = await getKeyStorage()
+    .then((keyStorage) => keyStorage.aesCBC);
+  const aesCBC = await exportSymmetricCryptoKey(aesCBCWrapper.key)
+    .then((jsonWebKey) => JSON.stringify(jsonWebKey));
+  const publicKey = fetch(url)
+    .then((response) => response.text())
+    .then((text) => importRSAOAEPPublicCryptoKey(text));
+  Promise.all([aesCBC, publicKey])
+    .then((promises) => encryptTextWithRSAOAEP(promises[0], promises[1]))
+    .then((text) => new Blob([text], { type: 'application/json' }))
+    .then((blob) => ref
+      .put(blob, {
+        contentType: 'application/json',
+        customMetadata: {
+          fingerprint: aesCBCWrapper.fingerprint,
+          iv: arrayBufferToString(aesCBCWrapper.iv),
+        },
+      })
+      .on('state_changed', null,
+        () => dispatch(openSnackbar('You\'ve unsuccessfully shared your AES-CBC key.')),
+        () => dispatch(openSnackbar('You\'ve successfully shared your AES-CBC key.'))))
+    .then(() => dispatch(clearUILoading()))
+    .catch((error) => {
+      dispatch(openSnackbar(error.message));
+      dispatch(clearUILoading());
+    });
+};
+
+export const deleteExchangeKey = (
+  userID: string, exchangeUserID: string,
+) => async (
+  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction>,
+): Promise<void> => {
+  dispatch(setUILoading());
+  const ref = storage.child(`exchange/${exchangeUserID}/${userID}/aesCBC.json`);
+  ref.delete()
+    .then(() => {
+      dispatch(openSnackbar('You\'ve successfully deleted the exchanged key.'));
+      dispatch(clearUILoading());
+    })
+    .catch(() => {
+      dispatch(openSnackbar('You\'ve already deleted the exchanged key.'));
       dispatch(clearUILoading());
     });
 };

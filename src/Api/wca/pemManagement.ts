@@ -1,4 +1,4 @@
-import { arrayBufferToString } from './utils';
+import { arrayBufferToString, stringToArrayBuffer } from './utils';
 import { wca } from './config';
 
 const PEM_PUBLIC_HEADER = '-----BEGIN PUBLIC KEY-----';
@@ -7,16 +7,22 @@ const PEM_PRIVATE_HEADER = '-----BEGIN PRIVATE KEY-----';
 const PEM_PRIVATE_FOOTER = '-----END PRIVATE KEY-----';
 
 const importCryptoKey = (
-  cryptoKey: ArrayBuffer, format: 'spki' | 'pkcs8', algorithm: string, keyUsages: string[],
-): PromiseLike<CryptoKey> => wca
-  .importKey(format, cryptoKey, algorithm, true, keyUsages);
+  cryptoKey: string, format: 'spki' | 'pkcs8', algorithm: string, keyUsages: string[],
+): PromiseLike<CryptoKey> => {
+  const content = cryptoKey.substring(
+    PEM_PUBLIC_HEADER.length, cryptoKey.length - PEM_PUBLIC_FOOTER.length,
+  );
+  const binary = window.atob(content);
+  const key = stringToArrayBuffer(binary);
+  return wca.importKey(format, key, { name: algorithm, hash: 'SHA-512' }, true, keyUsages);
+};
 
 export const importRSAOAEPPublicCryptoKey = (
-  cryptoKey: ArrayBuffer,
-): PromiseLike<CryptoKey> => importCryptoKey(cryptoKey, 'spki', 'RSA-OAEP', ['encrypt', 'decrypt']);
+  cryptoKey: string,
+): PromiseLike<CryptoKey> => importCryptoKey(cryptoKey, 'spki', 'RSA-OAEP', ['encrypt']);
 
 export const importRSAPSSPublicCryptoKey = (
-  cryptoKey: ArrayBuffer,
+  cryptoKey: string,
 ): PromiseLike<CryptoKey> => importCryptoKey(cryptoKey, 'spki', 'RSA-PSS', ['sign', 'verify']);
 
 const exportCryptoKey = (

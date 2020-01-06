@@ -4,9 +4,9 @@ import {
   IconButton, ListItemIcon, Typography,
 } from '@material-ui/core';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
-import MailIcon from '@material-ui/icons/Mail';
+import DeleteIcon from '@material-ui/icons/Delete';
 import style from 'src/Styles';
-import { listSharedPublicKeys } from 'src/Api/firebase/storage';
+import { listSharedPublicKeys, exchangeKey, deleteExchangeKey } from 'src/Api/firebase/storage';
 import { useSelector, useDispatch } from 'react-redux';
 import { ApplicationState } from 'src/Store/ApplicationState';
 
@@ -26,8 +26,16 @@ const Documents: React.FC = () => {
     }
   }, [dispatch, user]);
 
-  const handleExchange = (userID: string): void => {
-    window.alert(userID);
+  const handleExchange = (exchangeUserID: string, url: string): void => {
+    if (user) {
+      dispatch(exchangeKey(user.uid, exchangeUserID, url));
+    }
+  };
+
+  const handleDeleteExchange = (exchangeUserID: string): void => {
+    if (user) {
+      dispatch(deleteExchangeKey(user.uid, exchangeUserID));
+    }
   };
 
   return (
@@ -39,7 +47,14 @@ const Documents: React.FC = () => {
         <List component="nav">
           {sharedPublicKeys.map((sharedPublicKey) => (
             <React.Fragment key={sharedPublicKey.userID}>
-              <ListItem>
+              <ListItem
+                button
+                onClick={
+                  (): void => handleExchange(
+                    sharedPublicKey.userID, sharedPublicKey.rsaOAEP.downloadURL,
+                  )
+                }
+              >
                 <ListItemIcon>
                   <InsertDriveFileIcon />
                 </ListItemIcon>
@@ -49,9 +64,11 @@ const Documents: React.FC = () => {
                 <ListItemSecondaryAction>
                   <IconButton
                     edge="end"
-                    onClick={(): void => handleExchange(sharedPublicKey.userID)}
+                    onClick={
+                      (): void => handleDeleteExchange(sharedPublicKey.userID)
+                    }
                   >
-                    <MailIcon />
+                    <DeleteIcon />
                   </IconButton>
                 </ListItemSecondaryAction>
               </ListItem>
