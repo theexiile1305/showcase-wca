@@ -4,20 +4,32 @@ import {
 } from '@material-ui/core';
 import style from 'src/Styles';
 import { decryptTextWithAES } from 'src/Api/wca';
+import { openSnackbar } from 'src/Store/ui/UIActions';
+import { useDispatch } from 'react-redux';
 
 const AESCBCDecryption: React.FC = () => {
   const classes = style();
 
+  const dispatch = useDispatch();
+
   const [plaintext, setPlaintext] = useState();
   const [ciphertext, setCiphertext] = useState();
+  const [defaultValue, setDefaultValue] = useState(' ');
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = (
+    event: React.FormEvent<HTMLFormElement>,
+  ): void => {
     event.preventDefault();
-    decryptTextWithAES(ciphertext).then((text) => setPlaintext(text));
+    decryptTextWithAES(ciphertext)
+      .then((text) => {
+        setDefaultValue('');
+        setPlaintext(text);
+      })
+      .catch(() => dispatch(openSnackbar('Please double check your input!')));
   };
 
   return (
-    <form noValidate onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit}>
       <Card className={classes.debugForm}>
         <CardContent>
           <Grid container spacing={2}>
@@ -35,8 +47,8 @@ const AESCBCDecryption: React.FC = () => {
                 label="Ciphertext"
                 id="aes-cbc-decryption-ciphertext"
                 name="aes-cbc-decryption-ciphertext"
+                placeholder="Please enter the data, which should be decrypted."
                 type="text"
-                defaultValue="Please enter the data, which should be decrypted."
                 variant="outlined"
                 value={ciphertext}
                 onChange={(
@@ -50,6 +62,8 @@ const AESCBCDecryption: React.FC = () => {
                 fullWidth
                 disabled
                 rows="5"
+                label="Plaintext"
+                defaultValue={defaultValue}
                 id="aes-cbc-decryption-plaintext"
                 name="aes-cbc-decryption-plaintext"
                 type="text"

@@ -4,21 +4,33 @@ import {
 } from '@material-ui/core';
 import style from 'src/Styles';
 import { encryptTextWithAES } from 'src/Api/wca';
+import { openSnackbar } from 'src/Store/ui/UIActions';
+import { useDispatch } from 'react-redux';
 
 const AESCBCEncryption: React.FC = () => {
   const classes = style();
 
+  const dispatch = useDispatch();
+
   const [plaintext, setPlaintext] = useState();
   const [ciphertext, setCiphertext] = useState();
+  const [defaultValue, setDefaultValue] = useState(' ');
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ): Promise<void> => {
     event.preventDefault();
-    encryptTextWithAES(plaintext).then((text) => setCiphertext(text));
+    encryptTextWithAES(plaintext)
+      .then((text) => {
+        setDefaultValue('');
+        setCiphertext(text);
+      })
+      .catch(() => dispatch(openSnackbar('Please double check your input!')));
   };
 
   return (
     <Card className={classes.debugForm}>
-      <form noValidate onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <CardContent>
           <Grid container spacing={2}>
             <Grid item xs={12}>
@@ -36,7 +48,7 @@ const AESCBCEncryption: React.FC = () => {
                 id="aes-cbc-encryption-plaintext"
                 name="aes-cbc-encryption-plaintext"
                 type="text"
-                defaultValue="Please enter the data, which should be encrypted."
+                placeholder="Please enter the data, which should be encrypted."
                 variant="outlined"
                 value={plaintext}
                 onChange={(
@@ -50,6 +62,8 @@ const AESCBCEncryption: React.FC = () => {
                 fullWidth
                 disabled
                 rows="5"
+                label="Chiphertext"
+                defaultValue={defaultValue}
                 id="aes-cbc-encryption-ciphertext"
                 name="aes-cbc-encryption-ciphertext"
                 type="text"
