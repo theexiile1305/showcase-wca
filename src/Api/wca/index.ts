@@ -83,8 +83,12 @@ export const encryptDataWithAES = (
 
 export const encryptTextWithAES = (
   text: string,
-): Promise<string> => encryptDataWithAES(stringToArrayBuffer(text))
-  .then((arrayBuffer) => arrayBufferToString(arrayBuffer));
+): Promise<string> => Promise
+  .resolve(window.btoa(text))
+  .then((base64) => stringToArrayBuffer(base64))
+  .then((arrayBuffer) => encryptDataWithAES(arrayBuffer))
+  .then((arrayBuffer) => arrayBufferToString(arrayBuffer))
+  .then((string) => window.btoa(string));
 
 export const decryptDataWithAES = (
   data: ArrayBuffer,
@@ -93,9 +97,13 @@ export const decryptDataWithAES = (
   .then((aesCBC) => wca.decrypt({ name: 'AES-CBC', iv: aesCBC.iv }, aesCBC.key, data));
 
 export const decryptTextWithAES = (
-  text: string,
-): Promise<string> => decryptDataWithAES(stringToArrayBuffer(text))
-  .then((arrayBuffer) => arrayBufferToString(arrayBuffer));
+  base64: string,
+): Promise<string> => Promise
+  .resolve(window.atob(base64))
+  .then((text) => stringToArrayBuffer(text))
+  .then((arrayBuffer) => decryptDataWithAES(arrayBuffer))
+  .then((arrayBuffer) => arrayBufferToString(arrayBuffer))
+  .then((text) => window.atob(text));
 
 export const encryptDataWithRSAOAEP = (
   data: ArrayBuffer, publicKey: CryptoKey,
@@ -103,8 +111,12 @@ export const encryptDataWithRSAOAEP = (
 
 export const encryptTextWithRSAOAEP = (
   text: string, publicKey: CryptoKey,
-): Promise<string> => encryptDataWithRSAOAEP(stringToArrayBuffer(text), publicKey)
-  .then((arrayBuffer) => arrayBufferToString(arrayBuffer));
+): Promise<string> => Promise
+  .resolve(window.btoa(text))
+  .then((base64) => stringToArrayBuffer(base64))
+  .then((arrayBuffer) => encryptDataWithRSAOAEP(arrayBuffer, publicKey))
+  .then((arrayBuffer) => arrayBufferToString(arrayBuffer))
+  .then((string) => window.btoa(string));
 
 export const decryptDataWithRSAOAEP = (
   data: ArrayBuffer,
@@ -113,21 +125,13 @@ export const decryptDataWithRSAOAEP = (
   .then((rsaOAEP) => wca.decrypt('RSA-OAEP', rsaOAEP.privateKey, data));
 
 export const decryptTextWithRSAOAEP = (
-  text: string,
-): Promise<string> => decryptDataWithRSAOAEP(stringToArrayBuffer(text))
-  .then((arrayBuffer) => arrayBufferToString(arrayBuffer));
-
-export const verifyDataWithRSAPSS = (
-  data: ArrayBuffer, signature: ArrayBuffer, publicKey: CryptoKey,
-): Promise<boolean> => Promise.resolve(
-  wca.verify({ name: 'RSA-PSS', saltLength: 0 }, publicKey, signature, data),
-);
-
-export const verifyTextWithRSAPSS = (
-  text: string, signature: string, publicKey: CryptoKey,
-): Promise<boolean> => verifyDataWithRSAPSS(
-  stringToArrayBuffer(text), stringToArrayBuffer(signature), publicKey,
-);
+  base64: string,
+): Promise<string> => Promise
+  .resolve(window.atob(base64))
+  .then((text) => stringToArrayBuffer(text))
+  .then((arrayBuffer) => decryptDataWithRSAOAEP(arrayBuffer))
+  .then((arrayBuffer) => arrayBufferToString(arrayBuffer))
+  .then((text) => window.atob(text));
 
 export const signDataWithRSAPSS = (
   data: ArrayBuffer,
@@ -137,5 +141,26 @@ export const signDataWithRSAPSS = (
 
 export const signTextWithRSAPSS = (
   text: string,
-): Promise<string> => signDataWithRSAPSS(stringToArrayBuffer(text))
-  .then((arrayBuffer) => arrayBufferToString(arrayBuffer));
+): Promise<string> => Promise
+  .resolve(window.btoa(text))
+  .then((base64) => stringToArrayBuffer(base64))
+  .then((arrayBuffer) => signDataWithRSAPSS(arrayBuffer))
+  .then((arrayBuffer) => arrayBufferToString(arrayBuffer))
+  .then((string) => window.btoa(string));
+
+export const verifyDataWithRSAPSS = (
+  data: ArrayBuffer, signature: ArrayBuffer, publicKey: CryptoKey,
+): Promise<boolean> => Promise.resolve(
+  wca.verify({ name: 'RSA-PSS', saltLength: 0 }, publicKey, signature, data),
+);
+
+export const verifyTextWithRSAPSS = (
+  message: string, signatureBase64: string, publicKey: CryptoKey,
+): Promise<boolean> => Promise
+  .resolve(window.atob(signatureBase64))
+  .then((text) => stringToArrayBuffer(text))
+  .then((arrayBuffer) => {
+    const base64 = window.btoa(message);
+    const rawMessage = stringToArrayBuffer(base64);
+    return verifyDataWithRSAPSS(rawMessage, arrayBuffer, publicKey);
+  });
