@@ -1,22 +1,40 @@
 import React from 'react';
-import {
-  Container, createStyles, makeStyles, Theme,
-} from '@material-ui/core';
-
-const useStyles = makeStyles((theme: Theme) => createStyles({
-  main: {
-    marginTop: theme.spacing(8),
-    marginBottom: theme.spacing(2),
-  },
-}));
+import { Grid, Typography } from '@material-ui/core';
+import style from 'src/Styles';
+import AESCBCEncryption from './AESCBCEncryption';
+import AESCBCDecryption from './AESCBCDecryption';
+import RSAOAEPEncryption from './RSAOAEPEncryption';
+import RSAOAEPDecryption from './RSAOAEPDecryption';
+import RSAPSSSigning from './RSAPSSSigning';
+import RSAPSSVerifying from './RSAPSSVerifying';
 
 const Debug: React.FC = () => {
-  const classes = useStyles();
+  const classes = style();
 
   return (
-    <Container component="main" className={classes.main} maxWidth="sm">
-      <div>Debug</div>
-    </Container>
+    <Grid container alignItems="center" spacing={4}>
+      <Grid item xs={12} className={classes.center}>
+        <Typography variant="h4">Debug</Typography>
+      </Grid>
+      <Grid item xs={6}>
+        <AESCBCEncryption />
+      </Grid>
+      <Grid item xs={6}>
+        <AESCBCDecryption />
+      </Grid>
+      <Grid item xs={6}>
+        <RSAOAEPEncryption />
+      </Grid>
+      <Grid item xs={6}>
+        <RSAOAEPDecryption />
+      </Grid>
+      <Grid item xs={6}>
+        <RSAPSSSigning />
+      </Grid>
+      <Grid item xs={6}>
+        <RSAPSSVerifying />
+      </Grid>
+    </Grid>
   );
 };
 

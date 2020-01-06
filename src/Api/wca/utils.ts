@@ -1,11 +1,3 @@
-export const encode = (
-  text: string,
-): ArrayBuffer => new TextEncoder().encode(text);
-
-export const decode = (
-  data: ArrayBuffer,
-): string => new TextDecoder('utf-8').decode(new Uint8Array(data));
-
 export const arrayBufferToString = (
   data: ArrayBuffer,
 ): string => String.fromCharCode.apply(null, Array.from(new Uint8Array(data)));
