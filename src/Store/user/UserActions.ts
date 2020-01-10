@@ -1,14 +1,16 @@
 import { Action, ActionCreator } from 'redux';
-import { MUser } from 'src/Models/User';
 
 export enum UserAction {
   SAVE_USER = '@@wca/SAVE_USER',
   LOGOUT_USER = '@@wca/LOGOUT_USER'
 }
 
-export interface SaveUserAction extends Action {
+export interface StoreUserAction extends Action {
   type: UserAction.SAVE_USER;
-  user: MUser | null;
+  uid: string | null;
+  email: string | null;
+  displayName: string | null;
+  emailVerified: boolean;
 }
 
 export interface LogoutUserAction extends Action {
@@ -16,14 +18,15 @@ export interface LogoutUserAction extends Action {
 }
 
 export type UserActions =
-  | SaveUserAction
+  | StoreUserAction
   | LogoutUserAction;
 
-export const saveUserData: ActionCreator<SaveUserAction> = (user: firebase.User) => {
-  let currentUser = null;
+export const storeUser: ActionCreator<StoreUserAction> = (
+  user: firebase.User,
+) => {
   if (user) {
-    localStorage.setItem('isAuthenticated', 'true');
-    currentUser = {
+    return {
+      type: UserAction.SAVE_USER,
       uid: user.uid,
       email: user.email,
       displayName: user.displayName,
@@ -32,13 +35,13 @@ export const saveUserData: ActionCreator<SaveUserAction> = (user: firebase.User)
   }
   return {
     type: UserAction.SAVE_USER,
-    user: currentUser,
+    uid: null,
+    email: null,
+    displayName: null,
+    emailVerified: false,
   };
 };
-
-export const logoutUser: ActionCreator<LogoutUserAction> = () => {
-  localStorage.setItem('isAuthenticated', 'false');
-  return {
-    type: UserAction.LOGOUT_USER,
-  };
-};
+export const logoutUser: ActionCreator<LogoutUserAction> = (
+) => ({
+  type: UserAction.LOGOUT_USER,
+});
