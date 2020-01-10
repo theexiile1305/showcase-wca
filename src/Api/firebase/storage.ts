@@ -10,14 +10,10 @@ import {
 } from 'src/Store/documents/DocumentActions';
 import { SharedPublicKey } from 'src/Models/SharedPublicKey';
 import { SharedPublicKeys } from 'src/Models/SharedPublicKeys';
-import store from 'src/Store';
-import saveData from '../saveData';
 import { storage } from './firebase';
 import { exportPublicCryptoKey, importRSAOAEPPublicCryptoKey, exportSymmetricCryptoKey } from '../wca/pemManagement';
-import {
-  encryptDataWithAES, decryptDataWithAES, encryptTextWithRSAOAEP, createFingerprint,
-} from '../wca';
 import { getKeyStorage } from '../localforage';
+import { createFingerprint } from '../wca';
 import { MIME_TYPES } from './constants';
 
 // keep
@@ -92,7 +88,7 @@ export const uploadDocuments = (
     const { name, type, lastModified } = file;
     const ref = storage.child(`documents/${userID}/${name}`);
     blobToArrayBuffer(file)
-      .then((arrayBuffer) => encryptDataWithAES(arrayBuffer))
+      // .then((arrayBuffer) => encryptDataWithAES(arrayBuffer))
       .then((arrayBuffer) => new Blob([arrayBuffer], { type }))
       .then((blob) => ref
         .put(blob, {
@@ -257,8 +253,8 @@ export const exchangeKey = (
     .then((response) => response.text())
     .then((text) => importRSAOAEPPublicCryptoKey(text));
   Promise.all([aesCBC, publicKey])
-    .then((promises) => encryptTextWithRSAOAEP(promises[0], promises[1]))
-    .then((text) => new Blob([text], { type: 'application/json' }))
+    // .then((promises) => encryptTextWithRSAOAEP(promises[0], promises[1]))
+    .then((text) => new Blob([''], { type: 'application/json' }))
     .then((blob) => ref
       .put(blob, {
         contentType: 'application/json',

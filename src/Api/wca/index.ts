@@ -1,4 +1,4 @@
-import store from 'src/Store';
+import { store } from 'src/Store';
 import {
   RSA_OAEP_ALGORITHM, wca, PBKDF2_DERIVE_PASSWORD_HASH_ALGORITHM,
   PBKDF2_DERIVE_PASSWORD_KEY_ALGORITHM, AES_CBC_PASSWORD_KEY_ALGORITHM,

@@ -1,6 +1,5 @@
 
 import { Dispatch } from 'react';
-import store from 'src/Store';
 import {
   logoutUser, LogoutUserAction, StoreUserAction, storeUser,
 } from 'src/Store/user/UserActions';
@@ -17,6 +16,7 @@ import {
   removeCryptoKeys, RemoveCryptoKeysAction,
 } from 'src/Store/crypto/CryptoActions';
 import { saveAESCBC, SaveAESCBCAction } from 'src/Store/debug/DebugActions';
+import { store } from 'src/Store';
 import { getSaltPasswordHash } from './constants';
 import { downloadKey } from './storage';
 import { auth } from './firebase';
@@ -43,7 +43,18 @@ const getPasswordHash = (
 };
 
 // keep
-export const isAuthenticated = (): boolean => auth.currentUser != null;
+export const isAuthenticated = (
+): boolean => store.getState().user.uid != null;
+
+// keep
+export const verifyAuth = (
+): void => {
+  auth.onAuthStateChanged((user) => {
+    if (!user) {
+      auth.signOut();
+    }
+  });
+};
 
 // keep
 export const signUp = (
