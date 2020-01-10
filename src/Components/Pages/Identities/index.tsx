@@ -24,7 +24,7 @@ const Documents: React.FC = () => {
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={6} className={classes.center}>
+      <Grid item xs={12} className={classes.center}>
         <Typography variant="h4">Available Identities</Typography>
       </Grid>
       <Grid item xs={12}>
