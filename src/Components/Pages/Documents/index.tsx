@@ -7,7 +7,7 @@ import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import DeleteIcon from '@material-ui/icons/Delete';
 import style from 'src/Styles';
 import {
-  listAllDocuments, deleteDocument, downloadDocument, uploadDocuments,
+  listAllDocuments, deleteDocument,
 } from 'src/Api/firebase/storage';
 import { useSelector, useDispatch } from 'react-redux';
 import { ApplicationState } from 'src/Store/ApplicationState';
@@ -18,30 +18,30 @@ const Documents: React.FC = () => {
   const dispatch = useDispatch();
 
   const documents = useSelector((state: ApplicationState) => state.documents.documents);
-  const user = useSelector((state: ApplicationState) => state.user.user);
+  const uid = useSelector((state: ApplicationState) => state.user.uid);
 
   useEffect(() => {
-    if (user) {
-      dispatch(listAllDocuments(user.uid));
+    if (uid) {
+      dispatch(listAllDocuments(uid));
     }
-  }, [dispatch, user]);
+  }, [dispatch, uid]);
 
   const hanldeUpload = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const { files } = event.target;
-    if (user && files) {
-      dispatch(uploadDocuments(user.uid, files));
+    if (uid && files) {
+      // dispatch(uploadDocuments(user.uid, files));
     }
   };
 
   const handleDownload = (filename: string): void => {
-    if (user) {
-      downloadDocument(user.uid, filename);
+    if (uid) {
+      // downloadDocument(user.uid, filename);
     }
   };
 
   const handleDelete = (filename: string): void => {
-    if (user) {
-      dispatch(deleteDocument(user.uid, filename));
+    if (uid) {
+      dispatch(deleteDocument(uid, filename));
     }
   };
 

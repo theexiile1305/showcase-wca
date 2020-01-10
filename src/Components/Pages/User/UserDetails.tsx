@@ -14,7 +14,7 @@ import DeleteAccountDialog from './DeleteAccountDialog';
 const UserDetails: React.FC = () => {
   const dispatch = useDispatch();
 
-  const user = useSelector((state: ApplicationState) => state.user.user);
+  const user = useSelector((state: ApplicationState) => state.user);
 
   return (
     <>
@@ -24,10 +24,10 @@ const UserDetails: React.FC = () => {
             User Details
           </Typography>
           <Typography component="p" variant="body2" color="textSecondary">
-            {`Username: ${user?.displayName}`}
+            {`Username: ${user.displayName}`}
           </Typography>
           <Typography component="p" variant="body2" color="textSecondary">
-            {`E-Mail: ${user?.email}`}
+            {`E-Mail: ${user.email}`}
           </Typography>
         </CardContent>
         <CardActions>

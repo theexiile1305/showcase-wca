@@ -18,23 +18,23 @@ const Documents: React.FC = () => {
   const sharedPublicKeys = useSelector(
     (state: ApplicationState) => state.documents.sharedPublicKeys,
   );
-  const user = useSelector((state: ApplicationState) => state.user.user);
+  const uid = useSelector((state: ApplicationState) => state.user.uid);
 
   useEffect(() => {
-    if (user) {
+    if (uid) {
       dispatch(listSharedPublicKeys());
     }
-  }, [dispatch, user]);
+  }, [dispatch, uid]);
 
   const handleExchange = (exchangeUserID: string, url: string): void => {
-    if (user) {
-      dispatch(exchangeKey(user.uid, exchangeUserID, url));
+    if (uid) {
+      dispatch(exchangeKey(uid, exchangeUserID, url));
     }
   };
 
   const handleDeleteExchange = (exchangeUserID: string): void => {
-    if (user) {
-      dispatch(deleteExchangeKey(user.uid, exchangeUserID));
+    if (uid) {
+      dispatch(deleteExchangeKey(uid, exchangeUserID));
     }
   };
 
