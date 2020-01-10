@@ -16,13 +16,14 @@ import {
   storeDataNameKey, StoreDataNameKeyAction,
   removeCryptoKeys, RemoveCryptoKeysAction,
 } from 'src/Store/crypto/CryptoActions';
+import { saveAESCBC, SaveAESCBCAction } from 'src/Store/debug/DebugActions';
 import { getSaltPasswordHash } from './constants';
 import { downloadKey } from './storage';
 import { auth } from './firebase';
 import {
   derivePasswordHash, derivePasswordKey, importDataNameKey,
   importRSAPSSPublicKey, importRSAOAEPPublicKey, importRSAPSSPrivateKey,
-  importRSAOAEPPrivateKey, changePasswordHash, setupKeys,
+  importRSAOAEPPrivateKey, changePasswordHash, setupKeys, newIV,
 } from '../wca';
 import {
   getIVDataNameKey, getDataNameKey, getSaltPasswordKey, getRSAOAEPPrivateKey,
@@ -81,7 +82,7 @@ export const signInWithEmailPassword = (
 ) => async (
   dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction
   | StoreUserAction | StoreSaltPasswordHashAction | StorePasswordKeyAction | StoreRSAOAEPAction
-  | StoreRSAPSSAction | StoreDataNameKeyAction>,
+  | StoreRSAPSSAction | StoreDataNameKeyAction | SaveAESCBCAction>,
 ): Promise<void> => Promise
   .resolve(dispatch(setUILoading()))
   .then(() => getSaltPasswordHash())
@@ -127,6 +128,8 @@ export const signInWithEmailPassword = (
       .then((key) => downloadKey(key))
       .then((key) => importDataNameKey(key, rsaOAEPPrivate));
     dispatch(storeDataNameKey(ivDataNameKey, dataNameKey));
+
+    dispatch(saveAESCBC(await newIV()));
   })
   .then(() => dispatch(openSnackbar('You´ve been successfully signed in.')))
   .catch((error) => dispatch(openSnackbar(error.message)))
@@ -150,7 +153,10 @@ export const signOut = (
       dispatch(logoutUser());
     })
     .catch((error) => dispatch(openSnackbar(error.message)))
-    .finally(() => dispatch(clearUILoading()));
+    .finally(() => {
+      dispatch(clearUILoading());
+      redirect();
+    });
 };
 
 // keep

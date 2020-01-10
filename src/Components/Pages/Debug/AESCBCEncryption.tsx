@@ -3,7 +3,7 @@ import {
   Button, Card, CardActions, CardContent, Grid, TextField, Typography,
 } from '@material-ui/core';
 import style from 'src/Styles';
-import { encryptTextWithAES } from 'src/Api/wca';
+import { encryptWithAESCBC } from 'src/Api/wca';
 import { openSnackbar } from 'src/Store/ui/UIActions';
 import { useDispatch } from 'react-redux';
 
@@ -20,7 +20,7 @@ const AESCBCEncryption: React.FC = () => {
     event: React.FormEvent<HTMLFormElement>,
   ): Promise<void> => {
     event.preventDefault();
-    encryptTextWithAES(plaintext)
+    encryptWithAESCBC(plaintext)
       .then((text) => {
         setDefaultValue('');
         setCiphertext(text);

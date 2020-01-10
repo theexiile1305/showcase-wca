@@ -24,18 +24,6 @@ export const AES_CBC_PASSWORD_KEY_GEN_ALGORITHM = (
   length: 256,
 });
 
-export const PBKDF2_ALGORITHM = (salt: ArrayBuffer): Pbkdf2Params => ({
-  name: 'PBKDF2',
-  salt,
-  iterations: 100000,
-  hash: 'SHA-512',
-});
-
-export const AES_CBC_ENCRYPTION_ALGORITHM = (iv: ArrayBuffer): AesCbcParams => ({
-  name: 'AES-CBC',
-  iv,
-});
-
 export const AES_CBC_PASSWORD_KEY_ALGORITHM = (
   iv: ArrayBuffer,
 ): AesCbcParams => ({

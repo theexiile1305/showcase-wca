@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Button, Card, CardActions, CardContent, Grid, TextField, Typography,
 } from '@material-ui/core';
 import style from 'src/Styles';
-import { encryptTextWithRSAOAEP } from 'src/Api/wca';
-import { getKeyStorage } from 'src/Api/localforage';
+import { encryptWithRSAOAEP } from 'src/Api/wca';
 import { useDispatch } from 'react-redux';
 import { openSnackbar } from 'src/Store/ui/UIActions';
 
@@ -13,22 +12,15 @@ const RSAOAEPEncryption: React.FC = () => {
 
   const dispatch = useDispatch();
 
-  const [publicKey, setPublicKey] = useState();
   const [plaintext, setPlaintext] = useState();
   const [ciphertext, setCiphertext] = useState();
   const [defaultValue, setDefaultValue] = useState(' ');
-
-  useEffect(() => {
-    getKeyStorage()
-      .then((keyStorage) => keyStorage.rsaOAEP)
-      .then((rsaOAEP) => setPublicKey(rsaOAEP.publicKey));
-  }, []);
 
   const handleSubmit = (
     event: React.FormEvent<HTMLFormElement>,
   ): void => {
     event.preventDefault();
-    encryptTextWithRSAOAEP(plaintext, publicKey)
+    encryptWithRSAOAEP(plaintext)
       .then((text) => {
         setDefaultValue('');
         setCiphertext(text);

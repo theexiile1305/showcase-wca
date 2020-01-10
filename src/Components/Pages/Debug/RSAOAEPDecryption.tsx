@@ -3,7 +3,7 @@ import {
   Button, Card, CardActions, CardContent, Grid, TextField, Typography,
 } from '@material-ui/core';
 import style from 'src/Styles';
-import { decryptTextWithRSAOAEP } from 'src/Api/wca';
+import { decryptWithRSAOAEP } from 'src/Api/wca';
 import { openSnackbar } from 'src/Store/ui/UIActions';
 import { useDispatch } from 'react-redux';
 
@@ -20,7 +20,7 @@ const RSAOAEPDecryption: React.FC = () => {
     event: React.FormEvent<HTMLFormElement>,
   ): void => {
     event.preventDefault();
-    decryptTextWithRSAOAEP(ciphertext)
+    decryptWithRSAOAEP(ciphertext)
       .then((text) => {
         setDefaultValue('');
         setPlaintext(text);
@@ -44,7 +44,7 @@ const RSAOAEPDecryption: React.FC = () => {
                 required
                 fullWidth
                 rows="5"
-                label="Ciphertext"
+                label="Ciphertext in Base64"
                 id="rsa-oaep-decryption-ciphertext"
                 name="rsa-oaep-decryption-ciphertext"
                 placeholder="Please enter the data, which should be decrypted."

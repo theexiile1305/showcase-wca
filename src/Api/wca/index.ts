@@ -1,10 +1,11 @@
-import { saveKeyStorage, getKeyStorage } from '../localforage';
+import store from 'src/Store';
+import { getKeyStorage } from '../localforage';
 import {
-  RSA_OAEP_ALGORITHM, wca, PBKDF2_ALGORITHM, AES_CBC_ENCRYPTION_ALGORITHM, PBKDF2_DERIVE_PASSWORD_HASH_ALGORITHM, PBKDF2_DERIVE_PASSWORD_KEY_ALGORITHM, AES_CBC_PASSWORD_KEY_ALGORITHM, AES_CBC_PASSWORD_KEY_GEN_ALGORITHM, RSA_OAEP_GEN_ALGORITHM, RSA_PSS_GEN_ALGORITHM, FINGERPRINT_ALGORITHM, RSA_OAEP_IMPORT_ALGORITHM, RSA_PSS_IMPORT_ALGORITHM,
+  RSA_OAEP_ALGORITHM, wca, PBKDF2_DERIVE_PASSWORD_HASH_ALGORITHM, PBKDF2_DERIVE_PASSWORD_KEY_ALGORITHM, AES_CBC_PASSWORD_KEY_ALGORITHM, AES_CBC_PASSWORD_KEY_GEN_ALGORITHM, RSA_OAEP_GEN_ALGORITHM, RSA_PSS_GEN_ALGORITHM, FINGERPRINT_ALGORITHM, RSA_OAEP_IMPORT_ALGORITHM, RSA_PSS_IMPORT_ALGORITHM,
 } from './config';
 import { exportSymmetricCryptoKey, exportPublicCryptoKey, exportPrivateCryptoKey } from './pemManagement';
 import {
-  arrayBufferToBase64, base64StringToArrayBuffer, stringToArrayBuffer,
+  arrayBufferToBase64, base64StringToArrayBuffer, stringToArrayBuffer, arrayBufferToString,
 } from './utils';
 import { saveKeysToPKI, saveKeyInfo } from '../firebase/firestore';
 
@@ -114,7 +115,7 @@ export const importRSAOAEPPrivateKey = (
 ): Promise<CryptoKey> => Promise
   .resolve(base64StringToArrayBuffer(key))
   .then((arrayBuffer) => wca.decrypt(
-    AES_CBC_ENCRYPTION_ALGORITHM(base64StringToArrayBuffer(ivRSAOAEP)), passwordKey, arrayBuffer,
+    AES_CBC_PASSWORD_KEY_ALGORITHM(base64StringToArrayBuffer(ivRSAOAEP)), passwordKey, arrayBuffer,
   ))
   .then((arrayBuffer) => wca.importKey(
     'pkcs8', arrayBuffer, RSA_OAEP_IMPORT_ALGORITHM(), true, ['decrypt'],
@@ -135,7 +136,7 @@ export const importRSAPSSPrivateKey = (
 ): Promise<CryptoKey> => Promise
   .resolve(base64StringToArrayBuffer(key))
   .then((arrayBuffer) => wca.decrypt(
-    AES_CBC_ENCRYPTION_ALGORITHM(base64StringToArrayBuffer(ivRSAPSS)), passwordKey, arrayBuffer,
+    AES_CBC_PASSWORD_KEY_ALGORITHM(base64StringToArrayBuffer(ivRSAPSS)), passwordKey, arrayBuffer,
   ))
   .then((arrayBuffer) => wca.importKey(
     'pkcs8', arrayBuffer, RSA_PSS_IMPORT_ALGORITHM(), true, ['sign'],
@@ -196,10 +197,54 @@ export const changePasswordHash = (
 ): Promise<void> => setupKeys(password, userID);
 
 // keep
-export const encryptWithAES = (
-  string: string,
+export const encryptWithAESCBC = (
+  plaintext: string,
 ): Promise<string> => Promise
-  .resolve('');
+  .resolve(stringToArrayBuffer(plaintext))
+  .then((arrayBuffer) => {
+    const { key } = store.getState().crypto.passwordKey!!;
+    const { iv } = store.getState().debug.aesCBC!!;
+    return wca.encrypt(
+      AES_CBC_PASSWORD_KEY_ALGORITHM(base64StringToArrayBuffer(iv)), key, arrayBuffer,
+    );
+  })
+  .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer));
+
+// keep
+export const decryptWithAESCBC = (
+  ciphertext: string,
+): Promise<string> => Promise
+  .resolve(base64StringToArrayBuffer(ciphertext))
+  .then((arrayBuffer) => {
+    const { key } = store.getState().crypto.passwordKey!!;
+    const { iv } = store.getState().debug.aesCBC!!;
+    return wca.decrypt(
+      AES_CBC_PASSWORD_KEY_ALGORITHM(base64StringToArrayBuffer(iv)), key, arrayBuffer,
+    );
+  })
+  .then((arrayBuffer) => arrayBufferToString(arrayBuffer));
+
+// keep
+export const encryptWithRSAOAEP = (
+  plaintext: string,
+): Promise<string> => Promise
+  .resolve(stringToArrayBuffer(plaintext))
+  .then((arrayBuffer) => {
+    const { publicKey } = store.getState().crypto.rsaOAEP!!;
+    return wca.encrypt(RSA_OAEP_ALGORITHM(), publicKey, arrayBuffer);
+  })
+  .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer));
+
+// keep
+export const decryptWithRSAOAEP = (
+  ciphertext: string,
+): Promise<string> => Promise
+  .resolve(base64StringToArrayBuffer(ciphertext))
+  .then((arrayBuffer) => {
+    const { key } = store.getState().crypto.passwordKey!!;
+    return wca.decrypt(RSA_OAEP_ALGORITHM(), key, arrayBuffer);
+  })
+  .then((arrayBuffer) => arrayBufferToString(arrayBuffer));
 
 // stop
 const deriveAESCBCkWithPBKDF2 = (
@@ -215,7 +260,7 @@ const encryptRawCryptoKey = (
   rawCryptoKey: CryptoKey, cryptoKey: CryptoKey, iv: ArrayBuffer,
 ): Promise<string> => Promise
   .resolve(wca.exportKey('raw', rawCryptoKey))
-  .then((arrayBuffer) => wca.encrypt(AES_CBC_ENCRYPTION_ALGORITHM(iv), cryptoKey, arrayBuffer))
+  .then((arrayBuffer) => wca.encrypt(AES_CBC_PASSWORD_KEY_ALGORITHM(iv), cryptoKey, arrayBuffer))
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer));
 
 
@@ -233,7 +278,7 @@ export const encrypWithAESCBC = (
 ): Promise<string> => Promise
   .resolve(window.btoa(data))
   .then((base64) => base64StringToArrayBuffer(base64))
-  .then((arrayBuffer) => wca.encrypt(AES_CBC_ENCRYPTION_ALGORITHM, cryptoKey, arrayBuffer))
+  .then((arrayBuffer) => wca.encrypt(AES_CBC_PASSWORD_KEY_ALGORITHM, cryptoKey, arrayBuffer))
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer))
   .then((string) => window.btoa(string));
 
