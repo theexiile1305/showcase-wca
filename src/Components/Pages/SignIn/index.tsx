@@ -5,7 +5,7 @@ import {
   Typography, Grid, TextField, Button,
 } from '@material-ui/core';
 import style from 'src/Styles';
-import { SIGN_UP, RESET_PASSWORD, HOME } from 'src/Routes';
+import { SIGN_UP, HOME } from 'src/Routes';
 import { signInWithEmailPassword } from 'src/Api/firebase/authentication';
 
 const SignIn: React.FC = () => {
@@ -77,7 +77,6 @@ const SignIn: React.FC = () => {
           justify="space-between"
           alignItems="center"
         >
-          <Link to={RESET_PASSWORD}>Forgot Password?</Link>
           <Link to={SIGN_UP}>
             {'Don\'t have an account? Sign Up'}
           </Link>

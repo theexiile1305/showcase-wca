@@ -11,19 +11,20 @@ import MenuIcon from '@material-ui/icons/Menu';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import PeopleIcon from '@material-ui/icons/People';
 import SettingsIcon from '@material-ui/icons/Settings';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import style from 'src/Styles';
 import {
   SIGN_IN, SIGN_UP, DOCUMENTS, IDENTITIES, DEBUG, HOME, USER,
 } from 'src/Routes';
-import { signOut } from 'src/Api/firebase/authentication';
+import { signOut, isAuthenticated } from 'src/Api/firebase/authentication';
 import { ApplicationState } from 'src/Store/ApplicationState';
 
 const Navbar: React.FC = () => {
   const classes = style();
 
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const loading = useSelector((state: ApplicationState) => state.ui.loading);
 
@@ -52,13 +53,22 @@ const Navbar: React.FC = () => {
           <Typography variant="h6" className={classes.navbarTitle}>
           Showcase Web Cryptography API
           </Typography>
-          {renderButton('Documents', <InsertDriveFileIcon />, DOCUMENTS)}
-          {renderButton('Identities', <PeopleIcon />, IDENTITIES)}
-          {renderButton('User Management', <SettingsIcon />, USER)}
-          {renderButton('Debug', <BugReportIcon />, DEBUG)}
-          {renderButton('Sign Up', <PersonAddIcon />, SIGN_UP)}
-          {renderButton('Sign In', <ArrowForwardIcon />, SIGN_IN)}
-          {renderButton('Logout', <ExitToAppIcon />, HOME, () => dispatch(signOut()))}
+          {isAuthenticated() ? (
+            <>
+              {renderButton('Documents', <InsertDriveFileIcon />, DOCUMENTS)}
+              {renderButton('Identities', <PeopleIcon />, IDENTITIES)}
+              {renderButton('User Management', <SettingsIcon />, USER)}
+              {renderButton('Debug', <BugReportIcon />, DEBUG)}
+              {renderButton('Logout', <ExitToAppIcon />, HOME, () => dispatch(
+                signOut(() => history.push(HOME)),
+              ))}
+            </>
+          ) : (
+            <>
+              {renderButton('Sign Up', <PersonAddIcon />, SIGN_UP)}
+              {renderButton('Sign In', <ArrowForwardIcon />, SIGN_IN)}
+            </>
+          )}
         </Toolbar>
       </AppBar>
       {loading && (<LinearProgress color="secondary" />)}
