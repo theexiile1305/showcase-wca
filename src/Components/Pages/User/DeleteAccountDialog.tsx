@@ -17,19 +17,12 @@ const DeleteAccountDialog: React.FC = () => {
   const openDeleteAccount = useSelector(
     (state: ApplicationState) => state.ui.dialog === DialogType.DELETE_ACCOUNT,
   );
-  const email = useSelector((state: ApplicationState) => {
-    const currentUser = state.user.user;
-    if (currentUser && currentUser.email) {
-      return currentUser.email;
-    }
-    return undefined;
-  });
 
   const [password, setPassword] = useState('');
 
   const handleDeleteAccount = (event: React.MouseEvent<HTMLElement>): void => {
     event.preventDefault();
-    dispatch(deleteAccount(email, password, () => history.push(HOME)));
+    dispatch(deleteAccount(password, () => history.push(HOME)));
   };
 
   return (

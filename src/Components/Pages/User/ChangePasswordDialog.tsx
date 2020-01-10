@@ -7,30 +7,20 @@ import { ApplicationState } from 'src/Store/ApplicationState';
 import { changePassword } from 'src/Api/firebase/authentication';
 import { closeDialog, CloseDialogAction } from 'src/Store/ui/UIActions';
 import DialogType from 'src/Models/DialogType';
-import { HOME } from 'src/Routes';
-import { useHistory } from 'react-router-dom';
 
 const ChangePasswordDialog: React.FC = () => {
   const dispatch = useDispatch();
-  const history = useHistory();
 
   const openChangePassword = useSelector(
     (state: ApplicationState) => state.ui.dialog === DialogType.CHANGE_PASSWORD,
   );
 
-  const email = useSelector((state: ApplicationState) => {
-    const currentUser = state.user.user;
-    if (currentUser && currentUser.email) {
-      return currentUser.email;
-    }
-    return undefined;
-  });
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
 
   const handlePasswordChange = (event: React.MouseEvent<HTMLElement>): void => {
     event.preventDefault();
-    dispatch(changePassword(email, currentPassword, newPassword, () => history.push(HOME)));
+    dispatch(changePassword(currentPassword, newPassword));
     dispatch(closeDialog(DialogType.CHANGE_PASSWORD));
   };
 
