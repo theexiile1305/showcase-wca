@@ -4,12 +4,14 @@ import UIReducer from './ui/UIReducer';
 import UserReducer from './user/UserReducer';
 import DocumentReducer from './documents/DocumentReducer';
 import CryptoReducer from './crypto/CryptoReducer';
+import DebugReducer from './debug/DebugReducer';
 
 const RootReducer = combineReducers<ApplicationState>({
   ui: UIReducer,
   user: UserReducer,
   documents: DocumentReducer,
   crypto: CryptoReducer,
+  debug: DebugReducer,
 });
 
 export default RootReducer;
