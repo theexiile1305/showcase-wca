@@ -18,23 +18,26 @@ const RSAPSS: React.FC = () => {
   const [fingerprintPublicKey, setFingerprintPublicKey] = useState('');
   const [fingerprintPrivateKey, setFingerprintPrivateKey] = useState('');
 
+  const exportPublicPEM = async (key: CryptoKey): Promise<void> => exportToPublicPEM(key)
+    .then((pem) => {
+      setPublicKey(addPublicHeaderFooter(pem));
+      return pem;
+    })
+    .then((pem) => createFingerprint(pem))
+    .then((fingerprint) => setFingerprintPublicKey(fingerprint));
+
+  const exportPrivatePEM = async (key: CryptoKey): Promise<void> => exportToPrivatePEM(key)
+    .then((pem) => {
+      setPrivateKey(addPrivateHeaderFooter(pem));
+      return pem;
+    })
+    .then((pem) => createFingerprint(pem))
+    .then((fingerprint) => setFingerprintPrivateKey(fingerprint));
+
   useEffect(() => {
     if (rsaPSS) {
-      exportToPublicPEM(rsaPSS.publicKey)
-        .then((pem) => {
-          setPublicKey(addPublicHeaderFooter(pem));
-          return pem;
-        })
-        .then((pem) => createFingerprint(pem))
-        .then((fingerprint) => setFingerprintPublicKey(fingerprint));
-
-      exportToPrivatePEM(rsaPSS.privateKey)
-        .then((pem) => {
-          setPrivateKey(addPrivateHeaderFooter(pem));
-          return pem;
-        })
-        .then((pem) => createFingerprint(pem))
-        .then((fingerprint) => setFingerprintPrivateKey(fingerprint));
+      exportPublicPEM(rsaPSS.publicKey);
+      exportPrivatePEM(rsaPSS.privateKey);
     }
   }, [rsaPSS]);
 

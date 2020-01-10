@@ -109,7 +109,6 @@ export const uploadDocuments = (
 const shareRSAPublicKey = async (
   userID: string, filename: string, publicKey: CryptoKey, fingerprint: string,
 ): Promise<void> => {
-  const ref = storage.child(`publicKeys/${userID}/${filename}`);
 };
 
 export const shareRSAPublicKeys = async (
@@ -236,7 +235,6 @@ export const exchangeKey = (
   dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction>,
 ): Promise<void> => {
   dispatch(setUILoading());
-  const ref = storage.child(`exchange/${exchangeUserID}/${userID}/aesCBC.json`);
 };
 
 export const deleteExchangeKey = (

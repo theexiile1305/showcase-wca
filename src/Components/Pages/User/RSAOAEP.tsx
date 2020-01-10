@@ -18,23 +18,26 @@ const RSAOAEP: React.FC = () => {
   const [fingerprintPublicKey, setFingerprintPublicKey] = useState('');
   const [fingerprintPrivateKey, setFingerprintPrivateKey] = useState('');
 
+  const exportPublicPEM = async (key: CryptoKey): Promise<void> => exportToPublicPEM(key)
+    .then((pem) => {
+      setPublicKey(addPublicHeaderFooter(pem));
+      return pem;
+    })
+    .then((pem) => createFingerprint(pem))
+    .then((fingerprint) => setFingerprintPublicKey(fingerprint));
+
+  const exportPrivatePEM = async (key: CryptoKey): Promise<void> => exportToPrivatePEM(key)
+    .then((pem) => {
+      setPrivateKey(addPrivateHeaderFooter(pem));
+      return pem;
+    })
+    .then((pem) => createFingerprint(pem))
+    .then((fingerprint) => setFingerprintPrivateKey(fingerprint));
+
   useEffect(() => {
     if (rsaOAEP) {
-      exportToPublicPEM(rsaOAEP.publicKey)
-        .then((pem) => {
-          setPublicKey(addPublicHeaderFooter(pem));
-          return pem;
-        })
-        .then((pem) => createFingerprint(pem))
-        .then((fingerprint) => setFingerprintPublicKey(fingerprint));
-
-      exportToPrivatePEM(rsaOAEP.privateKey)
-        .then((pem) => {
-          setPrivateKey(addPrivateHeaderFooter(pem));
-          return pem;
-        })
-        .then((pem) => createFingerprint(pem))
-        .then((fingerprint) => setFingerprintPrivateKey(fingerprint));
+      exportPublicPEM(rsaOAEP.publicKey);
+      exportPrivatePEM(rsaOAEP.privateKey);
     }
   }, [rsaOAEP]);
 
