@@ -1,27 +1,42 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useEffect, useState } from 'react';
 import {
   Button, Card, CardActions, CardContent, Typography,
 } from '@material-ui/core';
-import { getKeyStorage } from 'src/Api/localforage';
+import { useSelector } from 'react-redux';
 import 'src/Assets/App.css';
 import savePEM from 'src/Api/savePEM';
-import { exportPublicCryptoKey, exportPrivateCryptoKey } from 'src/Api/wca/pemManagement';
+import { ApplicationState } from 'src/Store/ApplicationState';
+import { exportToPublicPEM, createFingerprint, exportToPrivatePEM } from 'src/Api/wca';
+import { addPublicHeaderFooter, addPrivateHeaderFooter } from 'src/Api/wca/pemManagement';
 
 const RSAPSS: React.FC = () => {
-  const [publicKey, setPublicKey] = useState();
-  const [privateKey, setPrivateKey] = useState();
+  const rsaPSS = useSelector((state: ApplicationState) => state.crypto.rsaPSS);
+
+  const [publicKey, setPublicKey] = useState('');
+  const [privateKey, setPrivateKey] = useState('');
   const [fingerprintPublicKey, setFingerprintPublicKey] = useState('');
   const [fingerprintPrivateKey, setFingerprintPrivateKey] = useState('');
 
   useEffect(() => {
-    getKeyStorage().then((keyStorage) => keyStorage.rsaPSS)
-      .then((rsaPSS) => {
-        setPublicKey(rsaPSS.publicKey);
-        setPrivateKey(rsaPSS.privateKey);
-        setFingerprintPublicKey(rsaPSS.publicKeyFingerprint);
-        setFingerprintPrivateKey(rsaPSS.privateKeyFingerprint);
-      });
-  }, []);
+    if (rsaPSS) {
+      exportToPublicPEM(rsaPSS.publicKey)
+        .then((pem) => {
+          setPublicKey(addPublicHeaderFooter(pem));
+          return pem;
+        })
+        .then((pem) => createFingerprint(pem))
+        .then((fingerprint) => setFingerprintPublicKey(fingerprint));
+
+      exportToPrivatePEM(rsaPSS.privateKey)
+        .then((pem) => {
+          setPrivateKey(addPrivateHeaderFooter(pem));
+          return pem;
+        })
+        .then((pem) => createFingerprint(pem))
+        .then((fingerprint) => setFingerprintPrivateKey(fingerprint));
+    }
+  }, [rsaPSS]);
 
   return (
     <>
@@ -47,18 +62,14 @@ const RSAPSS: React.FC = () => {
           <Button
             size="small"
             color="primary"
-            onClick={
-              (): PromiseLike<void> => exportPublicCryptoKey(publicKey).then((key) => savePEM(key, 'publicKey'))
-            }
+            onClick={(): void => savePEM(publicKey, 'publicKey')}
           >
             Export Public Key
           </Button>
           <Button
             size="small"
             color="primary"
-            onClick={
-              (): PromiseLike<void> => exportPrivateCryptoKey(privateKey).then((key) => savePEM(key, 'privateKey'))
-            }
+            onClick={(): void => savePEM(privateKey, 'privateKey')}
           >
             Export Private Key
           </Button>

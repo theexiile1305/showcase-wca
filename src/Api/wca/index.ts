@@ -84,6 +84,13 @@ export const exportToPublicPEM = (
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer));
 
 // keep
+export const exportToPrivatePEM = (
+  cryptoKey: CryptoKey,
+): Promise<string> => Promise
+  .resolve(wca.exportKey('pkcs8', cryptoKey))
+  .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer));
+
+// keep
 export const generateDataNameKey = (
   cryptoKey: CryptoKey,
 ): Promise<string> => Promise

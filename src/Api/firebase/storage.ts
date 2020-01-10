@@ -11,7 +11,6 @@ import {
 import { SharedPublicKey } from 'src/Models/SharedPublicKey';
 import { SharedPublicKeys } from 'src/Models/SharedPublicKeys';
 import { storage } from './firebase';
-import { exportPublicCryptoKey, importRSAOAEPPublicCryptoKey, exportSymmetricCryptoKey } from '../wca/pemManagement';
 import { getKeyStorage } from '../localforage';
 import { createFingerprint } from '../wca';
 import { MIME_TYPES } from './constants';
@@ -111,13 +110,6 @@ const shareRSAPublicKey = async (
   userID: string, filename: string, publicKey: CryptoKey, fingerprint: string,
 ): Promise<void> => {
   const ref = storage.child(`publicKeys/${userID}/${filename}`);
-  await exportPublicCryptoKey(publicKey)
-    .then((pem) => new Blob([pem], { type: 'application/x-pem-file ' }))
-    .then((blob) => ref
-      .put(blob, {
-        contentType: 'application/x-pem-file ',
-        customMetadata: { fingerprint },
-      }));
 };
 
 export const shareRSAPublicKeys = async (
@@ -245,32 +237,6 @@ export const exchangeKey = (
 ): Promise<void> => {
   dispatch(setUILoading());
   const ref = storage.child(`exchange/${exchangeUserID}/${userID}/aesCBC.json`);
-  const aesCBCWrapper = await getKeyStorage()
-    .then((keyStorage) => keyStorage.aesCBC);
-  const aesCBC = await exportSymmetricCryptoKey(aesCBCWrapper.key)
-    .then((jsonWebKey) => JSON.stringify(jsonWebKey));
-  const publicKey = fetch(url)
-    .then((response) => response.text())
-    .then((text) => importRSAOAEPPublicCryptoKey(text));
-  Promise.all([aesCBC, publicKey])
-    // .then((promises) => encryptTextWithRSAOAEP(promises[0], promises[1]))
-    .then((text) => new Blob([''], { type: 'application/json' }))
-    .then((blob) => ref
-      .put(blob, {
-        contentType: 'application/json',
-        customMetadata: {
-          fingerprint: aesCBCWrapper.fingerprint,
-          // iv: arrayBufferToString(aesCBCWrapper.iv),
-        },
-      })
-      .on('state_changed', null,
-        () => dispatch(openSnackbar('You\'ve unsuccessfully shared your AES-CBC key.')),
-        () => dispatch(openSnackbar('You\'ve successfully shared your AES-CBC key.'))))
-    .then(() => dispatch(clearUILoading()))
-    .catch((error) => {
-      dispatch(openSnackbar(error.message));
-      dispatch(clearUILoading());
-    });
 };
 
 export const deleteExchangeKey = (
