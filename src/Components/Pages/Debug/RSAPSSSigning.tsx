@@ -3,9 +3,9 @@ import {
   Button, Card, CardActions, CardContent, Grid, TextField, Typography,
 } from '@material-ui/core';
 import style from 'src/Styles';
-import { signTextWithRSAPSS } from 'src/Api/wca';
 import { openSnackbar } from 'src/Store/ui/UIActions';
 import { useDispatch } from 'react-redux';
+import { signWithRSAPSS } from 'src/Api/wca';
 
 const RSAPSSSigning: React.FC = () => {
   const classes = style();
@@ -20,7 +20,7 @@ const RSAPSSSigning: React.FC = () => {
     event: React.FormEvent<HTMLFormElement>,
   ): void => {
     event.preventDefault();
-    signTextWithRSAPSS(message)
+    signWithRSAPSS(message)
       .then((text) => {
         setDefaultValue('');
         setSignature(text);
