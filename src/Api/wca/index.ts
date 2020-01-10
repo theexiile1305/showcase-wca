@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { store } from 'src/Store';
 import {
   RSA_OAEP_ALGORITHM, wca, PBKDF2_DERIVE_PASSWORD_HASH_ALGORITHM,
@@ -171,7 +172,9 @@ export const setupKeys = async (
   const rsaPSSKeyPair = await generateRSAPSSKeyPair();
 
   const ivRSAOAEP = await newIV();
-  const privateRSAOAEPKey = await encryptPrivateKey(passwordKey, ivRSAOAEP, rsaOAEPKeyPair.privateKey);
+  const privateRSAOAEPKey = await encryptPrivateKey(
+    passwordKey, ivRSAOAEP, rsaOAEPKeyPair.privateKey,
+  );
   const publicRSAOAEPKey = await exportToPublicPEM(rsaOAEPKeyPair.publicKey);
 
   const ivRSAPSS = await newIV();

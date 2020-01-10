@@ -119,7 +119,9 @@ export const signInWithEmailPassword = (
     const ivRSAOAEP = await getIVRSAOAEP(userID);
     const rsaOAEPPrivate = await getRSAOAEPPrivateKey(userID)
       .then((rsaOAEPPrivateKey) => downloadKey(rsaOAEPPrivateKey))
-      .then((rsaOAEPPrivateKey) => importRSAOAEPPrivateKey(rsaOAEPPrivateKey, passwordKey, ivRSAOAEP));
+      .then((rsaOAEPPrivateKey) => importRSAOAEPPrivateKey(
+        rsaOAEPPrivateKey, passwordKey, ivRSAOAEP,
+      ));
     const rsaOAEPPublic = await getRSAOAEPPublicKey(userID)
       .then((rsaOAEPPublicKey) => downloadKey(rsaOAEPPublicKey))
       .then((rsaOAEPPublicKey) => importRSAOAEPPublicKey(rsaOAEPPublicKey));

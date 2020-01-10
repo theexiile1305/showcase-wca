@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { Dispatch } from 'redux';
 import {
   SetUILoadingAction, SetUIStopLoadingAction, OpenSnackbarAction,
@@ -106,9 +107,10 @@ export const uploadDocuments = (
   }
 };
 
-const shareRSAPublicKey = async (
+const shareRSAPublicKey = (
   userID: string, filename: string, publicKey: CryptoKey, fingerprint: string,
-): Promise<void> => {
+): void => {
+  const i = '';
 };
 
 export const shareRSAPublicKeys = async (
