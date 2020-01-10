@@ -4,7 +4,7 @@ import {
 } from './config';
 import { exportSymmetricCryptoKey, exportPublicCryptoKey, exportPrivateCryptoKey } from './pemManagement';
 import {
-  arrayBufferToBase64, stringToArrayBuffer, rawStringToArrayBuffer,
+  arrayBufferToBase64, base64StringToArrayBuffer, stringToArrayBuffer,
 } from './utils';
 import { saveKeysToPKI, saveKeyInfo } from '../firebase/firestore';
 
@@ -19,11 +19,11 @@ export const newPBKDF2Salt = (
 export const derivePasswordHash = (
   password: string, saltPasswordHash: string,
 ): Promise<string> => Promise
-  .resolve(rawStringToArrayBuffer(password))
+  .resolve(stringToArrayBuffer(password))
   .then((keyMaterial) => wca.importKey('raw', keyMaterial, 'PBKDF2', false, ['deriveBits']))
   .then((cryptoKey) => wca
     .deriveBits(
-      PBKDF2_DERIVE_PASSWORD_HASH_ALGORITHM(stringToArrayBuffer(saltPasswordHash)),
+      PBKDF2_DERIVE_PASSWORD_HASH_ALGORITHM(base64StringToArrayBuffer(saltPasswordHash)),
       cryptoKey,
       512,
     ))
@@ -33,11 +33,11 @@ export const derivePasswordHash = (
 export const derivePasswordKey = (
   password: string, saltPasswordKey: string,
 ): Promise<CryptoKey> => Promise
-  .resolve(rawStringToArrayBuffer(password))
+  .resolve(stringToArrayBuffer(password))
   .then((keyMaterial) => wca.importKey('raw', keyMaterial, 'PBKDF2', false, ['deriveKey']))
   .then((cryptoKey) => wca
     .deriveKey(
-      PBKDF2_DERIVE_PASSWORD_KEY_ALGORITHM(stringToArrayBuffer(saltPasswordKey)),
+      PBKDF2_DERIVE_PASSWORD_KEY_ALGORITHM(base64StringToArrayBuffer(saltPasswordKey)),
       cryptoKey,
       AES_CBC_PASSWORD_KEY_GEN_ALGORITHM(),
       true,
@@ -67,7 +67,7 @@ export const encryptPrivateKey = (
   .resolve(wca.exportKey('pkcs8', privateKey))
   .then((arrayBuffer) => wca
     .encrypt(
-      AES_CBC_PASSWORD_KEY_ALGORITHM(stringToArrayBuffer(iv)),
+      AES_CBC_PASSWORD_KEY_ALGORITHM(base64StringToArrayBuffer(iv)),
       cryptoKey,
       arrayBuffer,
     ))
@@ -93,7 +93,7 @@ export const generateDataNameKey = (
 export const createFingerprint = (
   string: string,
 ): Promise<string> => Promise
-  .resolve(stringToArrayBuffer(string))
+  .resolve(base64StringToArrayBuffer(string))
   .then((arrayBuffer) => wca.digest(FINGERPRINT_ALGORITHM, arrayBuffer))
   .then((hashBuffer) => Array.from(new Uint8Array(hashBuffer)))
   .then((hashArray) => hashArray.map((b) => b.toString(16).padStart(2, '0')).join(':'));
@@ -102,7 +102,7 @@ export const createFingerprint = (
 export const importDataNameKey = (
   key: string, publicRSAOAEP: CryptoKey,
 ): Promise<CryptoKey> => Promise
-  .resolve(stringToArrayBuffer(key))
+  .resolve(base64StringToArrayBuffer(key))
   .then((arrayBuffer) => wca.decrypt(RSA_OAEP_ALGORITHM(), publicRSAOAEP, arrayBuffer))
   .then((arrayBuffer) => wca.importKey(
     'raw', arrayBuffer, AES_CBC_PASSWORD_KEY_GEN_ALGORITHM(), true, ['encrypt', 'decrypt'],
@@ -112,9 +112,9 @@ export const importDataNameKey = (
 export const importRSAOAEPPrivateKey = (
   key: string, passwordKey: CryptoKey, ivRSAOAEP: string,
 ): Promise<CryptoKey> => Promise
-  .resolve(stringToArrayBuffer(key))
+  .resolve(base64StringToArrayBuffer(key))
   .then((arrayBuffer) => wca.decrypt(
-    AES_CBC_ENCRYPTION_ALGORITHM(stringToArrayBuffer(ivRSAOAEP)), passwordKey, arrayBuffer,
+    AES_CBC_ENCRYPTION_ALGORITHM(base64StringToArrayBuffer(ivRSAOAEP)), passwordKey, arrayBuffer,
   ))
   .then((arrayBuffer) => wca.importKey(
     'pkcs8', arrayBuffer, RSA_OAEP_IMPORT_ALGORITHM(), true, ['decrypt'],
@@ -124,7 +124,7 @@ export const importRSAOAEPPrivateKey = (
 export const importRSAOAEPPublicKey = (
   key: string,
 ): Promise<CryptoKey> => Promise
-  .resolve(stringToArrayBuffer(key))
+  .resolve(base64StringToArrayBuffer(key))
   .then((arrayBuffer) => wca.importKey(
     'spki', arrayBuffer, RSA_OAEP_IMPORT_ALGORITHM(), true, ['encrypt'],
   ));
@@ -133,9 +133,9 @@ export const importRSAOAEPPublicKey = (
 export const importRSAPSSPrivateKey = (
   key: string, passwordKey: CryptoKey, ivRSAPSS: string,
 ): Promise<CryptoKey> => Promise
-  .resolve(stringToArrayBuffer(key))
+  .resolve(base64StringToArrayBuffer(key))
   .then((arrayBuffer) => wca.decrypt(
-    AES_CBC_ENCRYPTION_ALGORITHM(stringToArrayBuffer(ivRSAPSS)), passwordKey, arrayBuffer,
+    AES_CBC_ENCRYPTION_ALGORITHM(base64StringToArrayBuffer(ivRSAPSS)), passwordKey, arrayBuffer,
   ))
   .then((arrayBuffer) => wca.importKey(
     'pkcs8', arrayBuffer, RSA_PSS_IMPORT_ALGORITHM(), true, ['sign'],
@@ -145,7 +145,7 @@ export const importRSAPSSPrivateKey = (
 export const importRSAPSSPublicKey = (
   key: string,
 ): Promise<CryptoKey> => Promise
-  .resolve(stringToArrayBuffer(key))
+  .resolve(base64StringToArrayBuffer(key))
   .then((arrayBuffer) => wca.importKey(
     'spki', arrayBuffer, RSA_PSS_IMPORT_ALGORITHM(), true, ['verify'],
   ));
@@ -195,15 +195,20 @@ export const changePasswordHash = (
   password: string, userID: string,
 ): Promise<void> => setupKeys(password, userID);
 
+// keep
+export const encryptWithAES = (
+  string: string,
+): Promise<string> => Promise
+  .resolve('');
 
 // stop
 const deriveAESCBCkWithPBKDF2 = (
   password: string, salt: string,
 ): Promise<void> => Promise
-  .resolve(stringToArrayBuffer(password))
+  .resolve(base64StringToArrayBuffer(password))
   .then((keyMaterial) => wca.importKey('raw', keyMaterial, 'PBKDF2', false, ['deriveBits', 'deriveKey']))
   .then((cryptoKey) => {
-    const rawSalt = stringToArrayBuffer(salt);
+    const rawSalt = base64StringToArrayBuffer(salt);
     // return wca.deriveKey(PBKDF2_ALGORITHM(rawSalt), cryptoKey, AES_CBC_ALGORITHM, true, ['encrypt', 'decrypt']);
   });
 const encryptRawCryptoKey = (
@@ -218,7 +223,7 @@ export const hash = (
   password: string,
 ): Promise<string> => Promise
   .resolve(window.btoa(password))
-  .then((base64) => stringToArrayBuffer(base64))
+  .then((base64) => base64StringToArrayBuffer(base64))
   .then((arrayBuffer) => wca.digest('SHA-512', arrayBuffer))
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer))
   .then((string) => window.btoa(string));
@@ -227,7 +232,7 @@ export const encrypWithAESCBC = (
   cryptoKey: CryptoKey, data: string,
 ): Promise<string> => Promise
   .resolve(window.btoa(data))
-  .then((base64) => stringToArrayBuffer(base64))
+  .then((base64) => base64StringToArrayBuffer(base64))
   .then((arrayBuffer) => wca.encrypt(AES_CBC_ENCRYPTION_ALGORITHM, cryptoKey, arrayBuffer))
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer))
   .then((string) => window.btoa(string));
@@ -235,7 +240,7 @@ export const encrypWithAESCBC = (
 const generatePublicKeyFingerprint = (
   cryptoKey: CryptoKey,
 ): PromiseLike<string> => exportPublicCryptoKey(cryptoKey)
-  .then((pem) => stringToArrayBuffer(pem))
+  .then((pem) => base64StringToArrayBuffer(pem))
   .then((encodedPEM) => wca.digest('SHA-512', encodedPEM))
   .then((hashBuffer) => Array.from(new Uint8Array(hashBuffer)))
   .then((hashArray) => hashArray.map((b) => b.toString(16).padStart(2, '0')).join(':'));
@@ -243,7 +248,7 @@ const generatePublicKeyFingerprint = (
 const generatePrivateKeyFingerprint = (
   cryptoKey: CryptoKey,
 ): PromiseLike<string> => exportPrivateCryptoKey(cryptoKey)
-  .then((pem) => stringToArrayBuffer(pem))
+  .then((pem) => base64StringToArrayBuffer(pem))
   .then((encodedPEM) => wca.digest('SHA-512', encodedPEM))
   .then((hashBuffer) => Array.from(new Uint8Array(hashBuffer)))
   .then((hashArray) => hashArray.map((b) => b.toString(16).padStart(2, '0')).join(':'));
@@ -252,7 +257,7 @@ const generateSymmetricFingerprint = (
   cryptoKey: CryptoKey,
 ): PromiseLike<string> => exportSymmetricCryptoKey(cryptoKey)
   .then((jsonWebKey) => JSON.stringify(jsonWebKey))
-  .then((keyAsString) => stringToArrayBuffer(keyAsString))
+  .then((keyAsString) => base64StringToArrayBuffer(keyAsString))
   .then((encodedPEM) => wca.digest('SHA-512', encodedPEM))
   .then((hashBuffer) => Array.from(new Uint8Array(hashBuffer)))
   .then((hashArray) => hashArray.map((b) => b.toString(16).padStart(2, '0')).join(':'));
@@ -320,7 +325,7 @@ export const encryptTextWithAES = (
   text: string,
 ): Promise<string> => Promise
   .resolve(window.btoa(text))
-  .then((base64) => stringToArrayBuffer(base64))
+  .then((base64) => base64StringToArrayBuffer(base64))
   .then((arrayBuffer) => encryptDataWithAES(arrayBuffer))
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer))
   .then((string) => window.btoa(string));
@@ -335,7 +340,7 @@ export const decryptTextWithAES = (
   base64: string,
 ): Promise<string> => Promise
   .resolve(window.atob(base64))
-  .then((text) => stringToArrayBuffer(text))
+  .then((text) => base64StringToArrayBuffer(text))
   .then((arrayBuffer) => decryptDataWithAES(arrayBuffer))
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer))
   .then((text) => window.atob(text));
@@ -348,7 +353,7 @@ export const encryptTextWithRSAOAEP = (
   text: string, publicKey: CryptoKey,
 ): Promise<string> => Promise
   .resolve(window.btoa(text))
-  .then((base64) => stringToArrayBuffer(base64))
+  .then((base64) => base64StringToArrayBuffer(base64))
   .then((arrayBuffer) => encryptDataWithRSAOAEP(arrayBuffer, publicKey))
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer))
   .then((string) => window.btoa(string));
@@ -363,7 +368,7 @@ export const decryptTextWithRSAOAEP = (
   base64: string,
 ): Promise<string> => Promise
   .resolve(window.atob(base64))
-  .then((text) => stringToArrayBuffer(text))
+  .then((text) => base64StringToArrayBuffer(text))
   .then((arrayBuffer) => decryptDataWithRSAOAEP(arrayBuffer))
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer))
   .then((text) => window.atob(text));
@@ -378,7 +383,7 @@ export const signTextWithRSAPSS = (
   text: string,
 ): Promise<string> => Promise
   .resolve(window.btoa(text))
-  .then((base64) => stringToArrayBuffer(base64))
+  .then((base64) => base64StringToArrayBuffer(base64))
   .then((arrayBuffer) => signDataWithRSAPSS(arrayBuffer))
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer))
   .then((string) => window.btoa(string));
@@ -393,9 +398,9 @@ export const verifyTextWithRSAPSS = (
   message: string, signatureBase64: string, publicKey: CryptoKey,
 ): Promise<boolean> => Promise
   .resolve(window.atob(signatureBase64))
-  .then((text) => stringToArrayBuffer(text))
+  .then((text) => base64StringToArrayBuffer(text))
   .then((arrayBuffer) => {
     const base64 = window.btoa(message);
-    const rawMessage = stringToArrayBuffer(base64);
+    const rawMessage = base64StringToArrayBuffer(base64);
     return verifyDataWithRSAPSS(rawMessage, arrayBuffer, publicKey);
   });

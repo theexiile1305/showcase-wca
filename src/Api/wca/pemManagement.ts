@@ -1,4 +1,4 @@
-import { stringToArrayBuffer, arrayBufferToBase64 } from './utils';
+import { base64StringToArrayBuffer, arrayBufferToBase64 } from './utils';
 import { wca } from './config';
 
 const PEM_PUBLIC_HEADER = '-----BEGIN PUBLIC KEY-----';
@@ -13,7 +13,7 @@ const importCryptoKey = (
     PEM_PUBLIC_HEADER.length, cryptoKey.length - PEM_PUBLIC_FOOTER.length,
   );
   const binary = window.atob(content);
-  const key = stringToArrayBuffer(binary);
+  const key = base64StringToArrayBuffer(binary);
   return wca.importKey(format, key, { name: algorithm, hash: 'SHA-512' }, true, keyUsages);
 };
 

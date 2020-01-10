@@ -2,7 +2,7 @@ const arrayBufferToString = (
   data: ArrayBuffer,
 ): string => String.fromCharCode.apply(null, Array.from(new Uint8Array(data)));
 
-export const rawStringToArrayBuffer = (
+export const stringToArrayBuffer = (
   text: string,
 ): ArrayBuffer => {
   const { length } = text;
@@ -14,9 +14,9 @@ export const rawStringToArrayBuffer = (
   return buffer;
 };
 
-export const stringToArrayBuffer = (
+export const base64StringToArrayBuffer = (
   string: string,
-): ArrayBuffer => rawStringToArrayBuffer(window.atob(string));
+): ArrayBuffer => stringToArrayBuffer(window.atob(string));
 
 export const arrayBufferToBase64 = (
   arrayBuffer: ArrayBuffer,
