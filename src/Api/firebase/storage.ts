@@ -10,12 +10,66 @@ import {
 } from 'src/Store/documents/DocumentActions';
 import { SharedPublicKey } from 'src/Models/SharedPublicKey';
 import { SharedPublicKeys } from 'src/Models/SharedPublicKeys';
+import store from 'src/Store';
 import saveData from '../saveData';
 import { storage } from './firebase';
 import { exportPublicCryptoKey, importRSAOAEPPublicCryptoKey, exportSymmetricCryptoKey } from '../wca/pemManagement';
-import { encryptDataWithAES, decryptDataWithAES, encryptTextWithRSAOAEP } from '../wca';
+import {
+  encryptDataWithAES, decryptDataWithAES, encryptTextWithRSAOAEP, createFingerprint,
+} from '../wca';
 import { getKeyStorage } from '../localforage';
-import { arrayBufferToString } from '../wca/utils';
+import { MIME_TYPES } from './constants';
+
+// keep
+const uploadDocument = (
+  path: string, data: Blob, metadata?: firebase.storage.UploadMetadata,
+): Promise<string> => storage
+  .child(path)
+  .put(data, metadata)
+  .then((uploadTask) => uploadTask.ref.fullPath);
+
+// keep
+export const saveKey = async (
+  fullPath: string, key: string,
+): Promise<string> => Promise
+  .resolve(createFingerprint(key))
+  .then((fingerprint) => {
+    const keyBlob = new Blob([key], { type: MIME_TYPES.X_PEM_FILE });
+    return uploadDocument(fullPath, keyBlob, {
+      contentType: MIME_TYPES.X_PEM_FILE,
+      customMetadata: { fingerprint },
+    });
+  });
+
+// keep
+export const removeKey = (
+  fullPath: string,
+): Promise<void> => storage.child(fullPath).delete();
+
+// keep
+const downloadDocument = (
+  reference: firebase.storage.Reference,
+): Promise<string> => reference
+  .getDownloadURL()
+  .then((url) => fetch(url))
+  .then((response) => response.text());
+
+// keep
+export const downloadKey = async (
+  fullPath: string,
+): Promise<string> => {
+  const reference = storage.child(fullPath);
+  const key = await downloadDocument(reference);
+  const fingerprint = await reference
+    .getMetadata()
+    .then((metadata) => metadata.customMetadata.fingerprint);
+  const calculatedFingerprint = await createFingerprint(key);
+  if (fingerprint !== calculatedFingerprint) {
+    throw new Error(`Fingerprints of donwload file ${fullPath} does not match.`);
+  }
+  return key;
+};
+
 
 const blobToArrayBuffer = (
   data: Blob,
@@ -78,18 +132,18 @@ export const shareRSAPublicKeys = async (
   await shareRSAPublicKey(userID, 'rsaPSS.pem', keys.rsaPSS.publicKey, keys.rsaPSS.publicKeyFingerprint);
 };
 
-export const downloadDocument = (
-  userID: string, filename: string,
-): void => {
-  const ref = storage.child(`documents/${userID}/${filename}`);
-  ref
-    .getDownloadURL()
-    .then((url) => fetch(url))
-    .then((response) => response.arrayBuffer())
-    .then((arrayBuffer) => decryptDataWithAES(arrayBuffer))
-    .then((decrypted) => new Blob([decrypted]))
-    .then((blob) => saveData(blob, filename));
-};
+// export const downloadDocument = (
+//   userID: string, filename: string,
+// ): void => {
+//   const ref = storage.child(`documents/${userID}/${filename}`);
+//   ref
+//     .getDownloadURL()
+//     .then((url) => fetch(url))
+//     .then((response) => response.arrayBuffer())
+//     .then((arrayBuffer) => decryptDataWithAES(arrayBuffer))
+//     .then((decrypted) => new Blob([decrypted]))
+//     .then((blob) => saveData(blob, filename));
+// };
 
 export const deleteSharedPublicKeys = (
   userID: string,
@@ -210,7 +264,7 @@ export const exchangeKey = (
         contentType: 'application/json',
         customMetadata: {
           fingerprint: aesCBCWrapper.fingerprint,
-          iv: arrayBufferToString(aesCBCWrapper.iv),
+          // iv: arrayBufferToString(aesCBCWrapper.iv),
         },
       })
       .on('state_changed', null,

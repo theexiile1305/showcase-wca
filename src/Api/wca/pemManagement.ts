@@ -1,4 +1,4 @@
-import { arrayBufferToString, stringToArrayBuffer } from './utils';
+import { stringToArrayBuffer, arrayBufferToBase64 } from './utils';
 import { wca } from './config';
 
 const PEM_PUBLIC_HEADER = '-----BEGIN PUBLIC KEY-----';
@@ -29,7 +29,7 @@ const exportCryptoKey = (
   cryptoKey: CryptoKey, format: 'spki' | 'pkcs8', header: string, footer: string,
 ): PromiseLike<string> => wca
   .exportKey(format, cryptoKey)
-  .then((exported) => arrayBufferToString(exported))
+  .then((exported) => arrayBufferToBase64(exported))
   .then((exportedAsString) => window.btoa(exportedAsString))
   .then((base64) => `${header}\n${base64}\n${footer}`);
 

@@ -1,8 +1,8 @@
-export const arrayBufferToString = (
+const arrayBufferToString = (
   data: ArrayBuffer,
 ): string => String.fromCharCode.apply(null, Array.from(new Uint8Array(data)));
 
-export const stringToArrayBuffer = (
+export const rawStringToArrayBuffer = (
   text: string,
 ): ArrayBuffer => {
   const { length } = text;
@@ -13,3 +13,11 @@ export const stringToArrayBuffer = (
   }
   return buffer;
 };
+
+export const stringToArrayBuffer = (
+  string: string,
+): ArrayBuffer => rawStringToArrayBuffer(window.atob(string));
+
+export const arrayBufferToBase64 = (
+  arrayBuffer: ArrayBuffer,
+): string => window.btoa(arrayBufferToString(arrayBuffer));
