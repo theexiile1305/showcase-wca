@@ -76,7 +76,7 @@ export const signUp = (
     .then(async (user) => {
       await user.updateProfile({ displayName });
       await user.sendEmailVerification();
-      await setupKeys(password, user.uid);
+      await setupKeys(password, user);
       await auth.signOut();
       dispatch(openSnackbar('Please verify your e-mail address in order to sign in.'));
     })
@@ -251,7 +251,7 @@ export const changePassword = (
     })
     .then(async (user) => {
       if (user != null) {
-        await changePasswordHash(newPassword, user.uid)
+        await changePasswordHash(newPassword, user)
           .then(() => getPasswordHash(newPassword))
           .then((newPasswordHash) => user.updatePassword(newPasswordHash));
         dispatch(openSnackbar('You´ve successfully changed your password.'));

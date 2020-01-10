@@ -17,6 +17,16 @@ export const saveKeysToPKI = async (
   });
 };
 
+export const determineEmail = (
+  userID: string,
+): Promise<string> => firestore.collection(USERS).doc(userID).get()
+  .then((doc) => doc.get('email'));
+
+// keep
+export const listAllKeysFromPKI = (
+): Promise<string[]> => firestore.collection(PKI).get()
+  .then((querySnapshot) => querySnapshot.docs.map((doc) => doc.id));
+
 // keep
 export const removeKeysFromPKI = (
   userID: string,
@@ -38,12 +48,14 @@ export const getRSAPSSPublicKey = (
 
 // keep
 export const saveKeyInfo = async (
-  userID: string, keyInfo: KeyInfo,
+  user: firebase.User, keyInfo: KeyInfo,
 ): Promise<void> => {
-  const rsaOAEPFullPath = await saveKey(USER_KEY_PEM(userID, 'rsaOAEP'), keyInfo.rsaOAEP.privateKey);
-  const rsaPSSFullPath = await saveKey(USER_KEY_PEM(userID, 'rsaPSS'), keyInfo.rsaPSS.privateKey);
-  const dataNameKeyFullPath = await saveKey(USER_KEY_PEM(userID, 'dataNameKey'), keyInfo.dataNameKey.key);
-  firestore.collection(USERS).doc(userID).set({
+  const { uid, email } = user;
+  const rsaOAEPFullPath = await saveKey(USER_KEY_PEM(uid, 'rsaOAEP'), keyInfo.rsaOAEP.privateKey);
+  const rsaPSSFullPath = await saveKey(USER_KEY_PEM(uid, 'rsaPSS'), keyInfo.rsaPSS.privateKey);
+  const dataNameKeyFullPath = await saveKey(USER_KEY_PEM(uid, 'dataNameKey'), keyInfo.dataNameKey.key);
+  firestore.collection(USERS).doc(uid).set({
+    email,
     passwordKey: {
       salt: keyInfo.passwordKey.salt,
     },

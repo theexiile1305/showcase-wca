@@ -162,7 +162,7 @@ export const importRSAPSSPublicKey = (
 
 // keep
 export const setupKeys = async (
-  password: string, userID: string,
+  password: string, user: firebase.User,
 ): Promise<void> => {
   const saltPasswordKey = await newPBKDF2Salt(32);
   const passwordKey = await derivePasswordKey(password, saltPasswordKey);
@@ -180,8 +180,8 @@ export const setupKeys = async (
 
   const ivDataNameKey = await newIV();
   const dataNameKey = await generateDataNameKey(rsaOAEPKeyPair.publicKey);
-  await saveKeysToPKI(userID, publicRSAOAEPKey, publicRSAPSSKey);
-  await saveKeyInfo(userID, {
+  await saveKeysToPKI(user.uid, publicRSAOAEPKey, publicRSAPSSKey);
+  await saveKeyInfo(user, {
     passwordKey: {
       salt: saltPasswordKey,
     },
@@ -202,8 +202,8 @@ export const setupKeys = async (
 
 // keep
 export const changePasswordHash = (
-  password: string, userID: string,
-): Promise<void> => setupKeys(password, userID);
+  password: string, user: firebase.User,
+): Promise<void> => setupKeys(password, user);
 
 // keep
 export const encryptWithAESCBC = (
