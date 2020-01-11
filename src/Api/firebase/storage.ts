@@ -12,7 +12,6 @@ import {
 import { SharedPublicKey } from 'src/Models/SharedPublicKey';
 import { SharedPublicKeys } from 'src/Models/SharedPublicKeys';
 import { storage } from './firebase';
-import { getKeyStorage } from '../localforage';
 import { createFingerprint } from '../wca';
 import { MIME_TYPES } from './constants';
 
@@ -116,9 +115,6 @@ const shareRSAPublicKey = (
 export const shareRSAPublicKeys = async (
   userID: string,
 ): Promise<void> => {
-  const keys = await getKeyStorage();
-  await shareRSAPublicKey(userID, 'rsaOAEP.pem', keys.rsaOAEP.publicKey, keys.rsaOAEP.publicKeyFingerprint);
-  await shareRSAPublicKey(userID, 'rsaPSS.pem', keys.rsaPSS.publicKey, keys.rsaPSS.publicKeyFingerprint);
 };
 
 // export const downloadDocument = (
