@@ -1,21 +1,21 @@
-export interface CryptoStore {
-  saltPasswordHash: string | null;
+export interface CryptoKeys {
+  saltPasswordHash: string;
   passwordKey: {
     salt: string;
     key: CryptoKey;
-  } | null;
+  };
   rsaOAEP: {
     iv: string;
     privateKey: CryptoKey;
     publicKey: CryptoKey;
-  } | null;
+  };
   rsaPSS: {
     iv: string;
     privateKey: CryptoKey;
     publicKey: CryptoKey;
-  } | null;
+  };
   dataNameKey: {
     iv: string;
     key: CryptoKey;
-  } | null;
+  };
 }

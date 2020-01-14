@@ -8,14 +8,6 @@ import {
   SetUILoadingAction, SetUIStopLoadingAction, OpenSnackbarAction,
 } from 'src/Store/ui/UIActions';
 import {
-  storeSaltPasswordHash, StoreSaltPasswordHashAction,
-  storePasswordKey, StorePasswordKeyAction,
-  storeRSAOAEP, StoreRSAOAEPAction,
-  storeRSAPSS, StoreRSAPSSAction,
-  storeDataNameKey, StoreDataNameKeyAction,
-  removeCryptoKeys, RemoveCryptoKeysAction,
-} from 'src/Store/crypto/CryptoActions';
-import {
   saveAESCBC, SaveAESCBCAction, removeDebug, RemoveDebugAction,
 } from 'src/Store/debug/DebugActions';
 import { store } from 'src/Store';
@@ -34,17 +26,12 @@ import {
   getRSAOAEPPublicKey, getIVRSAOAEP, getIVRSAPSS, getRSAPSSPrivateKey,
   getRSAPSSPublicKey, removeKeysFromPKI, removeKeyInfo,
 } from './firestore';
+import { removeCryptoKeys, saveCryptoKeys } from '../localforage';
 
 // keep
 const getPasswordHash = (
   password: string,
-): Promise<string> => {
-  const { saltPasswordHash } = store.getState().crypto;
-  if (!saltPasswordHash) {
-    return derivePasswordHash(password, getSaltPasswordHash());
-  }
-  return derivePasswordHash(password, saltPasswordHash);
-};
+): Promise<string> => derivePasswordHash(password, getSaltPasswordHash());
 
 // keep
 export const isAuthenticated = (
@@ -96,15 +83,11 @@ export const signInWithEmailPassword = (
   email: string, password: string, redirect: () => void,
 ) => async (
   dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction
-  | StoreUserAction | StoreSaltPasswordHashAction | StorePasswordKeyAction | StoreRSAOAEPAction
-  | StoreRSAPSSAction | StoreDataNameKeyAction | SaveAESCBCAction>,
+  | StoreUserAction | SaveAESCBCAction>,
 ): Promise<void> => Promise
   .resolve(dispatch(setUILoading()))
   .then(() => getSaltPasswordHash())
-  .then((saltPasswordHash) => {
-    dispatch(storeSaltPasswordHash(saltPasswordHash));
-    return derivePasswordHash(password, saltPasswordHash);
-  })
+  .then((saltPasswordHash) => derivePasswordHash(password, saltPasswordHash))
   .then((passwordHash) => auth.signInWithEmailAndPassword(email, passwordHash))
   .then(async (userCredential) => {
     const { user } = userCredential;
@@ -116,10 +99,9 @@ export const signInWithEmailPassword = (
     return user.uid;
   })
   .then(async (userID) => {
+    const saltPasswordHash = getSaltPasswordHash();
     const saltPasswordKey = await getSaltPasswordKey(userID);
     const passwordKey = await derivePasswordKey(password, saltPasswordKey);
-    dispatch(storePasswordKey(saltPasswordKey, passwordKey));
-
     const ivRSAOAEP = await getIVRSAOAEP(userID);
     const rsaOAEPPrivate = await getRSAOAEPPrivateKey(userID)
       .then((rsaOAEPPrivateKey) => downloadKey(rsaOAEPPrivateKey))
@@ -129,8 +111,6 @@ export const signInWithEmailPassword = (
     const rsaOAEPPublic = await getRSAOAEPPublicKey(userID)
       .then((rsaOAEPPublicKey) => downloadKey(rsaOAEPPublicKey))
       .then((rsaOAEPPublicKey) => importRSAOAEPPublicKey(rsaOAEPPublicKey));
-    dispatch(storeRSAOAEP(ivRSAOAEP, rsaOAEPPrivate, rsaOAEPPublic));
-
     const ivRSAPSS = await getIVRSAPSS(userID);
     const rsaPSSPrivate = await getRSAPSSPrivateKey(userID)
       .then((rsaPSSPrivateKey) => downloadKey(rsaPSSPrivateKey))
@@ -138,15 +118,32 @@ export const signInWithEmailPassword = (
     const rsaPSSPublic = await getRSAPSSPublicKey(userID)
       .then((rsaPSSPublicKey) => downloadKey(rsaPSSPublicKey))
       .then((rsaPSSPublicKey) => importRSAPSSPublicKey(rsaPSSPublicKey));
-    dispatch(storeRSAPSS(ivRSAPSS, rsaPSSPrivate, rsaPSSPublic));
-
     const ivDataNameKey = await getIVDataNameKey(userID);
     const dataNameKey = await getDataNameKey(userID)
       .then((key) => downloadKey(key))
       .then((key) => importDataNameKey(key, rsaOAEPPrivate));
-    dispatch(storeDataNameKey(ivDataNameKey, dataNameKey));
-
     dispatch(saveAESCBC(await newIV()));
+    await saveCryptoKeys({
+      saltPasswordHash,
+      passwordKey: {
+        salt: saltPasswordKey,
+        key: passwordKey,
+      },
+      rsaOAEP: {
+        iv: ivRSAOAEP,
+        privateKey: rsaOAEPPrivate,
+        publicKey: rsaOAEPPublic,
+      },
+      rsaPSS: {
+        iv: ivRSAPSS,
+        privateKey: rsaPSSPrivate,
+        publicKey: rsaPSSPublic,
+      },
+      dataNameKey: {
+        iv: ivDataNameKey,
+        key: dataNameKey,
+      },
+    });
   })
   .then(() => dispatch(openSnackbar('You´ve been successfully signed in.')))
   .catch((error) => dispatch(openSnackbar(error.message)))
@@ -159,13 +156,12 @@ export const signInWithEmailPassword = (
 export const signOut = (
   redirect: () => void,
 ) => (
-  dispatch: Dispatch<SetUILoadingAction | RemoveCryptoKeysAction | RemoveDocumentsAction
-  | RemoveDebugAction | RemovePKIAction | OpenSnackbarAction | LogoutUserAction
-  | SetUIStopLoadingAction>,
+  dispatch: Dispatch<SetUILoadingAction | RemoveDocumentsAction | RemoveDebugAction
+  | RemovePKIAction | OpenSnackbarAction | LogoutUserAction | SetUIStopLoadingAction>,
 ): void => {
   dispatch(setUILoading());
   auth.signOut()
-    .then(() => dispatch(removeCryptoKeys()))
+    .then(() => removeCryptoKeys())
     .then(() => dispatch(removeDocuments()))
     .then(() => dispatch(removeDebug()))
     .then(() => dispatch(removePKI()))

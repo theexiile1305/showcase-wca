@@ -3,22 +3,21 @@ import React, { useEffect, useState } from 'react';
 import {
   Button, Card, CardActions, CardContent, Typography,
 } from '@material-ui/core';
-import { useSelector } from 'react-redux';
 import 'src/Assets/App.css';
 import savePEM from 'src/Api/savePEM';
-import { ApplicationState } from 'src/Store/ApplicationState';
 import { exportToPublicPEM, createFingerprint, exportToPrivatePEM } from 'src/Api/wca';
 import { addPrivateHeaderFooter, addPublicHeaderFooter } from 'src/Api/wca/pemManagement';
+import { getRSAOAEPPublicKey, getRSAOAEPPrivateKey } from 'src/Api/localforage';
 
 const RSAOAEP: React.FC = () => {
-  const rsaOAEP = useSelector((state: ApplicationState) => state.crypto.rsaOAEP);
-
   const [publicKey, setPublicKey] = useState('');
   const [privateKey, setPrivateKey] = useState('');
   const [fingerprintPublicKey, setFingerprintPublicKey] = useState('');
   const [fingerprintPrivateKey, setFingerprintPrivateKey] = useState('');
 
-  const exportPublicPEM = async (key: CryptoKey): Promise<void> => exportToPublicPEM(key)
+  const exportPublicPEM = (
+  ): Promise<void> => getRSAOAEPPublicKey()
+    .then((cryptoKey) => exportToPublicPEM(cryptoKey))
     .then((pem) => {
       setPublicKey(addPublicHeaderFooter(pem));
       return pem;
@@ -26,7 +25,9 @@ const RSAOAEP: React.FC = () => {
     .then((pem) => createFingerprint(pem))
     .then((fingerprint) => setFingerprintPublicKey(fingerprint));
 
-  const exportPrivatePEM = async (key: CryptoKey): Promise<void> => exportToPrivatePEM(key)
+  const exportPrivatePEM = (
+  ): Promise<void> => getRSAOAEPPrivateKey()
+    .then((cryptoKey) => exportToPrivatePEM(cryptoKey))
     .then((pem) => {
       setPrivateKey(addPrivateHeaderFooter(pem));
       return pem;
@@ -35,11 +36,9 @@ const RSAOAEP: React.FC = () => {
     .then((fingerprint) => setFingerprintPrivateKey(fingerprint));
 
   useEffect(() => {
-    if (rsaOAEP) {
-      exportPublicPEM(rsaOAEP.publicKey);
-      exportPrivatePEM(rsaOAEP.privateKey);
-    }
-  }, [rsaOAEP]);
+    exportPublicPEM();
+    exportPrivatePEM();
+  }, []);
 
   return (
     <>

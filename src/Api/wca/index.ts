@@ -6,11 +6,16 @@ import {
   AES_CBC_PASSWORD_KEY_GEN_ALGORITHM, RSA_OAEP_GEN_ALGORITHM,
   RSA_PSS_GEN_ALGORITHM, FINGERPRINT_ALGORITHM, RSA_OAEP_IMPORT_ALGORITHM,
   RSA_PSS_IMPORT_ALGORITHM,
+  RSA_PSS_ALGORITHM,
 } from './config';
 import {
   arrayBufferToBase64, base64StringToArrayBuffer, stringToArrayBuffer, arrayBufferToString,
 } from './utils';
 import { saveKeysToPKI, saveKeyInfo } from '../firebase/firestore';
+import {
+  getPasswordKey, getRSAOAEPPublicKey, getRSAOAEPPrivateKey,
+  getRSAPSSPrivateKey, getRSAPSSPublicKey,
+} from '../localforage';
 
 // keep
 export const newPBKDF2Salt = (
@@ -232,13 +237,11 @@ export const encryptWithAESCBC = (
   plaintext: string,
 ): Promise<string> => Promise
   .resolve(stringToArrayBuffer(plaintext))
-  .then((arrayBuffer) => {
-    const { key } = store.getState().crypto.passwordKey!!;
-    const { iv } = store.getState().debug.aesCBC!!;
-    return wca.encrypt(
-      AES_CBC_PASSWORD_KEY_ALGORITHM(base64StringToArrayBuffer(iv)), key, arrayBuffer,
-    );
-  })
+  .then(async (arrayBuffer) => wca.encrypt(
+    AES_CBC_PASSWORD_KEY_ALGORITHM(base64StringToArrayBuffer(store.getState().debug.aesCBC!!.iv)),
+    await getPasswordKey(),
+    arrayBuffer,
+  ))
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer));
 
 // keep
@@ -246,13 +249,11 @@ export const decryptWithAESCBC = (
   ciphertext: string,
 ): Promise<string> => Promise
   .resolve(base64StringToArrayBuffer(ciphertext))
-  .then((arrayBuffer) => {
-    const { key } = store.getState().crypto.passwordKey!!;
-    const { iv } = store.getState().debug.aesCBC!!;
-    return wca.decrypt(
-      AES_CBC_PASSWORD_KEY_ALGORITHM(base64StringToArrayBuffer(iv)), key, arrayBuffer,
-    );
-  })
+  .then(async (arrayBuffer) => wca.decrypt(
+    AES_CBC_PASSWORD_KEY_ALGORITHM(base64StringToArrayBuffer(store.getState().debug.aesCBC!!.iv)),
+    await getPasswordKey(),
+    arrayBuffer,
+  ))
   .then((arrayBuffer) => arrayBufferToString(arrayBuffer));
 
 // keep
@@ -260,10 +261,11 @@ export const encryptWithRSAOAEP = (
   plaintext: string,
 ): Promise<string> => Promise
   .resolve(stringToArrayBuffer(plaintext))
-  .then((arrayBuffer) => {
-    const { publicKey } = store.getState().crypto.rsaOAEP!!;
-    return wca.encrypt(RSA_OAEP_ALGORITHM(), publicKey, arrayBuffer);
-  })
+  .then(async (arrayBuffer) => wca.encrypt(
+    RSA_OAEP_ALGORITHM(),
+    await getRSAOAEPPublicKey(),
+    arrayBuffer,
+  ))
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer));
 
 // keep
@@ -271,10 +273,11 @@ export const decryptWithRSAOAEP = (
   ciphertext: string,
 ): Promise<string> => Promise
   .resolve(base64StringToArrayBuffer(ciphertext))
-  .then((arrayBuffer) => {
-    const { privateKey } = store.getState().crypto.rsaOAEP!!;
-    return wca.decrypt(RSA_OAEP_ALGORITHM(), privateKey, arrayBuffer);
-  })
+  .then(async (arrayBuffer) => wca.decrypt(
+    RSA_OAEP_ALGORITHM(),
+    await getRSAOAEPPrivateKey(),
+    arrayBuffer,
+  ))
   .then((arrayBuffer) => arrayBufferToString(arrayBuffer));
 
 // keep
@@ -282,11 +285,11 @@ export const signWithRSAPSS = (
   message: string,
 ): Promise<string> => Promise
   .resolve(stringToArrayBuffer(message))
-  .then((arrayBuffer) => {
-    const { privateKey } = store.getState().crypto.rsaPSS!!;
-    // change to RSA_PSS_ALGORITHM... CAUSE FAILURE -> WHY?
-    return wca.sign({ name: 'RSA-PSS', saltLength: 0 }, privateKey, arrayBuffer);
-  })
+  .then(async (arrayBuffer) => wca.sign(
+    RSA_PSS_ALGORITHM(),
+    await getRSAPSSPrivateKey(),
+    arrayBuffer,
+  ))
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer));
 
 // keep
@@ -294,10 +297,9 @@ export const verifyWithRSAPSS = (
   message: string, signature: string,
 ): Promise<boolean> => Promise
   .resolve(stringToArrayBuffer(message))
-  .then((arrayBuffer) => {
-    const { publicKey } = store.getState().crypto.rsaPSS!!;
-    return wca.verify(
-      // change to RSA_PSS_ALGORITHM... CAUSE FAILURE -> WHY?
-      { name: 'RSA-PSS', saltLength: 0 }, publicKey, base64StringToArrayBuffer(signature), arrayBuffer,
-    );
-  });
+  .then(async (arrayBuffer) => wca.verify(
+    RSA_PSS_ALGORITHM(),
+    await getRSAPSSPublicKey(),
+    base64StringToArrayBuffer(signature),
+    arrayBuffer,
+  ));
