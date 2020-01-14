@@ -1,6 +1,6 @@
 /* eslint-disable import/no-cycle */
 import { KeyInfo } from 'src/Models/firestore/KeyInfo';
-import firebase from 'firebase';
+import firebase from 'firebase/app';
 import {
   storeDocument, StoreDocumentAction,
 } from 'src/Store/documents/DocumentActions';
