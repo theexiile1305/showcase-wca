@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography, Grid } from '@material-ui/core';
+import { Typography, Grid } from '@material-ui/core';
 
 const NotFound: React.FC = () => (
   <Grid container spacing={3}>

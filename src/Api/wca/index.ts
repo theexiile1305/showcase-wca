@@ -9,7 +9,8 @@ import {
   RSA_PSS_ALGORITHM,
 } from './config';
 import {
-  arrayBufferToBase64, base64StringToArrayBuffer, stringToArrayBuffer, arrayBufferToString, blobToArrayBuffer,
+  arrayBufferToBase64, base64StringToArrayBuffer, stringToArrayBuffer,
+  arrayBufferToString, blobToArrayBuffer,
 } from './utils';
 import { saveKeysToPKI, saveKeyInfo } from '../firebase/firestore';
 import {
@@ -235,6 +236,7 @@ export const encryptWithAESCBC = (
 ): Promise<string> => Promise
   .resolve(stringToArrayBuffer(plaintext))
   .then(async (arrayBuffer) => wca.encrypt(
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     AES_CBC_PASSWORD_KEY_ALGORITHM(base64StringToArrayBuffer(store.getState().debug.aesCBC!!.iv)),
     await getPasswordKey(),
     arrayBuffer,
@@ -247,6 +249,7 @@ export const decryptWithAESCBC = (
 ): Promise<string> => Promise
   .resolve(base64StringToArrayBuffer(ciphertext))
   .then(async (arrayBuffer) => wca.decrypt(
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     AES_CBC_PASSWORD_KEY_ALGORITHM(base64StringToArrayBuffer(store.getState().debug.aesCBC!!.iv)),
     await getPasswordKey(),
     arrayBuffer,
