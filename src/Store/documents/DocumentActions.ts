@@ -1,85 +1,52 @@
 import { Action, ActionCreator } from 'redux';
 import { Document } from 'src/Models/Document';
-import { SharedPublicKeys } from 'src/Models/SharedPublicKeys';
 
 export enum DocumentAction {
-  SAVE_DOCUMENTS = '@@wca/SAVE_DOCUMENTS',
-  SAVE_SINGLE_DOCUMENT = '@@wca/SAVE_SINGLE_DOCUMENT',
+  STORE_DOCUMENT = '@@wca/STORE_DOCUMENT',
   REMOVE_DOCUMENT = '@@wca/REMOVE_DOCUMENT',
-  SAVE_SHARED_PUBLIC_KEYS = '@@wca/SAVE_SHARED_PUBLIC_KEYS',
-  REMOVE_SHARED_PUBLIC_KEYS = '@@wca/REMOVE_SHARED_PUBLIC_KEYS'
+  REMOVE_DOCUMENTS = '@@wca/REMOVE_DOCUMENTS',
+  ADD_SELECTED = '@@wca/ADD_SELECTED',
+  REMOVE_SELECTED = '@@wca/REMOVE_SELECTED'
 }
 
-export interface SaveDocumentAction extends Action {
-  type: DocumentAction.SAVE_DOCUMENTS;
-  documents: Document[];
-}
-
-export interface SaveSingleDocumentAction extends Action {
-  type: DocumentAction.SAVE_SINGLE_DOCUMENT;
+export interface StoreDocumentAction extends Action {
+  type: DocumentAction.STORE_DOCUMENT;
   document: Document;
 }
+
 export interface RemoveDocumentAction extends Action {
   type: DocumentAction.REMOVE_DOCUMENT;
-  filename: string;
+  id: string;
 }
 
-export interface SaveSharedPublicKeysAction extends Action {
-  type: DocumentAction.SAVE_SHARED_PUBLIC_KEYS;
-  sharedPublicKeys: SharedPublicKeys;
+export interface RemoveDocumentsAction extends Action {
+  type: DocumentAction.REMOVE_DOCUMENTS;
 }
-
-export interface RemoveSharedPublicKeysAction extends Action {
-  type: DocumentAction.REMOVE_SHARED_PUBLIC_KEYS;
-  userID: string;
-}
-
 export type DocumentActions =
-  | SaveDocumentAction
-  | SaveSingleDocumentAction
+  | StoreDocumentAction
   | RemoveDocumentAction
-  | SaveSharedPublicKeysAction
-  | RemoveSharedPublicKeysAction;
+  | RemoveDocumentsAction;
 
-export const saveDocuments: ActionCreator<SaveDocumentAction> = (
-  listResult: firebase.storage.ListResult,
-) => {
-  const documents = listResult.items.map((reference) => {
-    const document: Document = { id: reference.fullPath, filename: reference.name };
-    return document;
-  });
-
-  return {
-    type: DocumentAction.SAVE_DOCUMENTS,
-    documents,
-  };
-};
-
-export const saveSingleDocument: ActionCreator<SaveSingleDocumentAction> = (
-  filename: string, fullpath: string,
+export const storeDocument: ActionCreator<StoreDocumentAction> = (
+  id: string, filename: string, path: string, shared: boolean,
 ) => ({
-  type: DocumentAction.SAVE_SINGLE_DOCUMENT,
+  type: DocumentAction.STORE_DOCUMENT,
   document: {
-    id: fullpath,
+    id,
     filename,
+    path,
+    shared,
   },
 });
 
-export const removeDocument: ActionCreator<RemoveDocumentAction> = (filename: string) => ({
+export const removeDocument: ActionCreator<RemoveDocumentAction> = (
+  id: string,
+) => ({
   type: DocumentAction.REMOVE_DOCUMENT,
-  filename,
+  id,
 });
 
-export const saveSharedPublicKeys: ActionCreator<SaveSharedPublicKeysAction> = (
-  sharedPublicKeys: SharedPublicKeys,
+export const removeDocuments: ActionCreator<RemoveDocumentsAction> = (
 ) => ({
-  type: DocumentAction.SAVE_SHARED_PUBLIC_KEYS,
-  sharedPublicKeys,
-});
-
-export const removeSharedPublicKeys: ActionCreator<RemoveSharedPublicKeysAction> = (
-  userID: string,
-) => ({
-  type: DocumentAction.REMOVE_SHARED_PUBLIC_KEYS,
-  userID,
+  type: DocumentAction.REMOVE_DOCUMENTS,
 });

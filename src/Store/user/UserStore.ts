@@ -1,5 +1,6 @@
-import { MUser } from '../../Models/User';
-
 export interface UserStore {
-  user: MUser | null;
+  uid: string | null;
+  email: string | null;
+  displayName: string | null;
+  emailVerified: boolean;
 }

@@ -1,36 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Button, Card, CardActions, CardContent, Grid, TextField, Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import DoneIcon from '@material-ui/icons/Done';
 import style from 'src/Styles';
-import { verifyTextWithRSAPSS } from 'src/Api/wca';
-import { getKeyStorage } from 'src/Api/localforage';
 import { useDispatch } from 'react-redux';
 import { openSnackbar } from 'src/Store/ui/UIActions';
+import { verifyWithRSAPSS } from 'src/Api/wca';
 
 const RSAPSSVerifying: React.FC = () => {
   const classes = style();
 
   const dispatch = useDispatch();
-
-  const [publicKey, setPublicKey] = useState();
   const [message, setMessage] = useState();
   const [signature, setSignature] = useState();
   const [valid, setValid] = useState();
-
-  useEffect(() => {
-    getKeyStorage()
-      .then((keyStorage) => keyStorage.rsaPSS)
-      .then((rsaPSS) => setPublicKey(rsaPSS.publicKey));
-  }, []);
 
   const handleSubmit = (
     event: React.FormEvent<HTMLFormElement>,
   ): void => {
     event.preventDefault();
-    verifyTextWithRSAPSS(message, signature, publicKey)
+    verifyWithRSAPSS(message, signature)
       .then((isValid) => setValid(isValid))
       .catch(() => dispatch(openSnackbar('Please double check your inputs!')));
   };

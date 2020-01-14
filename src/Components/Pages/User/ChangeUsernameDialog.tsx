@@ -3,34 +3,24 @@ import { useSelector, useDispatch } from 'react-redux';
 import {
   Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, DialogContentText, Grid,
 } from '@material-ui/core';
-import { useHistory } from 'react-router-dom';
 import { ApplicationState } from 'src/Store/ApplicationState';
-import { changeDisplayName } from 'src/Api/firebase/authentication';
 import { closeDialog, CloseDialogAction } from 'src/Store/ui/UIActions';
 import DialogType from 'src/Models/DialogType';
-import { HOME } from 'src/Routes';
+import { changeDisplayName } from 'src/Api/firebase/authentication';
 
 const ChangeUsernameDialog: React.FC = () => {
   const dispatch = useDispatch();
-  const history = useHistory();
 
   const openChangeUsername = useSelector(
     (state: ApplicationState) => state.ui.dialog === DialogType.CHANGE_USERNAME,
   );
-  const email = useSelector((state: ApplicationState) => {
-    const currentUser = state.user.user;
-    if (currentUser && currentUser.email) {
-      return currentUser.email;
-    }
-    return undefined;
-  });
 
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
 
   const handleChangeUsernameAccount = (event: React.MouseEvent<HTMLElement>): void => {
     event.preventDefault();
-    dispatch(changeDisplayName(email, password, username, () => history.push(HOME)));
+    dispatch(changeDisplayName(password, username));
     dispatch(closeDialog(DialogType.CHANGE_USERNAME));
   };
 

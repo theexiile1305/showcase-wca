@@ -1,26 +1,43 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useEffect, useState } from 'react';
 import {
   Button, Card, CardActions, CardContent, Typography,
 } from '@material-ui/core';
-import { getKeyStorage } from 'src/Api/localforage';
 import 'src/Assets/App.css';
 import savePEM from 'src/Api/savePEM';
-import { exportPublicCryptoKey, exportPrivateCryptoKey } from 'src/Api/wca/pemManagement';
+import { exportToPublicPEM, createFingerprint, exportToPrivatePEM } from 'src/Api/wca';
+import { addPrivateHeaderFooter, addPublicHeaderFooter } from 'src/Api/wca/pemManagement';
+import { getRSAOAEPPublicKey, getRSAOAEPPrivateKey } from 'src/Api/localforage';
 
 const RSAOAEP: React.FC = () => {
-  const [publicKey, setPublicKey] = useState();
-  const [privateKey, setPrivateKey] = useState();
+  const [publicKey, setPublicKey] = useState('');
+  const [privateKey, setPrivateKey] = useState('');
   const [fingerprintPublicKey, setFingerprintPublicKey] = useState('');
   const [fingerprintPrivateKey, setFingerprintPrivateKey] = useState('');
 
+  const exportPublicPEM = (
+  ): Promise<void> => getRSAOAEPPublicKey()
+    .then((cryptoKey) => exportToPublicPEM(cryptoKey))
+    .then((pem) => {
+      setPublicKey(addPublicHeaderFooter(pem));
+      return pem;
+    })
+    .then((pem) => createFingerprint(pem))
+    .then((fingerprint) => setFingerprintPublicKey(fingerprint));
+
+  const exportPrivatePEM = (
+  ): Promise<void> => getRSAOAEPPrivateKey()
+    .then((cryptoKey) => exportToPrivatePEM(cryptoKey))
+    .then((pem) => {
+      setPrivateKey(addPrivateHeaderFooter(pem));
+      return pem;
+    })
+    .then((pem) => createFingerprint(pem))
+    .then((fingerprint) => setFingerprintPrivateKey(fingerprint));
+
   useEffect(() => {
-    getKeyStorage().then((keyStorage) => keyStorage.rsaOAEP)
-      .then((rsaOAEP) => {
-        setPublicKey(rsaOAEP.publicKey);
-        setPrivateKey(rsaOAEP.privateKey);
-        setFingerprintPublicKey(rsaOAEP.publicKeyFingerprint);
-        setFingerprintPrivateKey(rsaOAEP.privateKeyFingerprint);
-      });
+    exportPublicPEM();
+    exportPrivatePEM();
   }, []);
 
   return (
@@ -47,18 +64,14 @@ const RSAOAEP: React.FC = () => {
           <Button
             size="small"
             color="primary"
-            onClick={
-              (): PromiseLike<void> => exportPublicCryptoKey(publicKey).then((key) => savePEM(key, 'publicKey'))
-            }
+            onClick={(): void => savePEM(publicKey, 'publicKey')}
           >
             Export Public Key
           </Button>
           <Button
             size="small"
             color="primary"
-            onClick={
-              (): PromiseLike<void> => exportPrivateCryptoKey(privateKey).then((key) => savePEM(key, 'privateKey'))
-            }
+            onClick={(): void => savePEM(privateKey, 'privateKey')}
           >
             Export Private Key
           </Button>

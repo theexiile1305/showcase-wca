@@ -1,58 +1,46 @@
 import { Reducer, AnyAction } from 'redux';
 import { Document } from 'src/Models/Document';
-import { SharedPublicKeys } from 'src/Models/SharedPublicKeys';
 import { DocumentStore } from './DocumentStore';
 import { DocumentAction } from './DocumentActions';
 
 const initialState: DocumentStore = {
   documents: [],
-  sharedPublicKeys: [],
 };
 
 const addUniqueDocument = (
   array: Document[], element: Document,
 ): Document[] => {
-  const updated = array.filter((item) => item.filename !== element.filename);
-  return [...updated, element];
+  const updated = array
+    .filter((item) => item !== null)
+    .filter((item) => item.id !== element.id);
+  return [...updated, element].sort();
 };
 
-const addUniqueSharedPublicKeys = (
-  array: SharedPublicKeys[], element: SharedPublicKeys,
-): SharedPublicKeys[] => {
-  const updated = array.filter((item) => item.userID !== element.userID);
-  return [...updated, element];
+const removeDocument = (
+  array: Document[], id: string,
+): Document[] => {
+  const updated = array.filter((item) => item.id !== id);
+  return updated.sort();
 };
 
 const DocumentReducer: Reducer<DocumentStore> = (
   state: DocumentStore = initialState, action: AnyAction,
 ) => {
   switch (action.type) {
-    case DocumentAction.SAVE_DOCUMENTS:
+    case DocumentAction.STORE_DOCUMENT:
       return {
         ...state,
-        documents: action.documents,
-      };
-    case DocumentAction.SAVE_SINGLE_DOCUMENT:
-      return {
-        ...state,
-        documents: addUniqueDocument(state.documents, action.document).sort(),
+        documents: addUniqueDocument(state.documents, action.document),
       };
     case DocumentAction.REMOVE_DOCUMENT:
       return {
         ...state,
-        documents: state.documents.filter((item) => item.filename !== action.filename),
+        documents: removeDocument(state.documents, action.id),
       };
-    case DocumentAction.SAVE_SHARED_PUBLIC_KEYS:
+    case DocumentAction.REMOVE_DOCUMENTS:
       return {
         ...state,
-        sharedPublicKeys: addUniqueSharedPublicKeys(
-          state.sharedPublicKeys, action.sharedPublicKeys,
-        ),
-      };
-    case DocumentAction.REMOVE_SHARED_PUBLIC_KEYS:
-      return {
-        ...state,
-        sharedPublicKeys: state.sharedPublicKeys.filter((item) => item.userID !== action.userID),
+        documents: [],
       };
     default:
       return state;

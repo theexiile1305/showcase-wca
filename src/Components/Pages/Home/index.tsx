@@ -45,7 +45,7 @@ const Home: React.FC = () => {
     <Grid container spacing={3}>
       {renderPaper(
         12,
-        'Welcome to the Shwocase of the Web Cryptography API',
+        'Welcome to the Showcase of the Web Cryptography API',
         'In the course of my bachelor thesis \'Evaluation and Implementation of a secure cloud storage with the Web Cryptography API\' this application was implemented to show some basic cryptographic operations in web applications. This case study is a proof-of-concept to securely store, exchange and sign documents in the public cloud. Furthermore, all entities of the user- and identities management are encrypted on a client-side basis, enabling full end-to-end encryption.',
       )}
       {renderPaper(

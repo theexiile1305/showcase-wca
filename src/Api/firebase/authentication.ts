@@ -1,198 +1,300 @@
 
+import { Dispatch } from 'react';
+import {
+  logoutUser, LogoutUserAction, StoreUserAction, storeUser,
+} from 'src/Store/user/UserActions';
 import {
   setUILoading, clearUILoading, openSnackbar,
   SetUILoadingAction, SetUIStopLoadingAction, OpenSnackbarAction,
 } from 'src/Store/ui/UIActions';
-import { Dispatch } from 'react';
 import {
-  saveUserData, SaveUserAction, logoutUser, LogoutUserAction,
-} from 'src/Store/user/UserActions';
-import { setupKeys, encryptTextWithAES } from '../wca';
-import { removeKeyStorage } from '../localforage';
+  saveAESCBC, SaveAESCBCAction, removeDebug, RemoveDebugAction,
+} from 'src/Store/debug/DebugActions';
+import { store } from 'src/Store';
+import { removeDocuments, RemoveDocumentsAction } from 'src/Store/documents/DocumentActions';
+import { removePKI, RemovePKIAction } from 'src/Store/pki/PKIActions';
+import { getSaltPasswordHash } from './constants';
+import { downloadKey } from './storage';
 import { auth } from './firebase';
-import { shareRSAPublicKeys, deleteSharedPublicKeys } from './storage';
+import {
+  derivePasswordHash, derivePasswordKey, importDataNameKey,
+  importRSAPSSPublicKey, importRSAOAEPPublicKey, importRSAPSSPrivateKey,
+  importRSAOAEPPrivateKey, changePasswordHash, setupKeys, newIV,
+} from '../wca';
+import {
+  getIVDataNameKey, getDataNameKey, getSaltPasswordKey, getRSAOAEPPrivateKey,
+  getRSAOAEPPublicKey, getIVRSAOAEP, getIVRSAPSS, getRSAPSSPrivateKey,
+  getRSAPSSPublicKey, removeKeysFromPKI, removeKeyInfo,
+} from './firestore';
+import { removeCryptoKeys, saveCryptoKeys } from '../localforage';
 
-export const isAuthenticated = (): boolean => localStorage.getItem('isAuthenticated') === 'true';
+// keep
+const getPasswordHash = (
+  password: string,
+): Promise<string> => derivePasswordHash(password, getSaltPasswordHash());
 
+// keep
+export const isAuthenticated = (
+): boolean => store.getState().user.uid != null;
+
+// keep
+export const verifyAuth = (
+): void => {
+  auth.onAuthStateChanged((user) => {
+    if (!user) {
+      auth.signOut();
+    }
+  });
+};
+
+// keep
 export const signUp = (
   displayName: string, email: string, password: string, redirect: () => void,
-) => (
-  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | SaveUserAction
-  | OpenSnackbarAction>,
-): void => {
+) => async (
+  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction
+  | LogoutUserAction>,
+): Promise<void> => {
   dispatch(setUILoading());
-  setupKeys()
-    .then(() => encryptTextWithAES(password))
-    .then((encryptedPassword) => auth.createUserWithEmailAndPassword(email, encryptedPassword))
-    .then(() => {
-      const user = auth.currentUser;
-      if (user) {
-        user.updateProfile({ displayName });
-        shareRSAPublicKeys(user.uid);
-        user.sendEmailVerification();
-        dispatch(openSnackbar('Please verify your e-mail adress in order to sign in.'));
+  getPasswordHash(password)
+    .then((passwordHash) => auth.createUserWithEmailAndPassword(email, passwordHash))
+    .then(async (userCredential) => {
+      const { user } = userCredential;
+      if (!user) {
+        throw new Error('Please try your registration again.');
       }
       return user;
     })
-    .then((user) => {
-      dispatch(saveUserData(user));
+    .then(async (user) => {
+      await user.updateProfile({ displayName });
+      await user.sendEmailVerification();
+      await setupKeys(password, user);
+      await auth.signOut();
+      dispatch(openSnackbar('Please verify your e-mail address in order to sign in.'));
+    })
+    .catch((error) => dispatch(openSnackbar(error.message)))
+    .finally(() => {
       dispatch(clearUILoading());
       redirect();
-    })
-    .catch((error) => {
-      dispatch(openSnackbar(error.message));
-      dispatch(clearUILoading());
     });
 };
 
-export const signInWithEmailPassword = (email: string, password: string, redirect: () => void) => (
-  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | SaveUserAction
-  | OpenSnackbarAction>,
+// keep
+export const signInWithEmailPassword = (
+  email: string, password: string, redirect: () => void,
+) => async (
+  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction
+  | StoreUserAction | SaveAESCBCAction>,
+): Promise<void> => Promise
+  .resolve(dispatch(setUILoading()))
+  .then(() => getSaltPasswordHash())
+  .then((saltPasswordHash) => derivePasswordHash(password, saltPasswordHash))
+  .then((passwordHash) => auth.signInWithEmailAndPassword(email, passwordHash))
+  .then(async (userCredential) => {
+    const { user } = userCredential;
+    if (!user || !user.emailVerified || !user.email) {
+      await auth.signOut();
+      throw new Error('Please verify your e-mail adress in order to sign in.');
+    }
+    dispatch(storeUser(user));
+    return user.uid;
+  })
+  .then(async (userID) => {
+    const saltPasswordHash = getSaltPasswordHash();
+    const saltPasswordKey = await getSaltPasswordKey(userID);
+    const passwordKey = await derivePasswordKey(password, saltPasswordKey);
+    const ivRSAOAEP = await getIVRSAOAEP(userID);
+    const rsaOAEPPrivate = await getRSAOAEPPrivateKey(userID)
+      .then((rsaOAEPPrivateKey) => downloadKey(rsaOAEPPrivateKey))
+      .then((rsaOAEPPrivateKey) => importRSAOAEPPrivateKey(
+        rsaOAEPPrivateKey, passwordKey, ivRSAOAEP,
+      ));
+    const rsaOAEPPublic = await getRSAOAEPPublicKey(userID)
+      .then((rsaOAEPPublicKey) => downloadKey(rsaOAEPPublicKey))
+      .then((rsaOAEPPublicKey) => importRSAOAEPPublicKey(rsaOAEPPublicKey));
+    const ivRSAPSS = await getIVRSAPSS(userID);
+    const rsaPSSPrivate = await getRSAPSSPrivateKey(userID)
+      .then((rsaPSSPrivateKey) => downloadKey(rsaPSSPrivateKey))
+      .then((rsaPSSPrivateKey) => importRSAPSSPrivateKey(rsaPSSPrivateKey, passwordKey, ivRSAPSS));
+    const rsaPSSPublic = await getRSAPSSPublicKey(userID)
+      .then((rsaPSSPublicKey) => downloadKey(rsaPSSPublicKey))
+      .then((rsaPSSPublicKey) => importRSAPSSPublicKey(rsaPSSPublicKey));
+    const ivDataNameKey = await getIVDataNameKey(userID);
+    const dataNameKey = await getDataNameKey(userID)
+      .then((key) => downloadKey(key))
+      .then((key) => importDataNameKey(key, rsaOAEPPrivate));
+    dispatch(saveAESCBC(await newIV()));
+    await saveCryptoKeys({
+      saltPasswordHash,
+      passwordKey: {
+        salt: saltPasswordKey,
+        key: passwordKey,
+      },
+      rsaOAEP: {
+        iv: ivRSAOAEP,
+        privateKey: rsaOAEPPrivate,
+        publicKey: rsaOAEPPublic,
+      },
+      rsaPSS: {
+        iv: ivRSAPSS,
+        privateKey: rsaPSSPrivate,
+        publicKey: rsaPSSPublic,
+      },
+      dataNameKey: {
+        iv: ivDataNameKey,
+        key: dataNameKey,
+      },
+    });
+  })
+  .then(() => dispatch(openSnackbar('You´ve been successfully signed in.')))
+  .catch((error) => dispatch(openSnackbar(error.message)))
+  .finally(() => {
+    dispatch(clearUILoading());
+    redirect();
+  });
+
+// keep
+export const signOut = (
+  redirect: () => void,
+) => (
+  dispatch: Dispatch<SetUILoadingAction | RemoveDocumentsAction | RemoveDebugAction
+  | RemovePKIAction | OpenSnackbarAction | LogoutUserAction | SetUIStopLoadingAction>,
 ): void => {
   dispatch(setUILoading());
-  encryptTextWithAES(password)
-    .then((encryptedPassword) => auth.signInWithEmailAndPassword(email, encryptedPassword))
-    .then((result) => {
-      if (!result.user?.emailVerified) {
-        throw new Error('Please verify your e-mail adress in order to sign in.');
-      }
-      return result.user;
-    })
-    .then(async (user) => {
-      dispatch(saveUserData(user));
-      dispatch(openSnackbar('You\'ve been successfully signed in.'));
-      dispatch(clearUILoading());
-      redirect();
-    })
-    .catch((error) => {
-      dispatch(openSnackbar(error.message));
-      dispatch(clearUILoading());
-    });
-};
-
-export const signOut = () => (
-  dispatch: Dispatch<OpenSnackbarAction | LogoutUserAction>,
-): void => {
   auth.signOut()
+    .then(() => removeCryptoKeys())
+    .then(() => dispatch(removeDocuments()))
+    .then(() => dispatch(removeDebug()))
+    .then(() => dispatch(removePKI()))
     .then(() => {
-      dispatch(openSnackbar('You\'ve been successfully signed out.'));
+      dispatch(openSnackbar('You´ve been successfully signed out.'));
       dispatch(logoutUser());
     })
-    .catch((error) => dispatch(openSnackbar(error.message)));
-};
-
-export const resetPassword = (email: string, redirect: () => void) => (
-  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction>,
-): void => {
-  dispatch(setUILoading());
-  auth.sendPasswordResetEmail(email)
-    .then(() => {
-      // TODO: key handling --> what happen ?
-      dispatch(openSnackbar('You\'ve successfully reseted your password.'));
+    .catch((error) => dispatch(openSnackbar(error.message)))
+    .finally(() => {
       dispatch(clearUILoading());
       redirect();
-    })
-    .catch((error) => {
-      dispatch(openSnackbar(error.message));
-      dispatch(clearUILoading());
     });
 };
 
+// keep
 export const changeDisplayName = (
-  email: string | undefined, password: string, displayName: string, redirect: () => void,
+  password: string, displayName: string,
 ) => (
-  dispatch: Dispatch<OpenSnackbarAction | LogoutUserAction>,
+  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction
+  | StoreUserAction>,
 ): void => {
-  if (email === undefined) {
+  dispatch(setUILoading());
+  const { email } = store.getState().user;
+  if (!email) {
     throw new Error('Could not change the username. Try it again!');
   }
-  encryptTextWithAES(password)
-    .then((encryptedPassword) => auth.signInWithEmailAndPassword(email, encryptedPassword))
-    .then(() => {
-      const user = auth.currentUser;
+  getPasswordHash(password)
+    .then((passwordHash) => auth.signInWithEmailAndPassword(email, passwordHash))
+    .then(async (userCredential) => {
+      const { user } = userCredential;
       if (user != null) {
-        user.updateProfile({ displayName });
-        dispatch(openSnackbar('You\'ve successfully changed your username.'));
-        dispatch(logoutUser());
-        redirect();
+        await user.updateProfile({ displayName });
+        auth.onAuthStateChanged((currentUser) => {
+          if (currentUser) {
+            dispatch(storeUser(currentUser));
+            dispatch(openSnackbar('You´ve successfully changed your username.'));
+          }
+        });
       }
     })
-    .catch((error) => dispatch(openSnackbar(error.message)));
+    .catch((error) => dispatch(openSnackbar(error.message)))
+    .finally(() => dispatch(clearUILoading()));
 };
 
+// keep
 export const changeEmail = (
-  email: string | undefined, password: string, newEmail: string, redirect: () => void,
+  password: string, newEmail: string,
 ) => (
-  dispatch: Dispatch<OpenSnackbarAction | LogoutUserAction>,
+  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction
+  | StoreUserAction>,
 ): void => {
-  if (email === undefined) {
+  dispatch(setUILoading());
+  const { email } = store.getState().user;
+  if (!email) {
     throw new Error('Could not change the username. Try it again!');
   }
-  encryptTextWithAES(password)
-    .then((encryptedPassword) => auth.signInWithEmailAndPassword(email, encryptedPassword))
-    .then(() => {
-      const user = auth.currentUser;
+  getPasswordHash(password)
+    .then((passwordHash) => auth.signInWithEmailAndPassword(email, passwordHash))
+    .then(async (userCredential) => {
+      const { user } = userCredential;
       if (user != null) {
-        user.updateEmail(newEmail);
-        user.sendEmailVerification();
-        dispatch(openSnackbar('You\'ve successfully changed your email.'));
-        dispatch(logoutUser());
-        redirect();
+        await user.updateEmail(newEmail);
+        await user.sendEmailVerification();
+        auth.onAuthStateChanged((currentUser) => {
+          if (currentUser) {
+            dispatch(storeUser(currentUser));
+            dispatch(openSnackbar('You´ve successfully changed your email.'));
+          }
+        });
       }
     })
-    .catch((error) => dispatch(openSnackbar(error.message)));
+    .catch((error) => dispatch(openSnackbar(error.message)))
+    .finally(() => dispatch(clearUILoading()));
 };
 
+// keep
 export const changePassword = (
-  email: string | undefined, password: string, newPassword: string, redirect: () => void,
-) => (
-  dispatch: Dispatch<OpenSnackbarAction | LogoutUserAction>,
-): void => {
-  if (email === undefined) {
-    throw new Error('Could not change the username. Try it again!');
-  }
-  encryptTextWithAES(password)
-    .then((encryptedPassword) => auth.signInWithEmailAndPassword(email, encryptedPassword))
-    .then(() => encryptTextWithAES(newPassword))
-    .then((encryptedNewPassword) => {
-      const user = auth.currentUser;
-      if (user != null) {
-        user.updatePassword(encryptedNewPassword);
-        // TODO: key handling --> key dervation ?
-        dispatch(openSnackbar('You\'ve successfully changed your password.'));
-        dispatch(logoutUser());
-        redirect();
-      }
-    })
-    .catch((error) => dispatch(openSnackbar(error.message)));
-};
-
-export const deleteAccount = (
-  email: string | undefined, password: string, redirect: () => void,
+  password: string, newPassword: string,
 ) => (
   dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction
   | LogoutUserAction>,
 ): void => {
-  if (email === undefined) {
-    throw new Error('Could not delete the acount. Try it again!');
-  }
   dispatch(setUILoading());
-  encryptTextWithAES(password)
-    .then((encryptedPassword) => auth.signInWithEmailAndPassword(email, encryptedPassword))
-    .then(() => {
-      const user = auth.currentUser;
+  const { email } = store.getState().user;
+  if (!email) {
+    throw new Error('Could not change your password. Try it again!');
+  }
+  getPasswordHash(password)
+    .then((passwordHash) => auth.signInWithEmailAndPassword(email, passwordHash))
+    .then((userCredential) => {
+      const { user } = userCredential;
+      return user;
+    })
+    .then(async (user) => {
       if (user != null) {
-        deleteSharedPublicKeys(user.uid);
-        user.delete();
-        removeKeyStorage();
-        dispatch(openSnackbar('You\'ve successfully deleted your account.'));
+        await changePasswordHash(newPassword, user)
+          .then(() => getPasswordHash(newPassword))
+          .then((newPasswordHash) => user.updatePassword(newPasswordHash));
+        dispatch(openSnackbar('You´ve successfully changed your password.'));
         dispatch(logoutUser());
-        dispatch(logoutUser());
-        redirect();
       }
     })
-    .catch((error) => {
-      dispatch(openSnackbar(error.message));
+    .catch((error) => dispatch(openSnackbar(error.message)))
+    .finally(() => dispatch(clearUILoading()));
+};
+
+// keep
+export const deleteAccount = (
+  password: string, redirect: () => void,
+) => (
+  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction
+  | LogoutUserAction>,
+): void => {
+  dispatch(setUILoading());
+  const { email } = store.getState().user;
+  if (!email) {
+    throw new Error('Could not delete the acount. Try it again!');
+  }
+  getPasswordHash(password)
+    .then((passwordHash) => auth.signInWithEmailAndPassword(email, passwordHash))
+    .then(async (userCredential) => {
+      const { user } = userCredential;
+      if (user != null) {
+        await removeKeysFromPKI(user.uid);
+        await removeKeyInfo(user.uid);
+        await user.delete();
+        dispatch(openSnackbar('You´ve successfully deleted your account.'));
+        dispatch(logoutUser());
+      }
+    })
+    .catch((error) => dispatch(openSnackbar(error.message)))
+    .finally(() => {
       dispatch(clearUILoading());
+      redirect();
     });
 };

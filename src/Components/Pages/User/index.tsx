@@ -4,7 +4,6 @@ import style from 'src/Styles';
 import UserDetails from './UserDetails';
 import RSAOAEP from './RSAOAEP';
 import RSAPSS from './RSAPSS';
-import AESCBC from './AESCBC';
 
 const User: React.FC = () => {
   const classes = style();
@@ -14,15 +13,8 @@ const User: React.FC = () => {
       <Grid item xs={12} className={classes.center}>
         <Typography variant="h4">User Management</Typography>
       </Grid>
-      <Grid item xs={4} sm container>
-        <Grid item xs container direction="column" spacing={2}>
-          <Grid item xs container spacing={1}>
-            <UserDetails />
-          </Grid>
-          <Grid item xs>
-            <AESCBC />
-          </Grid>
-        </Grid>
+      <Grid item xs={4}>
+        <UserDetails />
       </Grid>
       <Grid item xs={4}>
         <RSAOAEP />
