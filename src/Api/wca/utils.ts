@@ -21,3 +21,12 @@ export const base64StringToArrayBuffer = (
 export const arrayBufferToBase64 = (
   arrayBuffer: ArrayBuffer,
 ): string => window.btoa(arrayBufferToString(arrayBuffer));
+
+export const blobToArrayBuffer = (
+  data: Blob,
+): Promise<ArrayBuffer> => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.readAsArrayBuffer(data);
+  reader.onerror = reject;
+  reader.onload = (): void => resolve(reader.result as ArrayBuffer);
+});

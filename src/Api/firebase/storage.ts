@@ -1,6 +1,6 @@
 /* eslint-disable import/no-cycle */
 import { storage } from './firebase';
-import { createFingerprint } from '../wca';
+import { createFingerprint, destroyContainer, buildContainer } from '../wca';
 import { MIME_TYPES } from './constants';
 
 // keep
@@ -62,15 +62,20 @@ export const downloadKey = async (
 // keep
 export const downloadDocument = (
   path: string,
-): Promise<Blob> => downloadBlob(storage.child(path));
+): Promise<Blob> => downloadBlob(storage.child(path))
+  .then((blob) => destroyContainer(blob));
 
 // keep
 export const uploadDocument = (
   path: string, file: File,
-): Promise<string> => uploadBlob(storage.child(path), file, {
-  contentType: file.type,
-  customMetadata: { lastModified: file.lastModified.toString() },
-});
+): Promise<string> => buildContainer(file)
+  .then((encryptedFile) => uploadBlob(
+    storage.child(path), encryptedFile, {
+      contentType: file.type,
+      customMetadata: { lastModified: file.lastModified.toString() },
+    },
+  ));
+
 
 // keep
 export const deleteDocument = (

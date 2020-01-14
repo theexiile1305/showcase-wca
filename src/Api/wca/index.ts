@@ -9,7 +9,7 @@ import {
   RSA_PSS_ALGORITHM,
 } from './config';
 import {
-  arrayBufferToBase64, base64StringToArrayBuffer, stringToArrayBuffer, arrayBufferToString,
+  arrayBufferToBase64, base64StringToArrayBuffer, stringToArrayBuffer, arrayBufferToString, blobToArrayBuffer,
 } from './utils';
 import { saveKeysToPKI, saveKeyInfo } from '../firebase/firestore';
 import {
@@ -83,6 +83,13 @@ export const encryptPrivateKey = (
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer));
 
 // keep
+export const exportSymmetricKey = (
+  cryptoKey: CryptoKey,
+): Promise<string> => Promise
+  .resolve(wca.exportKey('raw', cryptoKey))
+  .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer));
+
+// keep
 export const exportToPublicPEM = (
   cryptoKey: CryptoKey,
 ): Promise<string> => Promise
@@ -113,16 +120,6 @@ export const createFingerprint = (
   .then((arrayBuffer) => wca.digest(FINGERPRINT_ALGORITHM, arrayBuffer))
   .then((hashBuffer) => Array.from(new Uint8Array(hashBuffer)))
   .then((hashArray) => hashArray.map((b) => b.toString(16).padStart(2, '0')).join(':'));
-
-// keep
-const blobToArrayBuffer = (
-  data: Blob,
-): Promise<ArrayBuffer> => new Promise((resolve, reject) => {
-  const reader = new FileReader();
-  reader.readAsArrayBuffer(data);
-  reader.onerror = reject;
-  reader.onload = (): void => resolve(reader.result as ArrayBuffer);
-});
 
 // keep
 export const createBlobFingerprint = (
@@ -303,3 +300,48 @@ export const verifyWithRSAPSS = (
     base64StringToArrayBuffer(signature),
     arrayBuffer,
   ));
+
+// keep
+export const buildContainer = async (
+  blob: Blob,
+): Promise<Blob> => {
+  const iv = await newIV().then((base64) => base64StringToArrayBuffer(base64));
+  const key = await wca.generateKey(AES_CBC_PASSWORD_KEY_GEN_ALGORITHM(), true, ['encrypt', 'decrypt']);
+  const encryptedBlob = await Promise.resolve(blobToArrayBuffer(blob))
+    .then((arrayBuffer) => wca.encrypt(AES_CBC_PASSWORD_KEY_ALGORITHM(iv), key, arrayBuffer));
+  const encryptedKey = await Promise.resolve(exportSymmetricKey(key))
+    .then((base64) => base64StringToArrayBuffer(base64))
+    .then(async (arrayBuffer) => wca.encrypt(
+      RSA_OAEP_ALGORITHM(), await getRSAOAEPPublicKey(), arrayBuffer,
+    ));
+  const signature = await Promise.resolve(getRSAPSSPrivateKey())
+    .then((cryptoKey: CryptoKey) => wca.sign(RSA_PSS_ALGORITHM(), cryptoKey, encryptedBlob));
+  return new Blob([encryptedBlob, iv, encryptedKey, signature]);
+};
+
+// keep
+export const destroyContainer = async (
+  blob: Blob,
+): Promise<Blob> => {
+  const arrayBuffer = await blobToArrayBuffer(blob);
+  const { byteLength } = arrayBuffer;
+  const encryptedKey = arrayBuffer.slice(byteLength - 512 - 512, byteLength - 512);
+  const decryptedKey = await wca.decrypt(
+    RSA_OAEP_ALGORITHM(), await getRSAOAEPPrivateKey(), encryptedKey,
+  ).then((tmp) => wca.importKey(
+    'raw', tmp, AES_CBC_PASSWORD_KEY_GEN_ALGORITHM(), true, ['encrypt', 'decrypt'],
+  ));
+  const iv = arrayBuffer.slice(byteLength - 512 - 512 - 16, byteLength - 512 - 512);
+  const encryptedBlob = arrayBuffer.slice(0, byteLength - 512 - 512 - 16);
+  const decryptedBlob = await Promise.resolve(
+    wca.decrypt(AES_CBC_PASSWORD_KEY_ALGORITHM(iv), decryptedKey, encryptedBlob),
+  );
+  const signature = arrayBuffer.slice(byteLength - 512, byteLength);
+  const valid = await wca.verify(
+    RSA_PSS_ALGORITHM(), await getRSAPSSPublicKey(), signature, encryptedBlob,
+  );
+  if (!valid) {
+    throw new Error('The signature is not valid!');
+  }
+  return new Blob([decryptedBlob]);
+};
