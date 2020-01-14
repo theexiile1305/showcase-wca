@@ -110,6 +110,25 @@ export const createFingerprint = (
   .then((hashArray) => hashArray.map((b) => b.toString(16).padStart(2, '0')).join(':'));
 
 // keep
+const blobToArrayBuffer = (
+  data: Blob,
+): Promise<ArrayBuffer> => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.readAsArrayBuffer(data);
+  reader.onerror = reject;
+  reader.onload = (): void => resolve(reader.result as ArrayBuffer);
+});
+
+// keep
+export const createBlobFingerprint = (
+  file: File,
+): Promise<string> => Promise
+  .resolve(blobToArrayBuffer(file))
+  .then((arrayBuffer) => wca.digest(FINGERPRINT_ALGORITHM, arrayBuffer))
+  .then((hashBuffer) => Array.from(new Uint8Array(hashBuffer)))
+  .then((hashArray) => hashArray.map((b) => b.toString(16).padStart(2, '0')).join(''));
+
+// keep
 export const importDataNameKey = (
   key: string, publicRSAOAEP: CryptoKey,
 ): Promise<CryptoKey> => Promise

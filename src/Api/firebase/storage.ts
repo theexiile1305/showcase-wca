@@ -1,26 +1,12 @@
 /* eslint-disable import/no-cycle */
-import { Dispatch } from 'redux';
-import {
-  SetUILoadingAction, SetUIStopLoadingAction, OpenSnackbarAction,
-  setUILoading, clearUILoading, openSnackbar,
-} from 'src/Store/ui/UIActions';
-import {
-  saveDocuments, SaveDocumentAction, removeDocument, RemoveDocumentAction,
-  saveSingleDocument, SaveSingleDocumentAction, saveSharedPublicKeys, SaveSharedPublicKeysAction,
-  removeSharedPublicKeys, RemoveSharedPublicKeysAction,
-} from 'src/Store/documents/DocumentActions';
-import { SharedPublicKey } from 'src/Models/SharedPublicKey';
-import { SharedPublicKeys } from 'src/Models/SharedPublicKeys';
 import { storage } from './firebase';
 import { createFingerprint } from '../wca';
 import { MIME_TYPES } from './constants';
 
 // keep
-const uploadDocument = (
-  path: string, data: Blob, metadata?: firebase.storage.UploadMetadata,
-): Promise<string> => storage
-  .child(path)
-  .put(data, metadata)
+const uploadBlob = (
+  reference: firebase.storage.Reference, data: Blob, metadata?: firebase.storage.UploadMetadata,
+): Promise<string> => reference.put(data, metadata)
   .then((uploadTask) => uploadTask.ref.fullPath);
 
 // keep
@@ -30,7 +16,7 @@ export const saveKey = async (
   .resolve(createFingerprint(key))
   .then((fingerprint) => {
     const keyBlob = new Blob([key], { type: MIME_TYPES.X_PEM_FILE });
-    return uploadDocument(fullPath, keyBlob, {
+    return uploadBlob(storage.child(fullPath), keyBlob, {
       contentType: MIME_TYPES.X_PEM_FILE,
       customMetadata: { fingerprint },
     });
@@ -42,7 +28,7 @@ export const removeKey = (
 ): Promise<void> => storage.child(fullPath).delete();
 
 // keep
-const downloadDocument = (
+const downloadText = (
   reference: firebase.storage.Reference,
 ): Promise<string> => reference
   .getDownloadURL()
@@ -50,11 +36,19 @@ const downloadDocument = (
   .then((response) => response.text());
 
 // keep
+const downloadBlob = (
+  reference: firebase.storage.Reference,
+): Promise<Blob> => reference
+  .getDownloadURL()
+  .then((url) => fetch(url))
+  .then((response) => response.blob());
+
+// keep
 export const downloadKey = async (
   fullPath: string,
 ): Promise<string> => {
   const reference = storage.child(fullPath);
-  const key = await downloadDocument(reference);
+  const key = await downloadText(reference);
   const fingerprint = await reference
     .getMetadata()
     .then((metadata) => metadata.customMetadata.fingerprint);
@@ -65,190 +59,20 @@ export const downloadKey = async (
   return key;
 };
 
+// keep
+export const downloadDocument = (
+  path: string,
+): Promise<Blob> => downloadBlob(storage.child(path));
 
-const blobToArrayBuffer = (
-  data: Blob,
-): Promise<ArrayBuffer> => new Promise((resolve, reject) => {
-  const reader = new FileReader();
-  reader.readAsArrayBuffer(data);
-  reader.onerror = reject;
-  reader.onload = (): void => resolve(reader.result as ArrayBuffer);
+// keep
+export const uploadDocument = (
+  path: string, file: File,
+): Promise<string> => uploadBlob(storage.child(path), file, {
+  contentType: file.type,
+  customMetadata: { lastModified: file.lastModified.toString() },
 });
 
-export const uploadDocuments = (
-  userID: string, files: FileList,
-) => async (
-  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction
-  | SaveSingleDocumentAction>,
-): Promise<void> => {
-  dispatch(setUILoading());
-  for (let index = 0; index < files.length; index += 1) {
-    const file = files[index];
-    const { name, type, lastModified } = file;
-    const ref = storage.child(`documents/${userID}/${name}`);
-    blobToArrayBuffer(file)
-      // .then((arrayBuffer) => encryptDataWithAES(arrayBuffer))
-      .then((arrayBuffer) => new Blob([arrayBuffer], { type }))
-      .then((blob) => ref
-        .put(blob, {
-          contentType: type,
-          customMetadata: { lastModified: lastModified.toString() },
-        })
-        .on('state_changed', null,
-          () => dispatch(openSnackbar('You\'ve unsuccessfully uploaded the file(s).')),
-          () => dispatch(openSnackbar('You\'ve successfully uploaded the file(s).'))))
-      .then(() => dispatch(saveSingleDocument(name, ref.fullPath)))
-      .then(() => dispatch(clearUILoading()))
-      .catch((error) => {
-        dispatch(openSnackbar(error.message));
-        dispatch(clearUILoading());
-      });
-  }
-};
-
-const shareRSAPublicKey = (
-  userID: string, filename: string, publicKey: CryptoKey, fingerprint: string,
-): void => {
-  const i = '';
-};
-
-export const shareRSAPublicKeys = async (
-  userID: string,
-): Promise<void> => {
-};
-
-// export const downloadDocument = (
-//   userID: string, filename: string,
-// ): void => {
-//   const ref = storage.child(`documents/${userID}/${filename}`);
-//   ref
-//     .getDownloadURL()
-//     .then((url) => fetch(url))
-//     .then((response) => response.arrayBuffer())
-//     .then((arrayBuffer) => decryptDataWithAES(arrayBuffer))
-//     .then((decrypted) => new Blob([decrypted]))
-//     .then((blob) => saveData(blob, filename));
-// };
-
-export const deleteSharedPublicKeys = (
-  userID: string,
-) => (
-  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction
-  | RemoveSharedPublicKeysAction>,
-): void => {
-  dispatch(setUILoading());
-  const ref = storage.child(`publicKey/${userID}/`);
-  ref.delete()
-    .then(() => dispatch(removeSharedPublicKeys(userID)))
-    .then(() => dispatch(clearUILoading()));
-};
-
+// keep
 export const deleteDocument = (
-  userID: string, filename: string,
-) => (
-  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction
-  | RemoveDocumentAction>,
-): void => {
-  dispatch(setUILoading());
-  const ref = storage.child(`documents/${userID}/${filename}`);
-  ref.delete()
-    .then(() => {
-      dispatch(removeDocument(filename));
-      dispatch(openSnackbar('You\'ve unsuccessfully deleted the file.'));
-      dispatch(clearUILoading());
-    })
-    .catch(() => {
-      dispatch(openSnackbar('You\'ve successfully deleted the file.'));
-      dispatch(clearUILoading());
-    });
-};
-
-const getSharedPublicKey = async (
-  reference: firebase.storage.Reference, type: string,
-): Promise<SharedPublicKey> => {
-  const key = reference.child(type);
-  const downloadURL: string = await key.getDownloadURL();
-  const fingerprint: string = await key
-    .getMetadata()
-    .then((metadata) => metadata.customMetadata.fingerprint);
-  const sharedSinglePublicKey = { downloadURL, fingerprint };
-  return Promise.resolve(sharedSinglePublicKey);
-};
-
-const getSharedPublicKeys = async (
-  folder: firebase.storage.Reference,
-): Promise<SharedPublicKeys> => {
-  const result = await Promise.all([
-    getSharedPublicKey(folder, 'rsaOAEP.pem'),
-    getSharedPublicKey(folder, 'rsaPSS.pem'),
-  ]);
-  const sharedSinglePublicKeys = {
-    userID: folder.name,
-    rsaOAEP: result[0],
-    rsaPSS: result[1],
-  };
-  return sharedSinglePublicKeys;
-};
-
-export const listSharedPublicKeys = (
-) => async (
-  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction
-  | SaveSharedPublicKeysAction>,
-): Promise<void> => {
-  dispatch(setUILoading());
-  const ref = storage.child('publicKeys/');
-  ref.listAll()
-    .then((result) => result.prefixes.map(
-      async (folder) => dispatch(saveSharedPublicKeys(await getSharedPublicKeys(folder))),
-    ))
-    .then(() => dispatch(clearUILoading()))
-    .catch((error) => {
-      dispatch(openSnackbar(error.message));
-      dispatch(clearUILoading());
-    });
-};
-
-export const listAllDocuments = (
-  userID: string,
-) => (
-  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction
-  | SaveDocumentAction>,
-): void => {
-  dispatch(setUILoading());
-  const ref = storage.child(`documents/${userID}/`);
-  ref.listAll()
-    .then((result) => {
-      dispatch(saveDocuments(result));
-      dispatch(clearUILoading());
-    })
-    .catch((error) => {
-      dispatch(openSnackbar(error.message));
-      dispatch(clearUILoading());
-    });
-};
-
-export const exchangeKey = (
-  userID: string, exchangeUserID: string, url: string,
-) => async (
-  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction>,
-): Promise<void> => {
-  dispatch(setUILoading());
-};
-
-export const deleteExchangeKey = (
-  userID: string, exchangeUserID: string,
-) => async (
-  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction>,
-): Promise<void> => {
-  dispatch(setUILoading());
-  const ref = storage.child(`exchange/${exchangeUserID}/${userID}/aesCBC.json`);
-  ref.delete()
-    .then(() => {
-      dispatch(openSnackbar('You\'ve successfully deleted the exchanged key.'));
-      dispatch(clearUILoading());
-    })
-    .catch(() => {
-      dispatch(openSnackbar('You\'ve already deleted the exchanged key.'));
-      dispatch(clearUILoading());
-    });
-};
+  path: string,
+): Promise<void> => storage.child(path).delete();

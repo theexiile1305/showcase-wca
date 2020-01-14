@@ -28,14 +28,13 @@ export type DocumentActions =
   | RemoveDocumentsAction;
 
 export const storeDocument: ActionCreator<StoreDocumentAction> = (
-  id: string, filename: string, path: string, fingerprint: string, shared: boolean,
+  id: string, filename: string, path: string, shared: boolean,
 ) => ({
   type: DocumentAction.STORE_DOCUMENT,
   document: {
     id,
     filename,
     path,
-    fingerprint,
     shared,
   },
 });

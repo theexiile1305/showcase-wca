@@ -1,10 +1,18 @@
 /* eslint-disable import/no-cycle */
 import { KeyInfo } from 'src/Models/firestore/KeyInfo';
+import firebase from 'firebase';
+import {
+  storeDocument, StoreDocumentAction,
+} from 'src/Store/documents/DocumentActions';
+import { Dispatch } from 'react';
 import { firestore } from './firebase';
 import {
-  RSA_OAEP_PEM, RSA_PSS_PEM, PKI, USERS, USER_KEY_PEM,
+  RSA_OAEP_PEM, RSA_PSS_PEM, PKI, USERS, USER_KEY_PEM, DOCUMENTS, DOCUMENTS_DATA,
 } from './constants';
-import { saveKey, removeKey } from './storage';
+import {
+  saveKey, removeKey, uploadDocument, deleteDocument,
+} from './storage';
+import { createBlobFingerprint } from '../wca';
 
 // keep
 export const saveKeysToPKI = async (
@@ -18,6 +26,7 @@ export const saveKeysToPKI = async (
   });
 };
 
+// keep
 export const determineEmail = (
   userID: string,
 ): Promise<string> => firestore.collection(USERS).doc(userID).get()
@@ -124,3 +133,59 @@ export const getRSAPSSPrivateKey = (
   userID: string,
 ): Promise<string> => firestore.collection(USERS).doc(userID).get()
   .then((doc) => doc.get('rsaPSS.privateKey'));
+
+// keep
+export const uploadDocumentReferences = async (
+  userID: string, files: FileList,
+): Promise<void> => {
+  for (let index = 0; index < files.length; index = +1) {
+    const file = files[index];
+    createBlobFingerprint(file)
+      .then((fingerprint) => uploadDocument(DOCUMENTS_DATA(fingerprint), file))
+      .then(async (path) => firestore.collection(DOCUMENTS).add({
+        filename: file.name,
+        shared: false,
+        path,
+      }))
+      .then((reference) => reference.id)
+      .then((documentID) => firestore.collection(USERS).doc(userID)
+        .update({
+          documents: firebase.firestore.FieldValue.arrayUnion(documentID),
+        }));
+  }
+};
+
+// keep
+export const addSharedDocumentReference = (
+  userID: string, documentID: string,
+): Promise<void> => firestore
+  .collection(USERS)
+  .doc(userID)
+  .update({
+    documents: firebase.firestore.FieldValue.arrayUnion(documentID),
+  });
+
+// keep
+export const deleteDocumentReference = (
+  id: string, path: string,
+): Promise<void> => firestore
+  .collection(USERS).get()
+  .then((users) => users.forEach((user) => user.ref.update({
+    documents: firebase.firestore.FieldValue.arrayRemove(id),
+  })))
+  .then(() => firestore.collection(DOCUMENTS).doc(id).delete())
+  .then(() => deleteDocument(path));
+
+// keep
+export const listDocumentReferences = (
+  userID: string,
+) => async (
+  dispatch: Dispatch<StoreDocumentAction>,
+): Promise<void> => firestore
+  .collection(USERS).doc(userID).get()
+  .then((doc) => doc.get('documents'))
+  .then((documents) => documents.map((document: string) => firestore
+    .collection(DOCUMENTS).doc(document).get()
+    .then((doc) => dispatch(
+      storeDocument(document, doc.get('filename'), doc.get('path'), doc.get('shared')),
+    ))));

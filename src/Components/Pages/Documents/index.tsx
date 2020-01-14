@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Divider, Grid, List, ListItem, ListItemText, ListItemSecondaryAction,
   IconButton, ListItemIcon, Typography, Button,
@@ -6,11 +6,17 @@ import {
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import DeleteIcon from '@material-ui/icons/Delete';
 import style from 'src/Styles';
-import {
-  listAllDocuments, deleteDocument,
-} from 'src/Api/firebase/storage';
 import { useSelector, useDispatch } from 'react-redux';
 import { ApplicationState } from 'src/Store/ApplicationState';
+import {
+  listDocumentReferences, uploadDocumentReferences, deleteDocumentReference,
+} from 'src/Api/firebase/firestore';
+import { downloadDocument } from 'src/Api/firebase/storage';
+import {
+  setUILoading, openSnackbar, clearUILoading, OpenSnackbarAction,
+} from 'src/Store/ui/UIActions';
+import saveData from 'src/Api/saveData';
+import { removeDocuments } from 'src/Store/documents/DocumentActions';
 
 const Documents: React.FC = () => {
   const classes = style();
@@ -20,76 +26,127 @@ const Documents: React.FC = () => {
   const documents = useSelector((state: ApplicationState) => state.documents.documents);
   const uid = useSelector((state: ApplicationState) => state.user.uid);
 
+  const [updated, setUpdated] = useState(false);
+
   useEffect(() => {
     if (uid) {
-      dispatch(listAllDocuments(uid));
+      Promise
+        .resolve(dispatch(setUILoading()))
+        .then(() => dispatch(removeDocuments()))
+        .then(() => dispatch(listDocumentReferences(uid)))
+        .catch((error) => dispatch(openSnackbar(error.message)))
+        .finally(() => dispatch(clearUILoading()));
     }
-  }, [dispatch, uid]);
+    if (updated) {
+      setUpdated(!updated);
+    }
+  }, [uid, dispatch, updated]);
 
-  const hanldeUpload = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const { files } = event.target;
-    if (uid && files) {
-      // dispatch(uploadDocuments(user.uid, files));
-    }
-  };
+  const hanldeUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ): Promise<OpenSnackbarAction> => Promise
+    .resolve(dispatch(setUILoading()))
+    .then(async () => {
+      const { files } = event.target;
+      if (uid && files) {
+        await uploadDocumentReferences(uid, files);
+      }
+    })
+    .then(() => dispatch(openSnackbar('You`ve successfully uploaded the file.')))
+    .catch((error) => dispatch(openSnackbar(error.message)))
+    .finally(() => {
+      setUpdated(true);
+      dispatch(clearUILoading());
+    });
 
-  const handleDownload = (filename: string): void => {
-    if (uid) {
-      // downloadDocument(user.uid, filename);
-    }
-  };
+  const handleDownload = (
+    path: string, filename: string,
+  ): Promise<OpenSnackbarAction> => Promise
+    .resolve(dispatch(setUILoading()))
+    .then(() => downloadDocument(path))
+    .then((blob) => saveData(blob, filename))
+    .then(() => dispatch(openSnackbar('You`ve successfully downloaded the file.')))
+    .catch((error) => dispatch(openSnackbar(error.message)))
+    .finally(() => dispatch(clearUILoading()));
 
-  const handleDelete = (filename: string): void => {
-    if (uid) {
-      dispatch(deleteDocument(uid, filename));
-    }
-  };
+
+  const handleDelete = (
+    id: string, path: string,
+  ): Promise<OpenSnackbarAction> => Promise
+    .resolve(dispatch(setUILoading()))
+    .then(() => deleteDocumentReference(id, path))
+    .then(() => dispatch(openSnackbar('You`ve successfully deleted the file.')))
+    .catch((error) => dispatch(openSnackbar(error.message)))
+    .finally(() => {
+      setUpdated(true);
+      dispatch(clearUILoading());
+    });
 
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={6} className={classes.center}>
-        <Typography variant="h4">Documents</Typography>
-      </Grid>
-      <Grid item xs={6} className={classes.center}>
-        <label htmlFor="upload-button">
-          <input
-            accept="media_type"
-            id="upload-button"
-            multiple
-            type="file"
-            className={classes.input}
-            onChange={hanldeUpload}
-          />
-          <Button
-            variant="outlined"
-            color="primary"
-            component="span"
-          >
+    <>
+      <Grid container spacing={2}>
+        <Grid item xs={6} className={classes.center}>
+          <Typography variant="h4">Documents</Typography>
+        </Grid>
+        <Grid item xs={6} className={classes.center}>
+          <label htmlFor="upload-button">
+            <input
+              accept="media_type"
+              id="upload-button"
+              type="file"
+              className={classes.input}
+              onChange={(
+                event: React.ChangeEvent<HTMLInputElement>,
+              ): Promise<OpenSnackbarAction> => {
+                event.persist();
+                return hanldeUpload(event);
+              }}
+            />
+            <Button
+              variant="outlined"
+              color="primary"
+              component="span"
+            >
           Upload
-          </Button>
-        </label>
+            </Button>
+          </label>
+        </Grid>
+        <Grid item xs={12}>
+          <List component="nav">
+            {documents.map((document) => (
+              <React.Fragment key={document.id}>
+                <ListItem
+                  button
+                  onClick={
+                    (): Promise<OpenSnackbarAction> => handleDownload(
+                      document.path, document.filename,
+                    )
+                  }
+                >
+                  <ListItemIcon>
+                    <InsertDriveFileIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={document.filename} />
+                  <ListItemSecondaryAction>
+                    <IconButton
+                      edge="end"
+                      onClick={
+                        (): Promise<OpenSnackbarAction> => handleDelete(
+                          document.id, document.path,
+                        )
+                      }
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </ListItemSecondaryAction>
+                </ListItem>
+                <Divider />
+              </React.Fragment>
+            ))}
+          </List>
+        </Grid>
       </Grid>
-      <Grid item xs={12}>
-        <List component="nav">
-          {documents.map((document) => (
-            <React.Fragment key={document.id}>
-              <ListItem button onClick={(): void => handleDownload(document.filename)}>
-                <ListItemIcon>
-                  <InsertDriveFileIcon />
-                </ListItemIcon>
-                <ListItemText primary={document.filename} />
-                <ListItemSecondaryAction>
-                  <IconButton edge="end" onClick={(): void => handleDelete(document.filename)}>
-                    <DeleteIcon />
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
-              <Divider />
-            </React.Fragment>
-          ))}
-        </List>
-      </Grid>
-    </Grid>
+    </>
   );
 };
 
