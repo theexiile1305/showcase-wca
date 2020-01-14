@@ -2,8 +2,8 @@ FROM node:13.2-alpine as builder
 
 # Stage 1 - the build process
 WORKDIR /usr/src/app
-COPY ["package.json", "package-lock.json*", "./"]
-RUN yarn
+COPY ["package.json", "yarn.lock", "./"]
+RUN yarn --frozen-lockfile
 COPY . ./
 RUN yarn build
 
