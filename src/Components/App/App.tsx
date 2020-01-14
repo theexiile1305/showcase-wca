@@ -19,6 +19,7 @@ import Debug from '../Pages/Debug';
 import Identities from '../Pages/Identities';
 import User from '../Pages/User';
 import SimpleSnackbar from '../Layout/SimpleSnackbar';
+import NotFound from '../Pages/error/NotFound';
 
 const App: React.FC = () => {
   verifyAuth();
@@ -38,6 +39,7 @@ const App: React.FC = () => {
                 <AuthRoute exact path={IDENTITIES} component={Identities} />
                 <AuthRoute exact path={USER} component={User} />
                 <AuthRoute exact path={DEBUG} component={Debug} />
+                <Route path="*" component={NotFound} />
               </Switch>
             </div>
             <SimpleSnackbar />
