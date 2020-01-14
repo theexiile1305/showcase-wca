@@ -17,6 +17,11 @@ const DebugReducer: Reducer<DebugStore> = (
           iv: action.iv,
         },
       };
+    case DebugAction.REMOVE_DEBUG:
+      return {
+        ...state,
+        aesCBC: null,
+      };
     default:
       return state;
   }

@@ -22,6 +22,11 @@ const PKIReducer: Reducer<PKIStore> = (
         ...state,
         emails: addUniquePKI(state.emails, action.email),
       };
+    case PKIAction.REMOVE_PKI:
+      return {
+        ...state,
+        emails: [],
+      };
     default:
       return state;
   }

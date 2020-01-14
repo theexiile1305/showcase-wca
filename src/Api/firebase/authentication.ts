@@ -15,8 +15,12 @@ import {
   storeDataNameKey, StoreDataNameKeyAction,
   removeCryptoKeys, RemoveCryptoKeysAction,
 } from 'src/Store/crypto/CryptoActions';
-import { saveAESCBC, SaveAESCBCAction } from 'src/Store/debug/DebugActions';
+import {
+  saveAESCBC, SaveAESCBCAction, removeDebug, RemoveDebugAction,
+} from 'src/Store/debug/DebugActions';
 import { store } from 'src/Store';
+import { removeDocuments, RemoveDocumentsAction } from 'src/Store/documents/DocumentActions';
+import { removePKI, RemovePKIAction } from 'src/Store/pki/PKIActions';
 import { getSaltPasswordHash } from './constants';
 import { downloadKey } from './storage';
 import { auth } from './firebase';
@@ -155,12 +159,16 @@ export const signInWithEmailPassword = (
 export const signOut = (
   redirect: () => void,
 ) => (
-  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction
-  | LogoutUserAction | RemoveCryptoKeysAction>,
+  dispatch: Dispatch<SetUILoadingAction | RemoveCryptoKeysAction | RemoveDocumentsAction
+  | RemoveDebugAction | RemovePKIAction | OpenSnackbarAction | LogoutUserAction
+  | SetUIStopLoadingAction>,
 ): void => {
   dispatch(setUILoading());
   auth.signOut()
     .then(() => dispatch(removeCryptoKeys()))
+    .then(() => dispatch(removeDocuments()))
+    .then(() => dispatch(removeDebug()))
+    .then(() => dispatch(removePKI()))
     .then(() => {
       dispatch(openSnackbar('You´ve been successfully signed out.'));
       dispatch(logoutUser());
