@@ -3,7 +3,7 @@ import { Switch, Route, BrowserRouter } from 'react-router-dom';
 import 'src/Assets/App.css';
 import { Provider } from 'react-redux';
 import {
-  HOME, SIGN_IN, SIGN_UP, DOCUMENTS, IDENTITIES, DEBUG, USER, EXCHANGE,
+  HOME, SIGN_IN, SIGN_UP, DOCUMENTS, IDENTITIES, DEBUG, USER,
 } from 'src/Routes';
 import AuthRoute from 'src/Routes/AuthRoute';
 import { verifyAuth } from 'src/Api/firebase/authentication';

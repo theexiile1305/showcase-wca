@@ -196,3 +196,10 @@ export const listDocumentReferences = (
         storeDocument(document, filename, doc.get('path'), doc.get('shared')),
       );
     })));
+// keep
+export const getDocumentPathFromHash = (
+  hash: string,
+): Promise<string> => firestore.collection(EXCHANGE).doc(hash).get()
+  .then((doc) => doc.get('documentID'))
+  .then((documentID) => firestore.collection(DOCUMENTS).doc(documentID).get())
+  .then((doc) => doc.get('path'));
