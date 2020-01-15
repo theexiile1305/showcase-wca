@@ -8,7 +8,6 @@ const NotFound: React.FC = () => (
           Requested site was not found!
       </Typography>
     </Grid>
-    <Grid item xs={12} />
   </Grid>
 );
 
