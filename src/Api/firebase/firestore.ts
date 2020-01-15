@@ -12,7 +12,9 @@ import {
 import {
   saveKey, removeKey, uploadDocument, deleteDocument,
 } from './storage';
-import { createBlobFingerprint } from '../wca';
+import {
+  encryptWithDataNameKey, decryptWithDataNameKey,
+} from '../wca';
 
 // keep
 export const saveKeysToPKI = async (
@@ -140,13 +142,15 @@ export const uploadDocumentReferences = async (
 ): Promise<void> => {
   for (let index = 0; index < files.length; index = +1) {
     const file = files[index];
-    createBlobFingerprint(file)
-      .then((fingerprint) => uploadDocument(DOCUMENTS_DATA(fingerprint), file))
-      .then(async (path) => firestore.collection(DOCUMENTS).add({
-        filename: file.name,
-        shared: false,
-        path,
-      }))
+    encryptWithDataNameKey(file.name)
+      .then((filename) => uploadDocument(DOCUMENTS_DATA(filename), file))
+      .then(async (path) => {
+        const filename = await encryptWithDataNameKey(file.name);
+        return firestore.collection(DOCUMENTS).add({
+          filename,
+          path,
+        });
+      })
       .then((reference) => reference.id)
       .then((documentID) => firestore.collection(USERS).doc(userID)
         .update({
@@ -186,6 +190,9 @@ export const listDocumentReferences = (
   .then((doc) => doc.get('documents'))
   .then((documents) => documents.map((document: string) => firestore
     .collection(DOCUMENTS).doc(document).get()
-    .then((doc) => dispatch(
-      storeDocument(document, doc.get('filename'), doc.get('path'), doc.get('shared')),
-    ))));
+    .then(async (doc) => {
+      const filename = await decryptWithDataNameKey(doc.get('filename'));
+      dispatch(
+        storeDocument(document, filename, doc.get('path'), doc.get('shared')),
+      );
+    })));

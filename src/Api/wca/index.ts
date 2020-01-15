@@ -12,10 +12,12 @@ import {
   arrayBufferToBase64, base64StringToArrayBuffer, stringToArrayBuffer,
   arrayBufferToString, blobToArrayBuffer,
 } from './utils';
-import { saveKeysToPKI, saveKeyInfo } from '../firebase/firestore';
+import {
+  saveKeysToPKI, saveKeyInfo,
+} from '../firebase/firestore';
 import {
   getPasswordKey, getRSAOAEPPublicKey, getRSAOAEPPrivateKey,
-  getRSAPSSPrivateKey, getRSAPSSPublicKey,
+  getRSAPSSPrivateKey, getRSAPSSPublicKey, getDataNameCryptoKey, getIVDataNameCryptoKey,
 } from '../localforage';
 
 // keep
@@ -348,3 +350,29 @@ export const destroyContainer = async (
   }
   return new Blob([decryptedBlob]);
 };
+
+// keep
+export const encryptWithDataNameKey = (
+  filename: string,
+): Promise<string> => Promise
+  .resolve(stringToArrayBuffer(filename))
+  .then(async (arrayBuffer) => {
+    const iv = await getIVDataNameCryptoKey()
+      .then((base64) => base64StringToArrayBuffer(base64));
+    const key = await getDataNameCryptoKey();
+    return wca.encrypt(AES_CBC_PASSWORD_KEY_ALGORITHM(iv), key, arrayBuffer);
+  })
+  .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer));
+
+// keep
+export const decryptWithDataNameKey = (
+  filename: string,
+): Promise<string> => Promise
+  .resolve(base64StringToArrayBuffer(filename))
+  .then(async (arrayBuffer) => {
+    const iv = await getIVDataNameCryptoKey()
+      .then((base64) => base64StringToArrayBuffer(base64));
+    const key = await getDataNameCryptoKey();
+    return wca.decrypt(AES_CBC_PASSWORD_KEY_ALGORITHM(iv), key, arrayBuffer);
+  })
+  .then((arrayBuffer) => arrayBufferToString(arrayBuffer));
