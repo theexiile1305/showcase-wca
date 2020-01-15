@@ -5,6 +5,7 @@ import { DocumentAction } from './DocumentActions';
 
 const initialState: DocumentStore = {
   documents: [],
+  selected: null,
 };
 
 const addUniqueDocument = (
@@ -41,6 +42,12 @@ const DocumentReducer: Reducer<DocumentStore> = (
       return {
         ...state,
         documents: [],
+        selected: null,
+      };
+    case DocumentAction.ADD_SELECTED:
+      return {
+        ...state,
+        selected: action.documentID,
       };
     default:
       return state;
