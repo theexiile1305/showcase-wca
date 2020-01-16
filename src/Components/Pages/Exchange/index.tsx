@@ -3,7 +3,7 @@ import { Typography, Grid } from '@material-ui/core';
 import { useParams } from 'react-router-dom';
 import { getDocumentPathFromHash } from 'src/Api/firebase/firestore';
 import {
-  setUILoading, clearUILoading, openSnackbar, OpenSnackbarAction,
+  setUILoading, clearUILoading, openSnackbar,
 } from 'src/Store/ui/UIActions';
 import { downloadDocument } from 'src/Api/firebase/storage';
 import saveData from 'src/Api/saveData';
@@ -13,23 +13,18 @@ const Exchange: React.FC = () => {
   const dispatch = useDispatch();
   const { hash } = useParams();
 
-  const handleDownload = (
-  ): Promise<OpenSnackbarAction> => {
+  useEffect(() => {
     if (hash === undefined) {
       throw new Error('Invalid link. Please double check it!');
     }
-    return Promise.resolve(dispatch(setUILoading()))
+    Promise.resolve(dispatch(setUILoading()))
       .then(() => getDocumentPathFromHash(hash))
       .then((path) => downloadDocument(path))
       .then((blob) => saveData(blob, 'sharedDocument'))
       .then(() => dispatch(openSnackbar('You`ve successfully downloaded the file.')))
       .catch((error) => dispatch(openSnackbar(error.message)))
       .finally(() => dispatch(clearUILoading()));
-  };
-
-  useEffect(() => {
-    handleDownload();
-  }, []);
+  }, [dispatch, hash]);
 
   return (
     <Grid container spacing={3}>

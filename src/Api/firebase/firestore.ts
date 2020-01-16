@@ -7,14 +7,15 @@ import {
 import { Dispatch } from 'react';
 import { firestore } from './firebase';
 import {
-  RSA_OAEP_PEM, RSA_PSS_PEM, PKI, USERS, USER_KEY_PEM, DOCUMENTS, DOCUMENTS_DATA,
+  RSA_OAEP_PEM, RSA_PSS_PEM, PKI, USERS, USER_KEY_PEM, DOCUMENTS, DOCUMENTS_DATA, EXCHANGE,
 } from './constants';
 import {
-  saveKey, removeKey, uploadDocument, deleteDocument,
+  saveKey, removeKey, uploadDocument, deleteDocument, downloadDocument, uploadBlob, downloadKey,
 } from './storage';
 import {
-  encryptWithDataNameKey, decryptWithDataNameKey,
+  encryptWithDataNameKey, decryptWithDataNameKey, createHash, addSharingToContainer, importRSAOAEPPublicKey,
 } from '../wca';
+import currentHost from '../host';
 
 // keep
 export const saveKeysToPKI = async (
@@ -149,6 +150,7 @@ export const uploadDocumentReferences = async (
         return firestore.collection(DOCUMENTS).add({
           filename,
           path,
+          shared: false,
         });
       })
       .then((reference) => reference.id)
@@ -196,6 +198,40 @@ export const listDocumentReferences = (
         storeDocument(document, filename, doc.get('path'), doc.get('shared')),
       );
     })));
+
+// keep
+export const addExchangeHolder = (
+  userID: string, documentID: string,
+): Promise<string> => firestore.collection(DOCUMENTS).doc(documentID).update({ shared: true })
+  .then(() => firestore.collection(DOCUMENTS).doc(documentID).get())
+  .then((doc) => doc.get('path'))
+  .then(async (path) => {
+    const blob = await downloadDocument(path);
+    const cryptoKey = await getRSAOAEPPublicKey(userID)
+      .then((publicKeyPath) => downloadKey(publicKeyPath))
+      .then((key) => importRSAOAEPPublicKey(key));
+    const hash = createHash(path);
+    const newBlob = await addSharingToContainer(blob, userID, cryptoKey);
+    await uploadBlob(path, newBlob);
+    return hash;
+  })
+  .then(async (hash) => {
+    await firestore.collection(EXCHANGE).doc(hash).set({ documentID });
+    return `${currentHost}/${DOCUMENTS}/${hash}`;
+  });
+
+// keep
+// TODO: manage crypto stuff
+export const revokeExchangeHolder = (
+  userID: string, documentID: string,
+): Promise<void> => firestore.collection(DOCUMENTS).doc(documentID).update({ shared: false })
+  .then(() => firestore.collection(DOCUMENTS).doc(documentID).get())
+  .then((doc) => doc.get('path'))
+  .then((path) => createHash(path))
+  .then((hash) => firestore.collection(EXCHANGE).doc(hash))
+  .then((doc) => doc.delete());
+  // .then(() => revokePublicKey(userID, documentID));
+
 // keep
 export const getDocumentPathFromHash = (
   hash: string,
