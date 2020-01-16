@@ -8,11 +8,12 @@ import PersonIcon from '@material-ui/icons/Person';
 import { ApplicationState } from 'src/Store/ApplicationState';
 import {
   closeDialog, CloseDialogAction, setUILoading, clearUILoading,
-  openSnackbar, OpenSnackbarAction,
+  openSnackbar, OpenSnackbarAction, openDialog,
 } from 'src/Store/ui/UIActions';
 import DialogType from 'src/Models/DialogType';
 import { listAllKeysFromPKI, determineEmail, addExchangeHolder } from 'src/Api/firebase/firestore';
 import { EmailByUserID } from 'src/Models/EmailByUserID';
+import { addUrl } from 'src/Store/documents/DocumentActions';
 
 const AddExchangeHolderDialog: React.FC = () => {
   const dispatch = useDispatch();
@@ -45,12 +46,16 @@ const AddExchangeHolderDialog: React.FC = () => {
       }
       return addExchangeHolder(userID, documentID);
     })
-    .then((link) => navigator.clipboard.writeText(link))
+    .then((link) => {
+      navigator.clipboard.writeText(link);
+      dispatch(addUrl(link));
+    })
     .then(() => dispatch(openSnackbar('File location was successfully copied to clipboard.')))
     .catch((error) => dispatch(openSnackbar(error.message)))
     .finally(() => {
       dispatch(clearUILoading());
       dispatch(closeDialog(DialogType.ADD_EXCHANGE_HOLDER));
+      dispatch(openDialog(DialogType.ADD_URL));
     });
 
   return (

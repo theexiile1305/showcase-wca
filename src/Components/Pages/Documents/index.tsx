@@ -22,6 +22,7 @@ import { removeDocuments, addSelected } from 'src/Store/documents/DocumentAction
 import DialogType from 'src/Models/DialogType';
 import AddExchangeHolderDialog from './AddExchangeHolderDialog';
 import RevokeExchangeHolderDialog from './RevokeExchangeHolderDialog';
+import ExchangedURLDialog from './ExchangedURLDialog';
 
 const Documents: React.FC = () => {
   const classes = style();
@@ -133,27 +134,24 @@ const Documents: React.FC = () => {
                   </ListItemIcon>
                   <ListItemText primary={document.filename} />
                   <ListItemSecondaryAction>
-                    {document.shared ? (
-                      <IconButton
-                        edge="end"
-                        onClick={(): void => {
-                          dispatch(addSelected(document.id));
-                          dispatch(openDialog(DialogType.REVOKE_EXCHANGE_HOLDER));
-                        }}
-                      >
-                        <ClearIcon />
-                      </IconButton>
-                    ) : (
-                      <IconButton
-                        edge="end"
-                        onClick={(): void => {
-                          dispatch(addSelected(document.id));
-                          dispatch(openDialog(DialogType.ADD_EXCHANGE_HOLDER));
-                        }}
-                      >
-                        <AutorenewIcon />
-                      </IconButton>
-                    )}
+                    <IconButton
+                      edge="end"
+                      onClick={(): void => {
+                        dispatch(addSelected(document.id));
+                        dispatch(openDialog(DialogType.REVOKE_EXCHANGE_HOLDER));
+                      }}
+                    >
+                      <ClearIcon />
+                    </IconButton>
+                    <IconButton
+                      edge="end"
+                      onClick={(): void => {
+                        dispatch(addSelected(document.id));
+                        dispatch(openDialog(DialogType.ADD_EXCHANGE_HOLDER));
+                      }}
+                    >
+                      <AutorenewIcon />
+                    </IconButton>
                     <IconButton
                       edge="end"
                       onClick={
@@ -174,6 +172,7 @@ const Documents: React.FC = () => {
       </Grid>
       <AddExchangeHolderDialog />
       <RevokeExchangeHolderDialog />
+      <ExchangedURLDialog />
     </>
   );
 };

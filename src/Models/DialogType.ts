@@ -4,7 +4,8 @@ enum DialogType {
   CHANGE_EMAIL,
   CHANGE_PASSWORD,
   ADD_EXCHANGE_HOLDER,
-  REVOKE_EXCHANGE_HOLDER
+  REVOKE_EXCHANGE_HOLDER,
+  ADD_URL
 }
 
 export default DialogType;

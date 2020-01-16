@@ -6,6 +6,7 @@ export enum DocumentAction {
   REMOVE_DOCUMENT = '@@wca/REMOVE_DOCUMENT',
   REMOVE_DOCUMENTS = '@@wca/REMOVE_DOCUMENTS',
   ADD_SELECTED = '@@wca/ADD_SELECTED',
+  ADD_URL = '@@wca/ADD_URL'
 }
 
 export interface StoreDocumentAction extends Action {
@@ -27,11 +28,17 @@ export interface AddSelectedAction extends Action {
   documentID: string;
 }
 
+export interface AddURLAction extends Action {
+  type: DocumentAction.ADD_URL;
+  url: string;
+}
+
 export type DocumentActions =
   | StoreDocumentAction
   | RemoveDocumentAction
   | RemoveDocumentsAction
-  | AddSelectedAction;
+  | AddSelectedAction
+  | AddURLAction;
 
 export const storeDocument: ActionCreator<StoreDocumentAction> = (
   id: string, filename: string, path: string, shared: boolean,
@@ -62,4 +69,11 @@ export const addSelected: ActionCreator<AddSelectedAction> = (
 ) => ({
   type: DocumentAction.ADD_SELECTED,
   documentID,
+});
+
+export const addUrl: ActionCreator<AddURLAction> = (
+  url: string,
+) => ({
+  type: DocumentAction.ADD_URL,
+  url,
 });
