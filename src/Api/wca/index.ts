@@ -22,8 +22,7 @@ import {
 import {
   BEGIN_SIGNATURE, END_SIGNATURE, BEGIN_SIGNATURE_USER_ID, END_SIGNATURE_USER_ID,
   BEGIN_COUNTER, END_COUNTER, BEGIN_AES_KEYS_BLOCK, END_AES_KEYS_BLOCK, BEGIN_IV,
-  END_IV, BEGIN_BLOB, END_BLOB, BEGIN_USER_ID, END_USER_ID,
-  BEGIN_SINGLE_AES, END_SINGLE_AES, SINGLE_AES_BLOCK_SIZE, USER_ID_SIZE, AES_KEY_SIZE,
+  END_IV, BEGIN_BLOB, END_BLOB, SINGLE_AES_BLOCK_SIZE, USER_ID_SIZE, AES_KEY_SIZE,
 } from './containerConfig';
 import { downloadKey } from '../firebase/storage';
 
@@ -388,6 +387,7 @@ const decryptBlob = (
   .then((arrayBuffer) => wca.importKey('raw', arrayBuffer, AES_CBC_PASSWORD_KEY_GEN_ALGORITHM(), true, ['encrypt', 'decrypt']))
   .then((cryptoKey) => wca.decrypt(AES_CBC_PASSWORD_KEY_ALGORITHM(iv), cryptoKey, encryptedBlob));
 
+// keep
 export const destroyContainer = async (
   blob: Blob,
 ): Promise<Blob> => {
@@ -415,85 +415,46 @@ export const destroyContainer = async (
   return new Blob([decryptedBlob]);
 };
 
-// keep
-
+const deriveNewEncryptedAESKey = (
+  aesKeyBlock: ArrayBuffer, counterIndex: number, cryptoKey: CryptoKey,
+): Promise<ArrayBuffer> => Promise
+  .resolve(determineEncryptedKey(aesKeyBlock, counterIndex + 1))
+  .then(async (arrayBuffer) => wca.decrypt(
+    RSA_OAEP_ALGORITHM(), await getRSAOAEPPrivateKey(), arrayBuffer,
+  ))
+  .then((arrayBuffer) => wca.encrypt(RSA_OAEP_ALGORITHM(), cryptoKey, arrayBuffer));
 
 // keep
 export const addSharingToContainer = async (
-  encryptedBlob: Blob, userID: string, cryptoKey: CryptoKey,
+  blob: Blob, userID: string, cryptoKey: CryptoKey,
 ): Promise<Blob> => {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const currentUserID = store.getState().user.uid!!;
-  const arrayBuffer = await blobToArrayBuffer(encryptedBlob);
+  const arrayBuffer = await blobToArrayBuffer(blob);
   const { byteLength } = arrayBuffer;
-
-  const signature = arrayBuffer.slice(BEGIN_SIGNATURE(byteLength), END_SIGNATURE(byteLength));
-  const signatureUserID = arrayBuffer.slice(BEGIN_SIGNATURE_USER_ID(byteLength), END_SIGNATURE_USER_ID(byteLength));
-  const counter = arrayBuffer.slice(BEGIN_COUNTER(byteLength), END_COUNTER(byteLength));
-  const count = new DataView(counter, 0).getUint8(0);
-  const newCount = count + 1;
-  const newCounter = new Uint8Array([newCount]);
-
-  const aesKeyBlock = arrayBuffer.slice(BEGIN_AES_KEYS_BLOCK(byteLength, count), END_AES_KEYS_BLOCK(byteLength));
-  const iv = arrayBuffer.slice(BEGIN_IV(byteLength, count), END_IV(byteLength, count));
-  const blob = arrayBuffer.slice(BEGIN_BLOB(), END_BLOB(byteLength, count));
-  // const masterKey = determineEncryptedKey(arrayBuffer, count, byteLength, currentUserID);
-
-  //  console.log(masterKey);
-  console.log(cryptoKey);
-
-
-  // const newAESKey = await wca.encrypt(RSA_OAEP_ALGORITHM(), cryptoKey, masterKey);
-  const newAESKey = await encryptWithRSAOAEP('Test');
-  console.log(newAESKey);
+  const counterIndex = determineCounterValue(
+    arrayBuffer.slice(BEGIN_COUNTER(byteLength), END_COUNTER(byteLength)),
+  );
+  const encryptedBlob = arrayBuffer.slice(BEGIN_BLOB(), END_BLOB(byteLength, counterIndex));
+  const iv = arrayBuffer.slice(
+    BEGIN_IV(byteLength, counterIndex), END_IV(byteLength, counterIndex),
+  );
+  const aesKeyBlock = arrayBuffer.slice(
+    BEGIN_AES_KEYS_BLOCK(byteLength, counterIndex), END_AES_KEYS_BLOCK(byteLength),
+  );
   const newUserID = stringToArrayBuffer(userID);
-  console.log(newUserID.byteLength);
-
-  return new Blob([blob, iv, aesKeyBlock, newUserID, newAESKey, newCounter, signatureUserID, signature]);
-};
-
-// keep
-const removeEncryptedKey = (
-  arrayBuffer: ArrayBuffer, count: number, byteLength: number, userID: string,
-): ArrayBuffer => {
-  const array = new Uint8Array();
-  for (let index = 0; index <= count; index += 1) {
-    const currentUserID = arrayBuffer.slice(
-      BEGIN_USER_ID(byteLength, index, count),
-      END_USER_ID(byteLength, index, count),
-    );
-    const encryptedKey = arrayBuffer.slice(
-      BEGIN_SINGLE_AES(byteLength, index, count),
-      END_SINGLE_AES(byteLength, index, count),
-    );
-    if (arrayBufferToString(currentUserID) !== userID) {
-      console.log();
-    }
-  }
-  return array;
-};
-
-// keep
-export const removeSharingFromContainer = async (
-  encryptedBlob: Blob, userID: string,
-): Promise<Blob> => {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const currentUserID = store.getState().user.uid!!;
-  const arrayBuffer = await blobToArrayBuffer(encryptedBlob);
-  const { byteLength } = arrayBuffer;
-
+  const newEncryptedKey = await deriveNewEncryptedAESKey(aesKeyBlock, counterIndex, cryptoKey);
+  const newCounterIndex = new Uint8Array([counterIndex + 1]);
   const signature = arrayBuffer.slice(BEGIN_SIGNATURE(byteLength), END_SIGNATURE(byteLength));
-  const signatureUserID = arrayBuffer.slice(BEGIN_SIGNATURE_USER_ID(byteLength), END_SIGNATURE_USER_ID(byteLength));
-  const counter = arrayBuffer.slice(BEGIN_COUNTER(byteLength), END_COUNTER(byteLength));
-  const count = new DataView(counter, 0).getUint8(0);
-  const newCount = count + 1;
-  const newCounter = new Uint8Array([newCount]);
-  const aesKeyBlock = arrayBuffer.slice(BEGIN_AES_KEYS_BLOCK(byteLength, count), END_AES_KEYS_BLOCK(byteLength));
-  const iv = arrayBuffer.slice(BEGIN_IV(byteLength, count), END_IV(byteLength, count));
-  const blob = arrayBuffer.slice(BEGIN_BLOB(), END_BLOB(byteLength, count));
-
-
-  return new Blob([blob, iv, newCounter, signatureUserID, signature]);
+  const signatureUserID = arrayBuffer.slice(
+    BEGIN_SIGNATURE_USER_ID(byteLength), END_SIGNATURE_USER_ID(byteLength),
+  );
+  const valid = await verifySignature(encryptedBlob, signature, signatureUserID);
+  if (!valid) {
+    throw new Error('The signature is not valid!');
+  }
+  return new Blob([
+    encryptedBlob, iv, aesKeyBlock, newUserID, newEncryptedKey, newCounterIndex,
+    signatureUserID, signature,
+  ]);
 };
 
 // keep

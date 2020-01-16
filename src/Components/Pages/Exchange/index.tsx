@@ -20,7 +20,10 @@ const Exchange: React.FC = () => {
     Promise.resolve(dispatch(setUILoading()))
       .then(() => getDocumentPathFromHash(hash))
       .then((path) => downloadDocument(path))
-      .then((blob) => saveData(blob, 'sharedDocument'))
+      .then((blob) => {
+        const fileExtension = hash.substring(hash.indexOf('.'));
+        saveData(blob, `sharedDocument${fileExtension}`);
+      })
       .then(() => dispatch(openSnackbar('You`ve successfully downloaded the file.')))
       .catch((error) => dispatch(openSnackbar(error.message)))
       .finally(() => dispatch(clearUILoading()));

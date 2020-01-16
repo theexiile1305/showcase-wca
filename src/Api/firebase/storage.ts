@@ -36,7 +36,7 @@ const downloadText = (
   .then((response) => response.text());
 
 // keep
-const downloadBlob = (
+export const downloadBlob = (
   reference: firebase.storage.Reference,
 ): Promise<Blob> => reference
   .getDownloadURL()
