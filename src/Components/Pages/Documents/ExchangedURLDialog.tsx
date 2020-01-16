@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   Button, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText,
-  Grid, Typography,
+  Grid, Link, Typography,
 } from '@material-ui/core';
 import { ApplicationState } from 'src/Store/ApplicationState';
 import { closeDialog, CloseDialogAction } from 'src/Store/ui/UIActions';
@@ -28,9 +28,9 @@ const ExchangedURLDialog: React.FC = () => {
       <DialogContent dividers>
         <DialogContentText>
           <Typography variant="body2">
-            <a href={url}>
+            <Link href={url}>
               {url}
-            </a>
+            </Link>
           </Typography>
         </DialogContentText>
         <Grid container spacing={3}>

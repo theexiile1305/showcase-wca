@@ -30,3 +30,11 @@ export const blobToArrayBuffer = (
   reader.onerror = reject;
   reader.onload = (): void => resolve(reader.result as ArrayBuffer);
 });
+
+export const concatenate = (
+  ...arrays: Uint8Array[]
+): Uint8Array => Uint8Array.from(
+  Array.prototype.concat(
+    ...arrays.map((a) => Array.from(a)),
+  ),
+);

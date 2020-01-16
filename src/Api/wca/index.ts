@@ -10,7 +10,7 @@ import {
 } from './config';
 import {
   base64StringToArrayBuffer, stringToArrayBuffer,
-  arrayBufferToString, blobToArrayBuffer, arrayBufferToBase64,
+  arrayBufferToString, blobToArrayBuffer, arrayBufferToBase64, concatenate,
 } from './utils';
 import {
   saveKeysToPKI, saveKeyInfo, getRSAPSSPublicKey as getRSAPSSPublicKeyPath,
@@ -456,6 +456,63 @@ export const addSharingToContainer = async (
     signatureUserID, signature,
   ]);
 };
+
+// keep
+const reovkeEncryptedKey = (
+  aesKeyBlock: ArrayBuffer, counterValue: number, userID: string,
+): ArrayBuffer => {
+  let array = new Uint8Array();
+  console.log(array.byteLength);
+  for (let index = 0; index < counterValue * SINGLE_AES_BLOCK_SIZE; index += SINGLE_AES_BLOCK_SIZE) {
+    const currentUserID = aesKeyBlock.slice(index, index + USER_ID_SIZE);
+    if (arrayBufferToString(currentUserID) !== userID) {
+      const currentArrayBuffer = new Uint8Array(
+        (aesKeyBlock.slice(index, index + SINGLE_AES_BLOCK_SIZE)),
+      );
+      console.log(currentArrayBuffer.byteLength);
+      array = concatenate(array, currentArrayBuffer);
+    }
+  }
+  return array;
+};
+
+// keep
+export const revokeSharingToContainer = async (
+  blob: Blob, userID: string,
+): Promise<Blob> => {
+  const arrayBuffer = await blobToArrayBuffer(blob);
+  const { byteLength } = arrayBuffer;
+  const counterIndex = determineCounterValue(
+    arrayBuffer.slice(BEGIN_COUNTER(byteLength), END_COUNTER(byteLength)),
+  );
+  const encryptedBlob = arrayBuffer.slice(BEGIN_BLOB(), END_BLOB(byteLength, counterIndex));
+  const iv = arrayBuffer.slice(
+    BEGIN_IV(byteLength, counterIndex), END_IV(byteLength, counterIndex),
+  );
+
+  const aesKeyBlock = arrayBuffer.slice(
+    BEGIN_AES_KEYS_BLOCK(byteLength, counterIndex), END_AES_KEYS_BLOCK(byteLength),
+  );
+
+  const newAESKeyBlock = reovkeEncryptedKey(aesKeyBlock, counterIndex + 1, userID);
+  console.log(`Difference: ${aesKeyBlock.byteLength - newAESKeyBlock.byteLength}`);
+  console.log(aesKeyBlock.byteLength);
+  console.log(newAESKeyBlock.byteLength);
+
+  const newCounterIndex = new Uint8Array([counterIndex - 1]);
+  const signature = arrayBuffer.slice(BEGIN_SIGNATURE(byteLength), END_SIGNATURE(byteLength));
+  const signatureUserID = arrayBuffer.slice(
+    BEGIN_SIGNATURE_USER_ID(byteLength), END_SIGNATURE_USER_ID(byteLength),
+  );
+  const valid = await verifySignature(encryptedBlob, signature, signatureUserID);
+  if (!valid) {
+    throw new Error('The signature is not valid!');
+  }
+  return new Blob([
+    encryptedBlob, iv, newAESKeyBlock, newCounterIndex, signatureUserID, signature,
+  ]);
+};
+
 
 // keep
 export const encryptWithDataNameKey = (

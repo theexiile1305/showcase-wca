@@ -15,6 +15,7 @@ import {
 import {
   encryptWithDataNameKey, decryptWithDataNameKey, createHash, addSharingToContainer,
   importRSAOAEPPublicKey,
+  revokeSharingToContainer,
 } from '../wca';
 import currentHost from '../host';
 
@@ -224,7 +225,6 @@ export const addExchangeHolder = (
     const newBlob = await addSharingToContainer(blob, userID, cryptoKey);
     await uploadBlob(ref, newBlob, { contentType });
     await firestore.collection(EXCHANGE).doc(hash).set({ documentID });
-    console.log(`${currentHost}/${DOCUMENTS}/${hash}.${fileExtension}`);
     return `${currentHost}/${DOCUMENTS}/${hash}.${fileExtension}`;
   });
 
@@ -236,8 +236,17 @@ export const revokeExchangeHolder = (
   .then((doc) => doc.get('path'))
   .then((path) => createHash(path))
   .then((hash) => firestore.collection(EXCHANGE).doc(hash))
-  .then((doc) => doc.delete());
-  // .then(() => revokePublicKey(userID, documentID));
+  .then((doc) => doc.delete())
+  .then(() => firestore.collection(DOCUMENTS).doc(documentID).get())
+  .then((doc) => doc.get('path'))
+  .then(async (path) => {
+    const ref = storage.child(path);
+    const blob = await downloadBlob(ref);
+    const contentType = await ref.getMetadata()
+      .then((metadata) => metadata.contentType);
+    const newBlob = await revokeSharingToContainer(blob, userID);
+    uploadBlob(ref, newBlob, { contentType });
+  });
 
 // keep
 export const getDocumentPathFromHash = (
