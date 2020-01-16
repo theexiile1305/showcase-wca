@@ -58,7 +58,7 @@ const RevokeExchangeHolderDialog: React.FC = () => {
       open={openRevokeExchangeHolder}
     >
       <DialogTitle id="customized-dialog-title">
-          Add Exchange Holder
+          Revoke Exchange Holder
       </DialogTitle>
       <DialogContent dividers>
         <DialogContentText>
