@@ -53,7 +53,8 @@ export const END_AES_KEYS_BLOCK = (
 // userID block
 export const BEGIN_USER_ID = (
   byteLength: number, index: number, counterValue: number,
-): number => END_AES_KEYS_BLOCK(byteLength) - SINGLE_AES_BLOCK_SIZE * (COUNT_SIZE(counterValue) - index);
+): number => END_AES_KEYS_BLOCK(byteLength)
+- SINGLE_AES_BLOCK_SIZE * (COUNT_SIZE(counterValue) - index);
 
 export const END_USER_ID = (
   byteLength: number, index: number, counterValue: number,

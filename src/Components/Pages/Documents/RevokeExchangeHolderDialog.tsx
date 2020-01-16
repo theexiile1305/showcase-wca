@@ -91,7 +91,9 @@ const RevokeExchangeHolderDialog: React.FC = () => {
       </DialogContent>
       <DialogActions>
         <Button
-          onClick={(): CloseDialogAction => dispatch(closeDialog(DialogType.REVOKE_EXCHANGE_HOLDER))}
+          onClick={
+            (): CloseDialogAction => dispatch(closeDialog(DialogType.REVOKE_EXCHANGE_HOLDER))
+          }
           color="primary"
         >
             Cancel

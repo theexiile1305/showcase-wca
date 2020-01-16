@@ -14,6 +14,7 @@ const ExchangedURLDialog: React.FC = () => {
   const openAddURL = useSelector(
     (state: ApplicationState) => state.ui.dialog === DialogType.ADD_URL,
   );
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const url = useSelector((state: ApplicationState) => state.documents.url!!);
 
   return (

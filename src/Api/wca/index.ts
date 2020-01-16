@@ -364,7 +364,9 @@ const determineEncryptedKey = (
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const userID = store.getState().user.uid!!;
   let encryptedKey;
-  for (let index = 0; index < counterValue * SINGLE_AES_BLOCK_SIZE; index += SINGLE_AES_BLOCK_SIZE) {
+  for (let index = 0;
+    index < counterValue * SINGLE_AES_BLOCK_SIZE;
+    index += SINGLE_AES_BLOCK_SIZE) {
     const currentUserID = aesKeyBlock.slice(index, index + USER_ID_SIZE);
     if (arrayBufferToString(currentUserID) === userID) {
       encryptedKey = aesKeyBlock.slice(index + USER_ID_SIZE, index + USER_ID_SIZE + AES_KEY_SIZE);
@@ -462,14 +464,14 @@ const reovkeEncryptedKey = (
   aesKeyBlock: ArrayBuffer, counterValue: number, userID: string,
 ): ArrayBuffer => {
   let array = new Uint8Array();
-  console.log(array.byteLength);
-  for (let index = 0; index < counterValue * SINGLE_AES_BLOCK_SIZE; index += SINGLE_AES_BLOCK_SIZE) {
+  for (let index = 0;
+    index < counterValue * SINGLE_AES_BLOCK_SIZE;
+    index += SINGLE_AES_BLOCK_SIZE) {
     const currentUserID = aesKeyBlock.slice(index, index + USER_ID_SIZE);
     if (arrayBufferToString(currentUserID) !== userID) {
       const currentArrayBuffer = new Uint8Array(
         (aesKeyBlock.slice(index, index + SINGLE_AES_BLOCK_SIZE)),
       );
-      console.log(currentArrayBuffer.byteLength);
       array = concatenate(array, currentArrayBuffer);
     }
   }
@@ -489,16 +491,10 @@ export const revokeSharingToContainer = async (
   const iv = arrayBuffer.slice(
     BEGIN_IV(byteLength, counterIndex), END_IV(byteLength, counterIndex),
   );
-
   const aesKeyBlock = arrayBuffer.slice(
     BEGIN_AES_KEYS_BLOCK(byteLength, counterIndex), END_AES_KEYS_BLOCK(byteLength),
   );
-
   const newAESKeyBlock = reovkeEncryptedKey(aesKeyBlock, counterIndex + 1, userID);
-  console.log(`Difference: ${aesKeyBlock.byteLength - newAESKeyBlock.byteLength}`);
-  console.log(aesKeyBlock.byteLength);
-  console.log(newAESKeyBlock.byteLength);
-
   const newCounterIndex = new Uint8Array([counterIndex - 1]);
   const signature = arrayBuffer.slice(BEGIN_SIGNATURE(byteLength), END_SIGNATURE(byteLength));
   const signatureUserID = arrayBuffer.slice(
