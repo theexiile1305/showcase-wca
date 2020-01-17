@@ -3,10 +3,8 @@
 ![Codecov](https://img.shields.io/codecov/c/github/theexiile1305/showcase-wca)
 ![David](https://img.shields.io/david/theexiile1305/showcase-wca)
 ![GitHub](https://img.shields.io/github/license/theexiile1305/showcase-wca?style=plastic)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftheexiile1305%2Fshowcase-wca.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftheexiile1305%2Fshowcase-wca?ref=badge_shield)
-![Website](https://img.shields.io/website?url=https%3A%2F%2Fshowcase-wca.web.app%2F)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftheexiile1305%2Fshowcase-wca.svg?type=small)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftheexiile1305%2Fshowcase-wca?ref=badge_small)
-
+![Website](https://img.shields.io/website?url=https%3A%2F%2Fshowcase-wca.web.app%2F)
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
