@@ -24,7 +24,7 @@ import {
 import {
   getIVDataNameKey, getDataNameKey, getSaltPasswordKey, getRSAOAEPPrivateKey,
   getRSAOAEPPublicKey, getIVRSAOAEP, getIVRSAPSS, getRSAPSSPrivateKey,
-  getRSAPSSPublicKey, removeKeysFromPKI, removeKeyInfo,
+  getRSAPSSPublicKey, removeKeysFromPKI, removeKeyInfo, removeExistingDocuments,
 } from './firestore';
 import { removeCryptoKeys, saveCryptoKeys } from '../localforage';
 
@@ -255,7 +255,9 @@ export const deleteAccount = (
       const { user } = userCredential;
       if (user != null) {
         await removeKeysFromPKI(user.uid);
+        await removeExistingDocuments(user.uid);
         await removeKeyInfo(user.uid);
+        await removeCryptoKeys();
         await user.delete();
         dispatch(openSnackbar('You´ve successfully deleted your account.'));
         dispatch(logoutUser());

@@ -139,6 +139,30 @@ export const getRSAPSSPrivateKey = (
 ): Promise<string> => firestore.collection(USERS).doc(userID).get()
   .then((doc) => doc.get('rsaPSS.privateKey'));
 
+
+// keep
+export const removeExistingDocuments = (
+  userID: string,
+): Promise<void> => firestore
+  .collection(USERS).doc(userID).get()
+  .then((doc) => doc.get('documents'))
+  .then((documents) => documents
+    .forEach(async (documentID: string) => { // every documentID
+      await firestore.collection(DOCUMENTS).doc(documentID).get()
+        .then((doc) => doc.get('path'))
+        .then((path: string) => deleteDocument(path));
+      await firestore.collection(DOCUMENTS).doc(documentID).delete();
+      await firestore.collection(EXCHANGE).get()
+        .then((query) => query.docs) // every exchange hash for every documentID
+        .then((exchanges) => exchanges
+          .filter(async (hash) => {
+            const currentDocumentID = await firestore.collection(EXCHANGE).doc(hash.id).get()
+              .then((doc) => doc.get('documentID'));
+            return documentID === currentDocumentID;
+          }) // every exchange hash for every documentID that belongs to user with the given userID
+          .forEach((hash) => firestore.collection(EXCHANGE).doc(hash.id).delete()));
+    }));
+
 // keep
 export const uploadDocumentReferences = async (
   userID: string, files: FileList,
