@@ -5,14 +5,19 @@ import {
   storeDocument, StoreDocumentAction,
 } from 'src/Store/documents/DocumentActions';
 import { Dispatch } from 'react';
-import { firestore } from './firebase';
+import { firestore, storage } from './firebase';
 import {
-  RSA_OAEP_PEM, RSA_PSS_PEM, PKI, USERS, USER_KEY_PEM, DOCUMENTS, DOCUMENTS_DATA,
+  RSA_OAEP_PEM, RSA_PSS_PEM, PKI, USERS, USER_KEY_PEM, DOCUMENTS, DOCUMENTS_DATA, EXCHANGE,
 } from './constants';
 import {
-  saveKey, removeKey, uploadDocument, deleteDocument,
+  saveKey, removeKey, uploadDocument, deleteDocument, uploadBlob, downloadKey, downloadBlob,
 } from './storage';
-import { createBlobFingerprint } from '../wca';
+import {
+  encryptWithDataNameKey, decryptWithDataNameKey, createHash, addSharingToContainer,
+  importRSAOAEPPublicKey,
+  revokeSharingToContainer,
+} from '../wca';
+import currentHost from '../host';
 
 // keep
 export const saveKeysToPKI = async (
@@ -140,13 +145,16 @@ export const uploadDocumentReferences = async (
 ): Promise<void> => {
   for (let index = 0; index < files.length; index = +1) {
     const file = files[index];
-    createBlobFingerprint(file)
-      .then((fingerprint) => uploadDocument(DOCUMENTS_DATA(fingerprint), file))
-      .then(async (path) => firestore.collection(DOCUMENTS).add({
-        filename: file.name,
-        shared: false,
-        path,
-      }))
+    encryptWithDataNameKey(file.name)
+      .then((filename) => uploadDocument(DOCUMENTS_DATA(filename), file))
+      .then(async (path) => {
+        const filename = await encryptWithDataNameKey(file.name);
+        return firestore.collection(DOCUMENTS).add({
+          filename,
+          path,
+          shared: false,
+        });
+      })
       .then((reference) => reference.id)
       .then((documentID) => firestore.collection(USERS).doc(userID)
         .update({
@@ -186,6 +194,66 @@ export const listDocumentReferences = (
   .then((doc) => doc.get('documents'))
   .then((documents) => documents.map((document: string) => firestore
     .collection(DOCUMENTS).doc(document).get()
-    .then((doc) => dispatch(
-      storeDocument(document, doc.get('filename'), doc.get('path'), doc.get('shared')),
-    ))));
+    .then(async (doc) => {
+      const filename = await decryptWithDataNameKey(doc.get('filename'));
+      dispatch(
+        storeDocument(document, filename, doc.get('path'), doc.get('shared')),
+      );
+    })));
+
+
+export const getFileExtension = (
+  type: string,
+): string => type.substring(type.indexOf('/') + 1);
+
+// keep
+export const addExchangeHolder = (
+  userID: string, documentID: string,
+): Promise<string> => firestore.collection(DOCUMENTS).doc(documentID).update({ shared: true })
+  .then(() => firestore.collection(DOCUMENTS).doc(documentID).get())
+  .then((doc) => doc.get('path'))
+  .then(async (path) => {
+    const ref = storage.child(path);
+    const blob = await downloadBlob(ref);
+    const contentType = await ref.getMetadata()
+      .then((metadata) => metadata.contentType);
+    const fileExtension = getFileExtension(contentType);
+    const cryptoKey = await getRSAOAEPPublicKey(userID)
+      .then((publicKeyPath) => downloadKey(publicKeyPath))
+      .then((key) => importRSAOAEPPublicKey(key));
+    const hash = await createHash(path);
+    const newBlob = await addSharingToContainer(blob, userID, cryptoKey);
+    await uploadBlob(ref, newBlob, { contentType });
+    await firestore.collection(EXCHANGE).doc(hash).set({ documentID });
+    return `${currentHost}/${DOCUMENTS}/${hash}.${fileExtension}`;
+  });
+
+// keep
+export const revokeExchangeHolder = (
+  userID: string, documentID: string,
+): Promise<void> => firestore.collection(DOCUMENTS).doc(documentID).update({ shared: false })
+  .then(() => firestore.collection(DOCUMENTS).doc(documentID).get())
+  .then((doc) => doc.get('path'))
+  .then((path) => createHash(path))
+  .then((hash) => firestore.collection(EXCHANGE).doc(hash))
+  .then((doc) => doc.delete())
+  .then(() => firestore.collection(DOCUMENTS).doc(documentID).get())
+  .then((doc) => doc.get('path'))
+  .then(async (path) => {
+    const ref = storage.child(path);
+    const blob = await downloadBlob(ref);
+    const contentType = await ref.getMetadata()
+      .then((metadata) => metadata.contentType);
+    const newBlob = await revokeSharingToContainer(blob, userID);
+    uploadBlob(ref, newBlob, { contentType });
+  });
+
+// keep
+export const getDocumentPathFromHash = (
+  hash: string,
+): Promise<string> => Promise
+  .resolve(hash.substring(0, hash.indexOf('.')))
+  .then((path) => firestore.collection(EXCHANGE).doc(path).get())
+  .then((doc) => doc.get('documentID'))
+  .then((documentID) => firestore.collection(DOCUMENTS).doc(documentID).get())
+  .then((doc) => doc.get('path'));

@@ -5,6 +5,8 @@ import { DocumentAction } from './DocumentActions';
 
 const initialState: DocumentStore = {
   documents: [],
+  selected: null,
+  url: null,
 };
 
 const addUniqueDocument = (
@@ -41,6 +43,18 @@ const DocumentReducer: Reducer<DocumentStore> = (
       return {
         ...state,
         documents: [],
+        selected: null,
+        url: null,
+      };
+    case DocumentAction.ADD_SELECTED:
+      return {
+        ...state,
+        selected: action.documentID,
+      };
+    case DocumentAction.ADD_URL:
+      return {
+        ...state,
+        url: action.url,
       };
     default:
       return state;
