@@ -5,7 +5,7 @@
 ![GitHub](https://img.shields.io/github/license/theexiile1305/showcase-wca?style=plastic)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftheexiile1305%2Fshowcase-wca.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftheexiile1305%2Fshowcase-wca?ref=badge_shield)
 ![Website](https://img.shields.io/website?url=https%3A%2F%2Fshowcase-wca.web.app%2F)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Ftheexiile1305%2Fshowcase-wca.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Ftheexiile1305%2Fshowcase-wca?ref=badge_shield)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftheexiile1305%2Fshowcase-wca.svg?type=small)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftheexiile1305%2Fshowcase-wca?ref=badge_small)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
@@ -51,7 +51,3 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
-
-
-## License
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Ftheexiile1305%2Fshowcase-wca.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Ftheexiile1305%2Fshowcase-wca?ref=badge_large)
