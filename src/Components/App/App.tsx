@@ -20,6 +20,7 @@ import Identities from '../Pages/Identities';
 import User from '../Pages/User';
 import SimpleSnackbar from '../Layout/SimpleSnackbar';
 import NotFound from '../Pages/error/NotFound';
+import Exchange from '../Pages/Exchange';
 
 const App: React.FC = () => {
   verifyAuth();
@@ -36,6 +37,7 @@ const App: React.FC = () => {
                 <Route exact path={SIGN_IN} component={SignIn} />
                 <Route exact path={SIGN_UP} component={SignUp} />
                 <AuthRoute exact path={DOCUMENTS} component={Documents} />
+                <AuthRoute exact path={`${DOCUMENTS}/:hash`} component={Exchange} />
                 <AuthRoute exact path={IDENTITIES} component={Identities} />
                 <AuthRoute exact path={USER} component={User} />
                 <AuthRoute exact path={DEBUG} component={Debug} />

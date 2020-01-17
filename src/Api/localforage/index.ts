@@ -27,3 +27,9 @@ export const getRSAPSSPublicKey = (
 
 export const getRSAPSSPrivateKey = (
 ): Promise<CryptoKey> => getCryptoKeys().then((cryptoKeys) => cryptoKeys.rsaPSS.privateKey);
+
+export const getIVDataNameCryptoKey = (
+): Promise<string> => getCryptoKeys().then((cryptoKeys) => cryptoKeys.dataNameKey.iv);
+
+export const getDataNameCryptoKey = (
+): Promise<CryptoKey> => getCryptoKeys().then((cryptoKeys) => cryptoKeys.dataNameKey.key);

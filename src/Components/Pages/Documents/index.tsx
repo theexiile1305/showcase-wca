@@ -3,6 +3,8 @@ import {
   Divider, Grid, List, ListItem, ListItemText, ListItemSecondaryAction,
   IconButton, ListItemIcon, Typography, Button,
 } from '@material-ui/core';
+import AutorenewIcon from '@material-ui/icons/Autorenew';
+import ClearIcon from '@material-ui/icons/Clear';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import DeleteIcon from '@material-ui/icons/Delete';
 import style from 'src/Styles';
@@ -13,10 +15,14 @@ import {
 } from 'src/Api/firebase/firestore';
 import { downloadDocument } from 'src/Api/firebase/storage';
 import {
-  setUILoading, openSnackbar, clearUILoading, OpenSnackbarAction,
+  setUILoading, openSnackbar, clearUILoading, OpenSnackbarAction, openDialog,
 } from 'src/Store/ui/UIActions';
 import saveData from 'src/Api/saveData';
-import { removeDocuments } from 'src/Store/documents/DocumentActions';
+import { removeDocuments, addSelected } from 'src/Store/documents/DocumentActions';
+import DialogType from 'src/Models/DialogType';
+import AddExchangeHolderDialog from './AddExchangeHolderDialog';
+import RevokeExchangeHolderDialog from './RevokeExchangeHolderDialog';
+import ExchangedURLDialog from './ExchangedURLDialog';
 
 const Documents: React.FC = () => {
   const classes = style();
@@ -130,6 +136,24 @@ const Documents: React.FC = () => {
                   <ListItemSecondaryAction>
                     <IconButton
                       edge="end"
+                      onClick={(): void => {
+                        dispatch(addSelected(document.id));
+                        dispatch(openDialog(DialogType.REVOKE_EXCHANGE_HOLDER));
+                      }}
+                    >
+                      <ClearIcon />
+                    </IconButton>
+                    <IconButton
+                      edge="end"
+                      onClick={(): void => {
+                        dispatch(addSelected(document.id));
+                        dispatch(openDialog(DialogType.ADD_EXCHANGE_HOLDER));
+                      }}
+                    >
+                      <AutorenewIcon />
+                    </IconButton>
+                    <IconButton
+                      edge="end"
                       onClick={
                         (): Promise<OpenSnackbarAction> => handleDelete(
                           document.id, document.path,
@@ -146,6 +170,9 @@ const Documents: React.FC = () => {
           </List>
         </Grid>
       </Grid>
+      <AddExchangeHolderDialog />
+      <RevokeExchangeHolderDialog />
+      <ExchangedURLDialog />
     </>
   );
 };

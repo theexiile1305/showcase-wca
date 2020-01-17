@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import {
   Divider, Grid, List, ListItem, ListItemText, ListItemIcon, Typography,
 } from '@material-ui/core';
-import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
+import PersonIcon from '@material-ui/icons/Person';
 import style from 'src/Styles';
 import { listAllKeysFromPKI, determineEmail } from 'src/Api/firebase/firestore';
 import { savePKI } from 'src/Store/pki/PKIActions';
@@ -33,7 +33,7 @@ const Documents: React.FC = () => {
             <React.Fragment key={email}>
               <ListItem>
                 <ListItemIcon>
-                  <InsertDriveFileIcon />
+                  <PersonIcon />
                 </ListItemIcon>
                 <ListItemText
                   primary={email}

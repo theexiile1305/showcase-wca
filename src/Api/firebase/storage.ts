@@ -1,10 +1,10 @@
 /* eslint-disable import/no-cycle */
 import { storage } from './firebase';
-import { createFingerprint, destroyContainer, buildContainer } from '../wca';
+import { createFingerprint, buildContainer, destroyContainer } from '../wca';
 import { MIME_TYPES } from './constants';
 
 // keep
-const uploadBlob = (
+export const uploadBlob = (
   reference: firebase.storage.Reference, data: Blob, metadata?: firebase.storage.UploadMetadata,
 ): Promise<string> => reference.put(data, metadata)
   .then((uploadTask) => uploadTask.ref.fullPath);
@@ -36,7 +36,7 @@ const downloadText = (
   .then((response) => response.text());
 
 // keep
-const downloadBlob = (
+export const downloadBlob = (
   reference: firebase.storage.Reference,
 ): Promise<Blob> => reference
   .getDownloadURL()

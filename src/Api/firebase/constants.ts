@@ -5,6 +5,8 @@ export const USERS = 'users';
 // keep
 export const DOCUMENTS = 'documents';
 // keep
+export const EXCHANGE = 'exchange';
+// keep
 export enum MIME_TYPES {
   X_PEM_FILE = 'application/x-pem-file'
 }
