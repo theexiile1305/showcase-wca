@@ -19,7 +19,7 @@ import { auth } from './firebase';
 import {
   derivePasswordHash, derivePasswordKey, importDataNameKey,
   importRSAPSSPublicKey, importRSAOAEPPublicKey, importRSAPSSPrivateKey,
-  importRSAOAEPPrivateKey, changePasswordHash, setupKeys, newIV,
+  importRSAOAEPPrivateKey, setupKeys, newIV,
 } from '../wca';
 import {
   getIVDataNameKey, getDataNameKey, getSaltPasswordKey, getRSAOAEPPrivateKey,
@@ -231,37 +231,6 @@ export const changeEmail = (
             dispatch(openSnackbar('You´ve successfully changed your email.'));
           }
         });
-      }
-    })
-    .catch((error) => dispatch(openSnackbar(error.message)))
-    .finally(() => dispatch(clearUILoading()));
-};
-
-// keep
-export const changePassword = (
-  password: string, newPassword: string,
-) => (
-  dispatch: Dispatch<SetUILoadingAction | SetUIStopLoadingAction | OpenSnackbarAction
-  | LogoutUserAction>,
-): void => {
-  dispatch(setUILoading());
-  const { email } = store.getState().user;
-  if (!email) {
-    throw new Error('Could not change your password. Try it again!');
-  }
-  getPasswordHash(password)
-    .then((passwordHash) => auth.signInWithEmailAndPassword(email, passwordHash))
-    .then((userCredential) => {
-      const { user } = userCredential;
-      return user;
-    })
-    .then(async (user) => {
-      if (user != null) {
-        await changePasswordHash(newPassword, user)
-          .then(() => getPasswordHash(newPassword))
-          .then((newPasswordHash) => user.updatePassword(newPasswordHash));
-        dispatch(openSnackbar('You´ve successfully changed your password.'));
-        dispatch(logoutUser());
       }
     })
     .catch((error) => dispatch(openSnackbar(error.message)))
