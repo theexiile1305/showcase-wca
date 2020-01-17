@@ -243,11 +243,6 @@ export const setupKeys = async (
 };
 
 // keep
-export const changePasswordHash = (
-  password: string, user: firebase.User,
-): Promise<void> => setupKeys(password, user);
-
-// keep
 export const encryptWithAESCBC = (
   plaintext: string,
 ): Promise<string> => Promise

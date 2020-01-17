@@ -8,7 +8,6 @@ import { openDialog, OpenDialogAction } from 'src/Store/ui/UIActions';
 import DialogType from 'src/Models/DialogType';
 import ChangeUsernameDialog from './ChangeUsernameDialog';
 import ChangeEmailDialog from './ChangeEmailDialog';
-import ChangePasswordDialog from './ChangePasswordDialog';
 import DeleteAccountDialog from './DeleteAccountDialog';
 
 const UserDetails: React.FC = () => {
@@ -48,13 +47,6 @@ const UserDetails: React.FC = () => {
           <Button
             size="small"
             color="primary"
-            onClick={(): OpenDialogAction => dispatch(openDialog(DialogType.CHANGE_PASSWORD))}
-          >
-            Change Password
-          </Button>
-          <Button
-            size="small"
-            color="primary"
             onClick={(): OpenDialogAction => dispatch(openDialog(DialogType.DELETE_ACCOUNT))}
           >
             Delete Account
@@ -63,7 +55,6 @@ const UserDetails: React.FC = () => {
       </Card>
       <ChangeUsernameDialog />
       <ChangeEmailDialog />
-      <ChangePasswordDialog />
       <DeleteAccountDialog />
     </>
   );
