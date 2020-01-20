@@ -104,7 +104,7 @@ workflows:
                 requires:
                     - build
             - sonarcloud:
-                context: sonarcloud
+                context: SonarCloud
                 requires:
                     - build
             - size:
