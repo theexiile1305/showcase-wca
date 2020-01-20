@@ -13,14 +13,14 @@ import style from 'src/Styles';
 const Home: React.FC = () => {
   const classes = style();
 
-  const renderLink = (link: string, title: string): React.ReactFragment => (
+  const renderLink = (
+    link: string, title: string,
+  ): React.ReactFragment => (
     <Button
       color="primary"
       component={Link}
       to={link}
-      startIcon={
-        <LinkIcon />
-      }
+      startIcon={<LinkIcon />}
     >
       {title}
     </Button>

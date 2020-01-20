@@ -1,13 +1,13 @@
-import { Reducer, AnyAction } from 'redux';
+import { Reducer } from 'redux';
 import { DebugStore } from './DebugStore';
-import { DebugAction } from './DebugActions';
+import { DebugAction, DebugActions } from './DebugActions';
 
 const initialState: DebugStore = {
   aesCBC: null,
 };
 
 const DebugReducer: Reducer<DebugStore> = (
-  state: DebugStore = initialState, action: AnyAction,
+  state: DebugStore = initialState, action: DebugActions,
 ) => {
   switch (action.type) {
     case DebugAction.SAVE_AES_CBC:

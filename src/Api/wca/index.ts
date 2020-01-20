@@ -26,14 +26,12 @@ import {
 } from './containerConfig';
 import { downloadKey } from '../firebase/storage';
 
-// keep
 export const newPBKDF2Salt = (
   byteSize: number,
 ): Promise<string> => Promise
   .resolve(window.crypto.getRandomValues(new Uint8Array(byteSize)))
   .then((arrayBuffer) => (arrayBufferToBase64(arrayBuffer)));
 
-// keep
 export const derivePasswordHash = (
   password: string, saltPasswordHash: string,
 ): Promise<string> => Promise
@@ -47,7 +45,6 @@ export const derivePasswordHash = (
     ))
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer));
 
-// keep
 export const derivePasswordKey = (
   password: string, saltPasswordKey: string,
 ): Promise<CryptoKey> => Promise
@@ -62,23 +59,19 @@ export const derivePasswordKey = (
       ['encrypt', 'decrypt'],
     ));
 
-// keep
 export const generateRSAOAEPKeyPair = (
 ): Promise<CryptoKeyPair> => Promise
   .resolve(wca.generateKey(RSA_OAEP_GEN_ALGORITHM(), true, ['encrypt', 'decrypt']));
 
-// keep
 export const generateRSAPSSKeyPair = (
 ): Promise<CryptoKeyPair> => Promise
   .resolve(wca.generateKey(RSA_PSS_GEN_ALGORITHM(), true, ['sign', 'verify']));
 
-// keep
 export const newIV = (
 ): Promise<string> => Promise
   .resolve(window.crypto.getRandomValues(new Uint8Array(16)))
   .then((arrayBuffer) => (arrayBufferToBase64(arrayBuffer)));
 
-// keep
 export const encryptPrivateKey = (
   cryptoKey: CryptoKey, iv: string, privateKey: CryptoKey,
 ): Promise<string> => Promise
@@ -91,28 +84,24 @@ export const encryptPrivateKey = (
     ))
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer));
 
-// keep
 export const exportSymmetricKey = (
   cryptoKey: CryptoKey,
 ): Promise<string> => Promise
   .resolve(wca.exportKey('raw', cryptoKey))
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer));
 
-// keep
 export const exportToPublicPEM = (
   cryptoKey: CryptoKey,
 ): Promise<string> => Promise
   .resolve(wca.exportKey('spki', cryptoKey))
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer));
 
-// keep
 export const exportToPrivatePEM = (
   cryptoKey: CryptoKey,
 ): Promise<string> => Promise
   .resolve(wca.exportKey('pkcs8', cryptoKey))
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer));
 
-// keep
 export const generateDataNameKey = (
   cryptoKey: CryptoKey,
 ): Promise<string> => Promise
@@ -121,7 +110,6 @@ export const generateDataNameKey = (
   .then((arrayBuffer) => wca.encrypt(RSA_OAEP_ALGORITHM(), cryptoKey, arrayBuffer))
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer));
 
-// keep
 export const createHash = (
   string: string,
 ): Promise<string> => Promise
@@ -130,7 +118,6 @@ export const createHash = (
   .then((hashBuffer) => Array.from(new Uint8Array(hashBuffer)))
   .then((hashArray) => hashArray.map((b) => b.toString(16).padStart(2, '0')).join(''));
 
-// keep
 export const createFingerprint = (
   string: string,
 ): Promise<string> => Promise
@@ -139,7 +126,6 @@ export const createFingerprint = (
   .then((hashBuffer) => Array.from(new Uint8Array(hashBuffer)))
   .then((hashArray) => hashArray.map((b) => b.toString(16).padStart(2, '0')).join(':'));
 
-// keep
 export const createBlobFingerprint = (
   file: File,
 ): Promise<string> => Promise
@@ -148,7 +134,6 @@ export const createBlobFingerprint = (
   .then((hashBuffer) => Array.from(new Uint8Array(hashBuffer)))
   .then((hashArray) => hashArray.map((b) => b.toString(16).padStart(2, '0')).join(''));
 
-// keep
 export const importDataNameKey = (
   key: string, publicRSAOAEP: CryptoKey,
 ): Promise<CryptoKey> => Promise
@@ -158,7 +143,6 @@ export const importDataNameKey = (
     'raw', arrayBuffer, AES_CBC_PASSWORD_KEY_GEN_ALGORITHM(), true, ['encrypt', 'decrypt'],
   ));
 
-// keep
 export const importRSAOAEPPrivateKey = (
   key: string, passwordKey: CryptoKey, ivRSAOAEP: string,
 ): Promise<CryptoKey> => Promise
@@ -170,7 +154,6 @@ export const importRSAOAEPPrivateKey = (
     'pkcs8', arrayBuffer, RSA_OAEP_IMPORT_ALGORITHM(), true, ['decrypt'],
   ));
 
-// keep
 export const importRSAOAEPPublicKey = (
   key: string,
 ): Promise<CryptoKey> => Promise
@@ -179,7 +162,6 @@ export const importRSAOAEPPublicKey = (
     'spki', arrayBuffer, RSA_OAEP_IMPORT_ALGORITHM(), true, ['encrypt'],
   ));
 
-// keep
 export const importRSAPSSPrivateKey = (
   key: string, passwordKey: CryptoKey, ivRSAPSS: string,
 ): Promise<CryptoKey> => Promise
@@ -191,7 +173,6 @@ export const importRSAPSSPrivateKey = (
     'pkcs8', arrayBuffer, RSA_PSS_IMPORT_ALGORITHM(), true, ['sign'],
   ));
 
-// keep
 export const importRSAPSSPublicKey = (
   key: string,
 ): Promise<CryptoKey> => Promise
@@ -200,7 +181,6 @@ export const importRSAPSSPublicKey = (
     'spki', arrayBuffer, RSA_PSS_IMPORT_ALGORITHM(), true, ['verify'],
   ));
 
-// keep
 export const setupKeys = async (
   password: string, user: firebase.User,
 ): Promise<void> => {
@@ -242,7 +222,6 @@ export const setupKeys = async (
   });
 };
 
-// keep
 export const encryptWithAESCBC = (
   plaintext: string,
 ): Promise<string> => Promise
@@ -255,7 +234,6 @@ export const encryptWithAESCBC = (
   ))
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer));
 
-// keep
 export const decryptWithAESCBC = (
   ciphertext: string,
 ): Promise<string> => Promise
@@ -268,7 +246,6 @@ export const decryptWithAESCBC = (
   ))
   .then((arrayBuffer) => arrayBufferToString(arrayBuffer));
 
-// keep
 export const encryptWithRSAOAEP = (
   plaintext: string,
 ): Promise<string> => Promise
@@ -280,7 +257,6 @@ export const encryptWithRSAOAEP = (
   ))
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer));
 
-// keep
 export const decryptWithRSAOAEP = (
   ciphertext: string,
 ): Promise<string> => Promise
@@ -292,7 +268,6 @@ export const decryptWithRSAOAEP = (
   ))
   .then((arrayBuffer) => arrayBufferToString(arrayBuffer));
 
-// keep
 export const signWithRSAPSS = (
   message: string,
 ): Promise<string> => Promise
@@ -304,7 +279,6 @@ export const signWithRSAPSS = (
   ))
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer));
 
-// keep
 export const verifyWithRSAPSS = (
   message: string, signature: string,
 ): Promise<boolean> => Promise
@@ -316,7 +290,6 @@ export const verifyWithRSAPSS = (
     arrayBuffer,
   ));
 
-// keep
 export const buildContainer = async (
   plaintextBlob: Blob,
 ): Promise<Blob> => {
@@ -337,12 +310,10 @@ export const buildContainer = async (
   return new Blob([encryptedBlob, iv, userID, encryptedKey, counter, userID, signature]);
 };
 
-// keep
 const determineCounterValue = (
   counter: ArrayBuffer,
 ): number => new DataView(counter, 0).getUint8(0);
 
-// keep
 const verifySignature = async (
   encryptedBlob: ArrayBuffer, signature: ArrayBuffer, signatureUserID: ArrayBuffer,
 ): Promise<boolean> => Promise
@@ -352,7 +323,6 @@ const verifySignature = async (
   .then((cryptoKey) => importRSAPSSPublicKey(cryptoKey))
   .then((cryptoKey) => wca.verify(RSA_PSS_ALGORITHM(), cryptoKey, signature, encryptedBlob));
 
-// keep
 const determineEncryptedKey = (
   aesKeyBlock: ArrayBuffer, counterValue: number,
 ): ArrayBuffer => {
@@ -373,7 +343,6 @@ const determineEncryptedKey = (
   return encryptedKey;
 };
 
-// keep
 const decryptBlob = (
   encryptedBlob: ArrayBuffer, counterIndex: number, iv: ArrayBuffer, aesKeyBlock: ArrayBuffer,
 ): Promise<ArrayBuffer> => Promise
@@ -384,7 +353,6 @@ const decryptBlob = (
   .then((arrayBuffer) => wca.importKey('raw', arrayBuffer, AES_CBC_PASSWORD_KEY_GEN_ALGORITHM(), true, ['encrypt', 'decrypt']))
   .then((cryptoKey) => wca.decrypt(AES_CBC_PASSWORD_KEY_ALGORITHM(iv), cryptoKey, encryptedBlob));
 
-// keep
 export const destroyContainer = async (
   blob: Blob,
 ): Promise<Blob> => {
@@ -421,7 +389,6 @@ const deriveNewEncryptedAESKey = (
   ))
   .then((arrayBuffer) => wca.encrypt(RSA_OAEP_ALGORITHM(), cryptoKey, arrayBuffer));
 
-// keep
 export const addSharingToContainer = async (
   blob: Blob, userID: string, cryptoKey: CryptoKey,
 ): Promise<Blob> => {
@@ -454,7 +421,6 @@ export const addSharingToContainer = async (
   ]);
 };
 
-// keep
 const reovkeEncryptedKey = (
   aesKeyBlock: ArrayBuffer, counterValue: number, userID: string,
 ): ArrayBuffer => {
@@ -473,7 +439,6 @@ const reovkeEncryptedKey = (
   return array;
 };
 
-// keep
 export const revokeSharingToContainer = async (
   blob: Blob, userID: string,
 ): Promise<Blob> => {
@@ -505,7 +470,6 @@ export const revokeSharingToContainer = async (
 };
 
 
-// keep
 export const encryptWithDataNameKey = (
   filename: string,
 ): Promise<string> => Promise
@@ -518,7 +482,6 @@ export const encryptWithDataNameKey = (
   })
   .then((arrayBuffer) => arrayBufferToBase64(arrayBuffer));
 
-// keep
 export const decryptWithDataNameKey = (
   filename: string,
 ): Promise<string> => Promise

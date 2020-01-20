@@ -20,7 +20,9 @@ const DeleteAccountDialog: React.FC = () => {
 
   const [password, setPassword] = useState('');
 
-  const handleDeleteAccount = (event: React.MouseEvent<HTMLElement>): void => {
+  const handleDeleteAccount = (
+    event: React.MouseEvent<HTMLElement>,
+  ): void => {
     event.preventDefault();
     dispatch(deleteAccount(password, () => history.push(HOME)));
   };
@@ -58,14 +60,17 @@ const DeleteAccountDialog: React.FC = () => {
       </DialogContent>
       <DialogActions>
         <Button
-          onClick={(): CloseDialogAction => dispatch(closeDialog(DialogType.DELETE_ACCOUNT))}
+          onClick={(
+          ): CloseDialogAction => dispatch(closeDialog(DialogType.DELETE_ACCOUNT))}
           color="primary"
         >
             Cancel
         </Button>
         <Button
           color="primary"
-          onClick={(event): void => handleDeleteAccount(event)}
+          onClick={(
+            event,
+          ): void => handleDeleteAccount(event)}
         >
             Confirm
         </Button>

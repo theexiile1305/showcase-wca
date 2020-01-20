@@ -1,6 +1,6 @@
-import { Reducer, AnyAction } from 'redux';
+import { Reducer } from 'redux';
 import { PKIStore } from './PKIStore';
-import { PKIAction } from './PKIActions';
+import { PKIAction, PKIActions } from './PKIActions';
 
 const initialState: PKIStore = {
   emails: [],
@@ -14,7 +14,7 @@ const addUniquePKI = (
 };
 
 const PKIReducer: Reducer<PKIStore> = (
-  state: PKIStore = initialState, action: AnyAction,
+  state: PKIStore = initialState, action: PKIActions,
 ) => {
   switch (action.type) {
     case PKIAction.SAVE_PKI:

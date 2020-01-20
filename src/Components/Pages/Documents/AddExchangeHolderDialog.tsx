@@ -11,9 +11,9 @@ import {
   openSnackbar, OpenSnackbarAction, openDialog,
 } from 'src/Store/ui/UIActions';
 import DialogType from 'src/Models/DialogType';
-import { listAllKeysFromPKI, determineEmail, addExchangeHolder } from 'src/Api/firebase/firestore';
 import { EmailByUserID } from 'src/Models/EmailByUserID';
 import { addUrl } from 'src/Store/documents/DocumentActions';
+import { listAllKeysFromPKI, determineEmail, addExchangeHolder } from 'src/Api/firebase/firestore';
 
 const AddExchangeHolderDialog: React.FC = () => {
   const dispatch = useDispatch();
@@ -78,9 +78,8 @@ const AddExchangeHolderDialog: React.FC = () => {
                 <React.Fragment key={user.userID}>
                   <ListItem
                     button
-                    onClick={
-                      (): Promise<OpenSnackbarAction> => hanldeAddExchangeHolder(user.userID)
-                    }
+                    onClick={(
+                    ): Promise<OpenSnackbarAction> => hanldeAddExchangeHolder(user.userID)}
                   >
                     <ListItemIcon>
                       <PersonIcon />
@@ -98,7 +97,8 @@ const AddExchangeHolderDialog: React.FC = () => {
       </DialogContent>
       <DialogActions>
         <Button
-          onClick={(): CloseDialogAction => dispatch(closeDialog(DialogType.ADD_EXCHANGE_HOLDER))}
+          onClick={(
+          ): CloseDialogAction => dispatch(closeDialog(DialogType.ADD_EXCHANGE_HOLDER))}
           color="primary"
         >
             Cancel

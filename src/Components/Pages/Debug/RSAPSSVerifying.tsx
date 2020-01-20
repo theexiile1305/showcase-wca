@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import {
   Button, Card, CardActions, CardContent, Grid, TextField, Typography,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import DoneIcon from '@material-ui/icons/Done';
-import style from 'src/Styles';
-import { useDispatch } from 'react-redux';
 import { openSnackbar } from 'src/Store/ui/UIActions';
 import { verifyWithRSAPSS } from 'src/Api/wca';
+import style from 'src/Styles';
 
 const RSAPSSVerifying: React.FC = () => {
   const classes = style();

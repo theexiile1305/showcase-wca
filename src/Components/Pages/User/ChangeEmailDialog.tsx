@@ -14,10 +14,13 @@ const ChangeEmailDialog: React.FC = () => {
   const openChangeEmail = useSelector(
     (state: ApplicationState) => state.ui.dialog === DialogType.CHANGE_EMAIL,
   );
+
   const [newEmail, setNewEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleChangeEmail = (event: React.MouseEvent<HTMLElement>): void => {
+  const handleChangeEmail = (
+    event: React.MouseEvent<HTMLElement>,
+  ): void => {
     event.preventDefault();
     dispatch(changeEmail(password, newEmail));
     dispatch(closeDialog(DialogType.CHANGE_EMAIL));
@@ -71,14 +74,17 @@ const ChangeEmailDialog: React.FC = () => {
       </DialogContent>
       <DialogActions>
         <Button
-          onClick={(): CloseDialogAction => dispatch(closeDialog(DialogType.CHANGE_EMAIL))}
+          onClick={(
+          ): CloseDialogAction => dispatch(closeDialog(DialogType.CHANGE_EMAIL))}
           color="primary"
         >
             Cancel
         </Button>
         <Button
           color="primary"
-          onClick={(event): void => handleChangeEmail(event)}
+          onClick={(
+            event,
+          ): void => handleChangeEmail(event)}
         >
             Confirm
         </Button>

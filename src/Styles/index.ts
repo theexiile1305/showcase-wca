@@ -11,21 +11,9 @@ const style = makeStyles((theme: Theme) => createStyles({
   debugForm: {
     textAlign: 'center',
   },
-  progress: {
-    position: 'absolute',
-  },
-  avatar: {
-    backgroundColor: theme.palette.secondary.main,
-    display: 'inline-flex',
-  },
   paper: {
     padding: theme.spacing(2),
     textAlign: 'center',
-    color: theme.palette.text.secondary,
-  },
-  paperUser: {
-    padding: theme.spacing(2),
-    textAlign: 'left',
     color: theme.palette.text.secondary,
   },
   navbarTitle: {

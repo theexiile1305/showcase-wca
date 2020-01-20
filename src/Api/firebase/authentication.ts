@@ -13,6 +13,7 @@ import {
 import { store } from 'src/Store';
 import { removeDocuments, RemoveDocumentsAction } from 'src/Store/documents/DocumentActions';
 import { removePKI, RemovePKIAction } from 'src/Store/pki/PKIActions';
+import { removeCryptoKeys, saveCryptoKeys } from '../localforage';
 import { getSaltPasswordHash } from './constants';
 import { downloadKey } from './storage';
 import { auth } from './firebase';
@@ -26,18 +27,14 @@ import {
   getRSAOAEPPublicKey, getIVRSAOAEP, getIVRSAPSS, getRSAPSSPrivateKey,
   getRSAPSSPublicKey, removeKeysFromPKI, removeKeyInfo, removeExistingDocuments,
 } from './firestore';
-import { removeCryptoKeys, saveCryptoKeys } from '../localforage';
 
-// keep
 const getPasswordHash = (
   password: string,
 ): Promise<string> => derivePasswordHash(password, getSaltPasswordHash());
 
-// keep
 export const isAuthenticated = (
 ): boolean => store.getState().user.uid != null;
 
-// keep
 export const verifyAuth = (
 ): void => {
   auth.onAuthStateChanged((user) => {
@@ -47,7 +44,6 @@ export const verifyAuth = (
   });
 };
 
-// keep
 export const signUp = (
   displayName: string, email: string, password: string, redirect: () => void,
 ) => async (
@@ -78,7 +74,6 @@ export const signUp = (
     });
 };
 
-// keep
 export const signInWithEmailPassword = (
   email: string, password: string, redirect: () => void,
 ) => async (
@@ -152,7 +147,6 @@ export const signInWithEmailPassword = (
     redirect();
   });
 
-// keep
 export const signOut = (
   redirect: () => void,
 ) => (
@@ -176,7 +170,6 @@ export const signOut = (
     });
 };
 
-// keep
 export const changeDisplayName = (
   password: string, displayName: string,
 ) => (
@@ -206,7 +199,6 @@ export const changeDisplayName = (
     .finally(() => dispatch(clearUILoading()));
 };
 
-// keep
 export const changeEmail = (
   password: string, newEmail: string,
 ) => (
@@ -237,7 +229,6 @@ export const changeEmail = (
     .finally(() => dispatch(clearUILoading()));
 };
 
-// keep
 export const deleteAccount = (
   password: string, redirect: () => void,
 ) => (

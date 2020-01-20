@@ -18,7 +18,9 @@ const ChangeUsernameDialog: React.FC = () => {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
 
-  const handleChangeUsernameAccount = (event: React.MouseEvent<HTMLElement>): void => {
+  const handleChangeUsernameAccount = (
+    event: React.MouseEvent<HTMLElement>,
+  ): void => {
     event.preventDefault();
     dispatch(changeDisplayName(password, username));
     dispatch(closeDialog(DialogType.CHANGE_USERNAME));
@@ -72,14 +74,17 @@ const ChangeUsernameDialog: React.FC = () => {
       </DialogContent>
       <DialogActions>
         <Button
-          onClick={(): CloseDialogAction => dispatch(closeDialog(DialogType.CHANGE_USERNAME))}
+          onClick={(
+          ): CloseDialogAction => dispatch(closeDialog(DialogType.CHANGE_USERNAME))}
           color="primary"
         >
             Cancel
         </Button>
         <Button
           color="primary"
-          onClick={(event): void => handleChangeUsernameAccount(event)}
+          onClick={(
+            event,
+          ): void => handleChangeUsernameAccount(event)}
         >
             Confirm
         </Button>

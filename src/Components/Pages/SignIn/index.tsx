@@ -4,20 +4,23 @@ import { useDispatch } from 'react-redux';
 import {
   Typography, Grid, TextField, Button,
 } from '@material-ui/core';
-import style from 'src/Styles';
 import { SIGN_UP, HOME } from 'src/Routes';
 import { signInWithEmailPassword } from 'src/Api/firebase/authentication';
+import style from 'src/Styles';
 
 const SignIn: React.FC = () => {
   const classes = style();
 
   const dispatch = useDispatch();
+
   const history = useHistory();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = (
+    event: React.FormEvent<HTMLFormElement>,
+  ): void => {
     event.preventDefault();
     dispatch(signInWithEmailPassword(email, password, () => history.push(HOME)));
   };
@@ -41,9 +44,9 @@ const SignIn: React.FC = () => {
             label="Enter Email"
             autoComplete="email"
             value={email}
-            onChange={
-              (event: React.ChangeEvent<HTMLInputElement>): void => setEmail(event.target.value)
-            }
+            onChange={(
+              event: React.ChangeEvent<HTMLInputElement>,
+            ): void => setEmail(event.target.value)}
           />
         </Grid>
         <Grid item xs={12}>
@@ -57,9 +60,9 @@ const SignIn: React.FC = () => {
             label="Enter Password"
             autoComplete="password"
             value={password}
-            onChange={
-              (event: React.ChangeEvent<HTMLInputElement>): void => setPassword(event.target.value)
-            }
+            onChange={(
+              event: React.ChangeEvent<HTMLInputElement>,
+            ): void => setPassword(event.target.value)}
           />
         </Grid>
         <Grid item xs={12}>

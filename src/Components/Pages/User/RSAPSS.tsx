@@ -1,13 +1,12 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useEffect, useState } from 'react';
 import {
   Button, Card, CardActions, CardContent, Typography,
 } from '@material-ui/core';
-import 'src/Assets/App.css';
-import savePEM from 'src/Api/savePEM';
 import { exportToPublicPEM, createFingerprint, exportToPrivatePEM } from 'src/Api/wca';
 import { addPublicHeaderFooter, addPrivateHeaderFooter } from 'src/Api/wca/pemManagement';
 import { getRSAPSSPrivateKey, getRSAPSSPublicKey } from 'src/Api/localforage';
+import savePEM from 'src/Api/savePEM';
+import 'src/Assets/App.css';
 
 const RSAPSS: React.FC = () => {
   const [publicKey, setPublicKey] = useState('');
@@ -64,14 +63,16 @@ const RSAPSS: React.FC = () => {
           <Button
             size="small"
             color="primary"
-            onClick={(): void => savePEM(publicKey, 'publicKey')}
+            onClick={(
+            ): void => savePEM(publicKey, 'publicKey')}
           >
             Export Public Key
           </Button>
           <Button
             size="small"
             color="primary"
-            onClick={(): void => savePEM(privateKey, 'privateKey')}
+            onClick={(
+            ): void => savePEM(privateKey, 'privateKey')}
           >
             Export Private Key
           </Button>

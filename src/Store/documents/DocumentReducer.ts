@@ -1,7 +1,7 @@
-import { Reducer, AnyAction } from 'redux';
+import { Reducer } from 'redux';
 import { Document } from 'src/Models/Document';
 import { DocumentStore } from './DocumentStore';
-import { DocumentAction } from './DocumentActions';
+import { DocumentAction, DocumentActions } from './DocumentActions';
 
 const initialState: DocumentStore = {
   documents: [],
@@ -26,7 +26,7 @@ const removeDocument = (
 };
 
 const DocumentReducer: Reducer<DocumentStore> = (
-  state: DocumentStore = initialState, action: AnyAction,
+  state: DocumentStore = initialState, action: DocumentActions,
 ) => {
   switch (action.type) {
     case DocumentAction.STORE_DOCUMENT:

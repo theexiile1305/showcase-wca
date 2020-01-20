@@ -33,21 +33,24 @@ const UserDetails: React.FC = () => {
           <Button
             size="small"
             color="primary"
-            onClick={(): OpenDialogAction => dispatch(openDialog(DialogType.CHANGE_USERNAME))}
+            onClick={(
+            ): OpenDialogAction => dispatch(openDialog(DialogType.CHANGE_USERNAME))}
           >
             Change Username
           </Button>
           <Button
             size="small"
             color="primary"
-            onClick={(): OpenDialogAction => dispatch(openDialog(DialogType.CHANGE_EMAIL))}
+            onClick={(
+            ): OpenDialogAction => dispatch(openDialog(DialogType.CHANGE_EMAIL))}
           >
             Change E-Mail
           </Button>
           <Button
             size="small"
             color="primary"
-            onClick={(): OpenDialogAction => dispatch(openDialog(DialogType.DELETE_ACCOUNT))}
+            onClick={(
+            ): OpenDialogAction => dispatch(openDialog(DialogType.DELETE_ACCOUNT))}
           >
             Delete Account
           </Button>

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import {
   Button, Card, CardActions, CardContent, Grid, TextField, Typography,
 } from '@material-ui/core';
-import style from 'src/Styles';
 import { encryptWithRSAOAEP } from 'src/Api/wca';
-import { useDispatch } from 'react-redux';
 import { openSnackbar } from 'src/Store/ui/UIActions';
+import style from 'src/Styles';
 
 const RSAOAEPEncryption: React.FC = () => {
   const classes = style();

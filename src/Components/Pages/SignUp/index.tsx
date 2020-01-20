@@ -1,24 +1,27 @@
 import React, { useState } from 'react';
+import { Link, useHistory } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import {
   Grid, Typography, TextField, Button,
 } from '@material-ui/core';
-import { Link, useHistory } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import style from 'src/Styles';
 import { signUp } from 'src/Api/firebase/authentication';
 import { SIGN_IN, HOME } from 'src/Routes';
+import style from 'src/Styles';
 
 const SignUp: React.FC = () => {
   const classes = style();
 
   const dispatch = useDispatch();
+
   const history = useHistory();
 
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = (
+    event: React.FormEvent<HTMLFormElement>,
+  ): void => {
     event.preventDefault();
     dispatch(signUp(username, email, password, () => history.push(HOME)));
   };
@@ -42,9 +45,9 @@ const SignUp: React.FC = () => {
             label="Enter Username"
             autoComplete="username"
             value={username}
-            onChange={
-              (event: React.ChangeEvent<HTMLInputElement>): void => setUsername(event.target.value)
-            }
+            onChange={(
+              event: React.ChangeEvent<HTMLInputElement>,
+            ): void => setUsername(event.target.value)}
           />
         </Grid>
         <Grid item xs={12}>
@@ -58,9 +61,9 @@ const SignUp: React.FC = () => {
             label="Enter Email"
             autoComplete="email"
             value={email}
-            onChange={
-              (event: React.ChangeEvent<HTMLInputElement>): void => setEmail(event.target.value)
-            }
+            onChange={(
+              event: React.ChangeEvent<HTMLInputElement>,
+            ): void => setEmail(event.target.value)}
           />
         </Grid>
         <Grid item xs={12}>
@@ -74,9 +77,9 @@ const SignUp: React.FC = () => {
             label="Enter Password"
             autoComplete="password"
             value={password}
-            onChange={
-              (event: React.ChangeEvent<HTMLInputElement>): void => setPassword(event.target.value)
-            }
+            onChange={(
+              event: React.ChangeEvent<HTMLInputElement>,
+            ): void => setPassword(event.target.value)}
           />
         </Grid>
         <Grid item xs={12}>

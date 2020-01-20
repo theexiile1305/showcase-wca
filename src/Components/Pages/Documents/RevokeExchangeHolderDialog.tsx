@@ -71,9 +71,8 @@ const RevokeExchangeHolderDialog: React.FC = () => {
                 <React.Fragment key={user.userID}>
                   <ListItem
                     button
-                    onClick={
-                      (): Promise<OpenSnackbarAction> => hanldeRevokeExchangeHolder(user.userID)
-                    }
+                    onClick={(
+                    ): Promise<OpenSnackbarAction> => hanldeRevokeExchangeHolder(user.userID)}
                   >
                     <ListItemIcon>
                       <PersonIcon />
@@ -91,9 +90,8 @@ const RevokeExchangeHolderDialog: React.FC = () => {
       </DialogContent>
       <DialogActions>
         <Button
-          onClick={
-            (): CloseDialogAction => dispatch(closeDialog(DialogType.REVOKE_EXCHANGE_HOLDER))
-          }
+          onClick={(
+          ): CloseDialogAction => dispatch(closeDialog(DialogType.REVOKE_EXCHANGE_HOLDER))}
           color="primary"
         >
             Cancel

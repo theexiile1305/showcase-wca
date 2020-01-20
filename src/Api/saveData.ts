@@ -1,4 +1,6 @@
-const saveData = (blob: Blob, fileName: string): void => {
+const saveData = (
+  blob: Blob, fileName: string,
+): void => {
   const a = document.createElement('a');
   document.body.appendChild(a);
   const url = window.URL.createObjectURL(blob);

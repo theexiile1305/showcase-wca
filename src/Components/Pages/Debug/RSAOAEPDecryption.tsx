@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import {
   Button, Card, CardActions, CardContent, Grid, TextField, Typography,
 } from '@material-ui/core';
-import style from 'src/Styles';
 import { decryptWithRSAOAEP } from 'src/Api/wca';
 import { openSnackbar } from 'src/Store/ui/UIActions';
 import { useDispatch } from 'react-redux';
+import style from 'src/Styles';
 
 const RSAOAEPDecryption: React.FC = () => {
   const classes = style();

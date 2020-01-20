@@ -40,7 +40,8 @@ const ExchangedURLDialog: React.FC = () => {
       </DialogContent>
       <DialogActions>
         <Button
-          onClick={(): CloseDialogAction => dispatch(closeDialog(DialogType.ADD_URL))}
+          onClick={(
+          ): CloseDialogAction => dispatch(closeDialog(DialogType.ADD_URL))}
           color="primary"
         >
             Cancel

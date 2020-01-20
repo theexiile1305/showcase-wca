@@ -3,13 +3,11 @@ import { storage } from './firebase';
 import { createFingerprint, buildContainer, destroyContainer } from '../wca';
 import { MIME_TYPES } from './constants';
 
-// keep
 export const uploadBlob = (
   reference: firebase.storage.Reference, data: Blob, metadata?: firebase.storage.UploadMetadata,
 ): Promise<string> => reference.put(data, metadata)
   .then((uploadTask) => uploadTask.ref.fullPath);
 
-// keep
 export const saveKey = async (
   fullPath: string, key: string,
 ): Promise<string> => Promise
@@ -22,12 +20,10 @@ export const saveKey = async (
     });
   });
 
-// keep
 export const removeKey = (
   fullPath: string,
 ): Promise<void> => storage.child(fullPath).delete();
 
-// keep
 const downloadText = (
   reference: firebase.storage.Reference,
 ): Promise<string> => reference
@@ -35,7 +31,6 @@ const downloadText = (
   .then((url) => fetch(url))
   .then((response) => response.text());
 
-// keep
 export const downloadBlob = (
   reference: firebase.storage.Reference,
 ): Promise<Blob> => reference
@@ -43,7 +38,6 @@ export const downloadBlob = (
   .then((url) => fetch(url))
   .then((response) => response.blob());
 
-// keep
 export const downloadKey = async (
   fullPath: string,
 ): Promise<string> => {
@@ -59,13 +53,11 @@ export const downloadKey = async (
   return key;
 };
 
-// keep
 export const downloadDocument = (
   path: string,
 ): Promise<Blob> => downloadBlob(storage.child(path))
   .then((blob) => destroyContainer(blob));
 
-// keep
 export const uploadDocument = (
   path: string, file: File,
 ): Promise<string> => buildContainer(file)
@@ -77,7 +69,6 @@ export const uploadDocument = (
   ));
 
 
-// keep
 export const deleteDocument = (
   path: string,
 ): Promise<void> => storage.child(path).delete();

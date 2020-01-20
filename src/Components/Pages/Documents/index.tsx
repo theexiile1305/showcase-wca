@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   Divider, Grid, List, ListItem, ListItemText, ListItemSecondaryAction,
   IconButton, ListItemIcon, Typography, Button,
@@ -7,12 +8,7 @@ import AutorenewIcon from '@material-ui/icons/Autorenew';
 import ClearIcon from '@material-ui/icons/Clear';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import DeleteIcon from '@material-ui/icons/Delete';
-import style from 'src/Styles';
-import { useSelector, useDispatch } from 'react-redux';
 import { ApplicationState } from 'src/Store/ApplicationState';
-import {
-  listDocumentReferences, uploadDocumentReferences, deleteDocumentReference,
-} from 'src/Api/firebase/firestore';
 import { downloadDocument } from 'src/Api/firebase/storage';
 import {
   setUILoading, openSnackbar, clearUILoading, OpenSnackbarAction, openDialog,
@@ -20,6 +16,8 @@ import {
 import saveData from 'src/Api/saveData';
 import { removeDocuments, addSelected } from 'src/Store/documents/DocumentActions';
 import DialogType from 'src/Models/DialogType';
+import style from 'src/Styles';
+import { listDocumentReferences, uploadDocumentReferences, deleteDocumentReference } from 'src/Api/firebase/firestore';
 import AddExchangeHolderDialog from './AddExchangeHolderDialog';
 import RevokeExchangeHolderDialog from './RevokeExchangeHolderDialog';
 import ExchangedURLDialog from './ExchangedURLDialog';
@@ -123,11 +121,10 @@ const Documents: React.FC = () => {
               <React.Fragment key={document.id}>
                 <ListItem
                   button
-                  onClick={
-                    (): Promise<OpenSnackbarAction> => handleDownload(
-                      document.path, document.filename,
-                    )
-                  }
+                  onClick={(
+                  ): Promise<OpenSnackbarAction> => handleDownload(
+                    document.path, document.filename,
+                  )}
                 >
                   <ListItemIcon>
                     <InsertDriveFileIcon />
