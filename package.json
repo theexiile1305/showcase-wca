@@ -32,7 +32,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test --passWithNoTests",
     "eject": "react-scripts eject",
-    "eslint": "eslint . --max-warnings 5 --ext .js,.jsx,.ts,.tsx",
+    "eslint": "eslint . --fix --ext .js,.jsx,.ts,.tsx",
     "size": "yarn build && size-limit",
     "cypress:run": "cypress run --record --key=${CYPRESS_RECORD_KEY}",
     "ci:cypress-run": "start-server-and-test start http://localhost:3000 cypress:run",
