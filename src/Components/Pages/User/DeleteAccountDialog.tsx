@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import {
-  Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, DialogContentText, Grid, Tooltip,
+  Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField,
+  DialogContentText, Grid, Tooltip,
 } from '@material-ui/core';
 import { ApplicationState } from 'src/Store/ApplicationState';
 import { deleteAccount } from 'src/Api/firebase/authentication';
