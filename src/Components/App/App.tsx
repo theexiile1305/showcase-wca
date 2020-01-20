@@ -1,14 +1,13 @@
 import React from 'react';
 import { Switch, Route, BrowserRouter } from 'react-router-dom';
-import 'src/Assets/App.css';
 import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
 import {
   HOME, SIGN_IN, SIGN_UP, DOCUMENTS, IDENTITIES, DEBUG, USER,
 } from 'src/Routes';
 import AuthRoute from 'src/Routes/AuthRoute';
 import { verifyAuth } from 'src/Api/firebase/authentication';
 import { store, persistor } from 'src/Store';
-import { PersistGate } from 'redux-persist/integration/react';
 import Navbar from '../Layout/Navbar';
 import Footer from '../Layout/Footer';
 import Home from '../Pages/Home';
@@ -21,6 +20,7 @@ import User from '../Pages/User';
 import SimpleSnackbar from '../Layout/SimpleSnackbar';
 import NotFound from '../Pages/error/NotFound';
 import Exchange from '../Pages/Exchange';
+import 'src/Assets/App.css';
 
 const App: React.FC = () => {
   verifyAuth();

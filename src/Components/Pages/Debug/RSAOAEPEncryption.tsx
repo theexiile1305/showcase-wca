@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import {
-  Button, Card, CardActions, CardContent, Grid, TextField, Typography,
-} from '@material-ui/core';
-import style from 'src/Styles';
-import { encryptWithRSAOAEP } from 'src/Api/wca';
 import { useDispatch } from 'react-redux';
+import {
+  Button, Card, CardActions, CardContent, Grid, TextField, Typography, Tooltip,
+} from '@material-ui/core';
+import { encryptWithRSAOAEP } from 'src/Api/wca';
 import { openSnackbar } from 'src/Store/ui/UIActions';
+import style from 'src/Styles';
 
 const RSAOAEPEncryption: React.FC = () => {
   const classes = style();
@@ -74,9 +74,11 @@ const RSAOAEPEncryption: React.FC = () => {
           </Grid>
         </CardContent>
         <CardActions>
-          <Button color="primary" type="submit">
+          <Tooltip title="Encrypt">
+            <Button color="primary" type="submit">
               Encrypt
-          </Button>
+            </Button>
+          </Tooltip>
         </CardActions>
       </form>
     </Card>

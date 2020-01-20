@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   Button, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText,
-  Grid, Link, Typography,
+  Grid, Typography, Link, Tooltip,
 } from '@material-ui/core';
 import { ApplicationState } from 'src/Store/ApplicationState';
 import { closeDialog, CloseDialogAction } from 'src/Store/ui/UIActions';
@@ -39,12 +39,15 @@ const ExchangedURLDialog: React.FC = () => {
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button
-          onClick={(): CloseDialogAction => dispatch(closeDialog(DialogType.ADD_URL))}
-          color="primary"
-        >
+        <Tooltip title="Cancel">
+          <Button
+            onClick={(
+            ): CloseDialogAction => dispatch(closeDialog(DialogType.ADD_URL))}
+            color="primary"
+          >
             Cancel
-        </Button>
+          </Button>
+        </Tooltip>
       </DialogActions>
     </Dialog>
   );

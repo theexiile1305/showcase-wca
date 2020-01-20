@@ -8,7 +8,9 @@ const initialState: UIStore = {
   dialog: null,
 };
 
-const UIReducer: Reducer<UIStore> = (state: UIStore = initialState, action: UIActions) => {
+const UIReducer: Reducer<UIStore> = (
+  state: UIStore = initialState, action: UIActions,
+) => {
   switch (action.type) {
     case UIAction.LOADING_UI:
       return {

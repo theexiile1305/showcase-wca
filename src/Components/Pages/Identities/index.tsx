@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   Divider, Grid, List, ListItem, ListItemText, ListItemIcon, Typography,
 } from '@material-ui/core';
 import PersonIcon from '@material-ui/icons/Person';
-import style from 'src/Styles';
-import { listAllKeysFromPKI, determineEmail } from 'src/Api/firebase/firestore';
 import { savePKI } from 'src/Store/pki/PKIActions';
-import { useDispatch, useSelector } from 'react-redux';
+import { determineEmail, listAllKeysFromPKI } from 'src/Api/firebase/firestore';
 import { ApplicationState } from 'src/Store/ApplicationState';
+import style from 'src/Styles';
 
 const Documents: React.FC = () => {
   const classes = style();

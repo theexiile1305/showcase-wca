@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import {
-  Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, DialogContentText, Grid,
+  Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField,
+  DialogContentText, Grid, Tooltip,
 } from '@material-ui/core';
 import { ApplicationState } from 'src/Store/ApplicationState';
 import { deleteAccount } from 'src/Api/firebase/authentication';
@@ -20,7 +21,9 @@ const DeleteAccountDialog: React.FC = () => {
 
   const [password, setPassword] = useState('');
 
-  const handleDeleteAccount = (event: React.MouseEvent<HTMLElement>): void => {
+  const handleDeleteAccount = (
+    event: React.MouseEvent<HTMLElement>,
+  ): void => {
     event.preventDefault();
     dispatch(deleteAccount(password, () => history.push(HOME)));
   };
@@ -57,18 +60,25 @@ const DeleteAccountDialog: React.FC = () => {
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button
-          onClick={(): CloseDialogAction => dispatch(closeDialog(DialogType.DELETE_ACCOUNT))}
-          color="primary"
-        >
+        <Tooltip title="Cancel">
+          <Button
+            onClick={(
+            ): CloseDialogAction => dispatch(closeDialog(DialogType.DELETE_ACCOUNT))}
+            color="primary"
+          >
             Cancel
-        </Button>
-        <Button
-          color="primary"
-          onClick={(event): void => handleDeleteAccount(event)}
-        >
+          </Button>
+        </Tooltip>
+        <Tooltip title="Confirm">
+          <Button
+            color="primary"
+            onClick={(
+              event,
+            ): void => handleDeleteAccount(event)}
+          >
             Confirm
-        </Button>
+          </Button>
+        </Tooltip>
       </DialogActions>
     </Dialog>
   );

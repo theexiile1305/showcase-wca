@@ -1,16 +1,17 @@
 import React, { useEffect } from 'react';
 import { Typography, Grid } from '@material-ui/core';
 import { useParams } from 'react-router-dom';
-import { getDocumentPathFromHash } from 'src/Api/firebase/firestore';
+import { useDispatch } from 'react-redux';
 import {
   setUILoading, clearUILoading, openSnackbar,
 } from 'src/Store/ui/UIActions';
 import { downloadDocument } from 'src/Api/firebase/storage';
+import { getDocumentPathFromHash } from 'src/Api/firebase/firestore';
 import saveData from 'src/Api/saveData';
-import { useDispatch } from 'react-redux';
 
 const Exchange: React.FC = () => {
   const dispatch = useDispatch();
+
   const { hash } = useParams();
 
   useEffect(() => {

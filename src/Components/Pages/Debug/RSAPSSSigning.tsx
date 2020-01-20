@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import {
-  Button, Card, CardActions, CardContent, Grid, TextField, Typography,
+  Button, Card, CardActions, CardContent, Grid, TextField, Typography, Tooltip,
 } from '@material-ui/core';
-import style from 'src/Styles';
 import { openSnackbar } from 'src/Store/ui/UIActions';
 import { useDispatch } from 'react-redux';
 import { signWithRSAPSS } from 'src/Api/wca';
+import style from 'src/Styles';
 
 const RSAPSSSigning: React.FC = () => {
   const classes = style();
@@ -74,9 +74,11 @@ const RSAPSSSigning: React.FC = () => {
           </Grid>
         </CardContent>
         <CardActions>
-          <Button color="primary" type="submit">
+          <Tooltip title="Sign">
+            <Button color="primary" type="submit">
               Sign
-          </Button>
+            </Button>
+          </Tooltip>
         </CardActions>
       </form>
     </Card>

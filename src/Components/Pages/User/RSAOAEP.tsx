@@ -1,13 +1,12 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useEffect, useState } from 'react';
 import {
-  Button, Card, CardActions, CardContent, Typography,
+  Button, Card, CardActions, CardContent, Typography, Tooltip,
 } from '@material-ui/core';
-import 'src/Assets/App.css';
-import savePEM from 'src/Api/savePEM';
 import { exportToPublicPEM, createFingerprint, exportToPrivatePEM } from 'src/Api/wca';
 import { addPrivateHeaderFooter, addPublicHeaderFooter } from 'src/Api/wca/pemManagement';
 import { getRSAOAEPPublicKey, getRSAOAEPPrivateKey } from 'src/Api/localforage';
+import saveASC from 'src/Api/saveASC';
+import 'src/Assets/App.css';
 
 const RSAOAEP: React.FC = () => {
   const [publicKey, setPublicKey] = useState('');
@@ -61,20 +60,26 @@ const RSAOAEP: React.FC = () => {
           </pre>
         </CardContent>
         <CardActions>
-          <Button
-            size="small"
-            color="primary"
-            onClick={(): void => savePEM(publicKey, 'publicKey')}
-          >
+          <Tooltip title="Export Public Key">
+            <Button
+              size="small"
+              color="primary"
+              onClick={(
+              ): void => saveASC(publicKey, 'publicKey')}
+            >
             Export Public Key
-          </Button>
-          <Button
-            size="small"
-            color="primary"
-            onClick={(): void => savePEM(privateKey, 'privateKey')}
-          >
+            </Button>
+          </Tooltip>
+          <Tooltip title="Export Private Key">
+            <Button
+              size="small"
+              color="primary"
+              onClick={(
+              ): void => saveASC(privateKey, 'privateKey')}
+            >
             Export Private Key
-          </Button>
+            </Button>
+          </Tooltip>
         </CardActions>
       </Card>
     </>

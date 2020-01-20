@@ -3,15 +3,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
-import style from 'src/Styles';
 import { ApplicationState } from 'src/Store/ApplicationState';
 import { closeSnackbar, CloseSnackbarAction } from 'src/Store/ui/UIActions';
+import style from 'src/Styles';
 
 const SimpleSnackbar: React.FC = () => {
   const classes = style();
+
   const dispatch = useDispatch();
-  const handleClose = (): CloseSnackbarAction => dispatch(closeSnackbar());
+
   const snackbar = useSelector((state: ApplicationState) => state.ui.snackbar);
+
+  const handleClose = (): CloseSnackbarAction => dispatch(closeSnackbar());
 
   return (
     <Snackbar

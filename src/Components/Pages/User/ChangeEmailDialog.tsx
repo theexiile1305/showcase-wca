@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-  Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, DialogContentText, Grid,
+  Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField,
+  DialogContentText, Grid, Tooltip,
 } from '@material-ui/core';
 import { ApplicationState } from 'src/Store/ApplicationState';
 import { closeDialog, CloseDialogAction } from 'src/Store/ui/UIActions';
@@ -14,10 +15,13 @@ const ChangeEmailDialog: React.FC = () => {
   const openChangeEmail = useSelector(
     (state: ApplicationState) => state.ui.dialog === DialogType.CHANGE_EMAIL,
   );
+
   const [newEmail, setNewEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleChangeEmail = (event: React.MouseEvent<HTMLElement>): void => {
+  const handleChangeEmail = (
+    event: React.MouseEvent<HTMLElement>,
+  ): void => {
     event.preventDefault();
     dispatch(changeEmail(password, newEmail));
     dispatch(closeDialog(DialogType.CHANGE_EMAIL));
@@ -70,18 +74,25 @@ const ChangeEmailDialog: React.FC = () => {
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button
-          onClick={(): CloseDialogAction => dispatch(closeDialog(DialogType.CHANGE_EMAIL))}
-          color="primary"
-        >
+        <Tooltip title="Cancel">
+          <Button
+            onClick={(
+            ): CloseDialogAction => dispatch(closeDialog(DialogType.CHANGE_EMAIL))}
+            color="primary"
+          >
             Cancel
-        </Button>
-        <Button
-          color="primary"
-          onClick={(event): void => handleChangeEmail(event)}
-        >
+          </Button>
+        </Tooltip>
+        <Tooltip title="Confirm">
+          <Button
+            color="primary"
+            onClick={(
+              event,
+            ): void => handleChangeEmail(event)}
+          >
             Confirm
-        </Button>
+          </Button>
+        </Tooltip>
       </DialogActions>
     </Dialog>
   );

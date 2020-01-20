@@ -1,18 +1,14 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   Divider, Grid, List, ListItem, ListItemText, ListItemSecondaryAction,
-  IconButton, ListItemIcon, Typography, Button,
+  IconButton, ListItemIcon, Typography, Button, Tooltip,
 } from '@material-ui/core';
 import AutorenewIcon from '@material-ui/icons/Autorenew';
 import ClearIcon from '@material-ui/icons/Clear';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import DeleteIcon from '@material-ui/icons/Delete';
-import style from 'src/Styles';
-import { useSelector, useDispatch } from 'react-redux';
 import { ApplicationState } from 'src/Store/ApplicationState';
-import {
-  listDocumentReferences, uploadDocumentReferences, deleteDocumentReference,
-} from 'src/Api/firebase/firestore';
 import { downloadDocument } from 'src/Api/firebase/storage';
 import {
   setUILoading, openSnackbar, clearUILoading, OpenSnackbarAction, openDialog,
@@ -20,6 +16,8 @@ import {
 import saveData from 'src/Api/saveData';
 import { removeDocuments, addSelected } from 'src/Store/documents/DocumentActions';
 import DialogType from 'src/Models/DialogType';
+import style from 'src/Styles';
+import { listDocumentReferences, uploadDocumentReferences, deleteDocumentReference } from 'src/Api/firebase/firestore';
 import AddExchangeHolderDialog from './AddExchangeHolderDialog';
 import RevokeExchangeHolderDialog from './RevokeExchangeHolderDialog';
 import ExchangedURLDialog from './ExchangedURLDialog';
@@ -108,62 +106,71 @@ const Documents: React.FC = () => {
                 return hanldeUpload(event);
               }}
             />
-            <Button
-              variant="outlined"
-              color="primary"
-              component="span"
-            >
+            <Tooltip title="Upload">
+              <Button
+                variant="outlined"
+                color="primary"
+                component="span"
+              >
           Upload
-            </Button>
+              </Button>
+            </Tooltip>
           </label>
         </Grid>
         <Grid item xs={12}>
           <List component="nav">
             {documents.map((document) => (
               <React.Fragment key={document.id}>
-                <ListItem
-                  button
-                  onClick={
-                    (): Promise<OpenSnackbarAction> => handleDownload(
+                <Tooltip title="Download">
+                  <ListItem
+                    button
+                    onClick={(
+                    ): Promise<OpenSnackbarAction> => handleDownload(
                       document.path, document.filename,
-                    )
-                  }
-                >
-                  <ListItemIcon>
-                    <InsertDriveFileIcon />
-                  </ListItemIcon>
-                  <ListItemText primary={document.filename} />
-                  <ListItemSecondaryAction>
-                    <IconButton
-                      edge="end"
-                      onClick={(): void => {
-                        dispatch(addSelected(document.id));
-                        dispatch(openDialog(DialogType.REVOKE_EXCHANGE_HOLDER));
-                      }}
-                    >
-                      <ClearIcon />
-                    </IconButton>
-                    <IconButton
-                      edge="end"
-                      onClick={(): void => {
-                        dispatch(addSelected(document.id));
-                        dispatch(openDialog(DialogType.ADD_EXCHANGE_HOLDER));
-                      }}
-                    >
-                      <AutorenewIcon />
-                    </IconButton>
-                    <IconButton
-                      edge="end"
-                      onClick={
-                        (): Promise<OpenSnackbarAction> => handleDelete(
-                          document.id, document.path,
-                        )
-                      }
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </ListItemSecondaryAction>
-                </ListItem>
+                    )}
+                  >
+                    <ListItemIcon>
+                      <InsertDriveFileIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={document.filename} />
+                    <ListItemSecondaryAction>
+                      <Tooltip title="Revoke an exchange holder">
+                        <IconButton
+                          edge="end"
+                          onClick={(): void => {
+                            dispatch(addSelected(document.id));
+                            dispatch(openDialog(DialogType.REVOKE_EXCHANGE_HOLDER));
+                          }}
+                        >
+                          <ClearIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Add an exhcnage holder">
+                        <IconButton
+                          edge="end"
+                          onClick={(): void => {
+                            dispatch(addSelected(document.id));
+                            dispatch(openDialog(DialogType.ADD_EXCHANGE_HOLDER));
+                          }}
+                        >
+                          <AutorenewIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Delete">
+                        <IconButton
+                          edge="end"
+                          onClick={
+                            (): Promise<OpenSnackbarAction> => handleDelete(
+                              document.id, document.path,
+                            )
+                          }
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </ListItemSecondaryAction>
+                  </ListItem>
+                </Tooltip>
                 <Divider />
               </React.Fragment>
             ))}

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import {
-  Button, Card, CardActions, CardContent, Grid, TextField, Typography,
+  Button, Card, CardActions, CardContent, Grid, TextField, Typography, Tooltip,
 } from '@material-ui/core';
-import style from 'src/Styles';
 import { encryptWithAESCBC } from 'src/Api/wca';
 import { openSnackbar } from 'src/Store/ui/UIActions';
-import { useDispatch } from 'react-redux';
+import style from 'src/Styles';
 
 const AESCBCEncryption: React.FC = () => {
   const classes = style();
@@ -74,9 +74,11 @@ const AESCBCEncryption: React.FC = () => {
           </Grid>
         </CardContent>
         <CardActions>
-          <Button color="primary" type="submit">
+          <Tooltip title="Encrypt">
+            <Button color="primary" type="submit">
               Encrypt
-          </Button>
+            </Button>
+          </Tooltip>
         </CardActions>
       </form>
     </Card>

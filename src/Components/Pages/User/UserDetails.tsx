@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-  Button, Card, CardActions, CardContent, Typography,
+  Button, Card, CardActions, CardContent, Typography, Tooltip,
 } from '@material-ui/core';
 import { ApplicationState } from 'src/Store/ApplicationState';
 import { openDialog, OpenDialogAction } from 'src/Store/ui/UIActions';
@@ -30,27 +30,36 @@ const UserDetails: React.FC = () => {
           </Typography>
         </CardContent>
         <CardActions>
-          <Button
-            size="small"
-            color="primary"
-            onClick={(): OpenDialogAction => dispatch(openDialog(DialogType.CHANGE_USERNAME))}
-          >
+          <Tooltip title="Change Username">
+            <Button
+              size="small"
+              color="primary"
+              onClick={(
+              ): OpenDialogAction => dispatch(openDialog(DialogType.CHANGE_USERNAME))}
+            >
             Change Username
-          </Button>
-          <Button
-            size="small"
-            color="primary"
-            onClick={(): OpenDialogAction => dispatch(openDialog(DialogType.CHANGE_EMAIL))}
-          >
+            </Button>
+          </Tooltip>
+          <Tooltip title="Change E-Mail">
+            <Button
+              size="small"
+              color="primary"
+              onClick={(
+              ): OpenDialogAction => dispatch(openDialog(DialogType.CHANGE_EMAIL))}
+            >
             Change E-Mail
-          </Button>
-          <Button
-            size="small"
-            color="primary"
-            onClick={(): OpenDialogAction => dispatch(openDialog(DialogType.DELETE_ACCOUNT))}
-          >
+            </Button>
+          </Tooltip>
+          <Tooltip title="Delete Account">
+            <Button
+              size="small"
+              color="primary"
+              onClick={(
+              ): OpenDialogAction => dispatch(openDialog(DialogType.DELETE_ACCOUNT))}
+            >
             Delete Account
-          </Button>
+            </Button>
+          </Tooltip>
         </CardActions>
       </Card>
       <ChangeUsernameDialog />

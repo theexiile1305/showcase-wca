@@ -1,5 +1,6 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
+import { Link, useHistory } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   AppBar, Toolbar, IconButton, Typography, Tooltip, LinearProgress,
 } from '@material-ui/core';
@@ -11,14 +12,12 @@ import MenuIcon from '@material-ui/icons/Menu';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import PeopleIcon from '@material-ui/icons/People';
 import SettingsIcon from '@material-ui/icons/Settings';
-import { Link, useHistory } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import style from 'src/Styles';
 import {
   SIGN_IN, SIGN_UP, DOCUMENTS, IDENTITIES, DEBUG, HOME, USER,
 } from 'src/Routes';
 import { signOut, isAuthenticated } from 'src/Api/firebase/authentication';
 import { ApplicationState } from 'src/Store/ApplicationState';
+import style from 'src/Styles';
 
 const Navbar: React.FC = () => {
   const classes = style();

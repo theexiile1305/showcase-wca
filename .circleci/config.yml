@@ -1,7 +1,7 @@
 version: 2.1
 orbs:
     cypress: cypress-io/cypress@1
-    codecov: codecov/codecov@1.0.5
+    sonarcloud: sonarsource/sonarcloud@1.0.1
 aliases:
     - &test_environment
         working_directory: ~/repo
@@ -42,11 +42,12 @@ aliases:
     - &test_stage
         - *attach_workspace_stage
         - run: yarn test
-        - codecov/upload:
-            file: coverage/*.json
     - &eslint_stage
         - *attach_workspace_stage
         - run: yarn eslint
+    - &sonarcloud_stage
+        - *attach_workspace_stage
+        - sonarcloud/scan
     -  &size_stage
         - *attach_workspace_stage
         - run: yarn size
@@ -73,6 +74,9 @@ jobs:
     eslint:
         <<: *test_environment
         steps: *eslint_stage
+    sonarcloud:
+        <<: *test_environment
+        steps: *sonarcloud_stage
     size:
         <<: *test_environment
         steps: *size_stage
@@ -96,6 +100,10 @@ workflows:
             - eslint:
                 requires:
                     - build
+            - sonarcloud:
+                context: SonarCloud
+                requires:
+                    - build
             - size:
                 requires:
                     - build
@@ -106,6 +114,7 @@ workflows:
                 requires:
                     - test
                     - eslint
+                    - sonarcloud
                     - size
                     - cypress
                 filters:
@@ -116,6 +125,7 @@ workflows:
                 requires:
                     - test
                     - eslint
+                    - sonarcloud
                     - size
                     - cypress
                 filters:
