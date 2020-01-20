@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Button, Card, CardActions, CardContent, Typography,
+  Button, Card, CardActions, CardContent, Typography, Tooltip,
 } from '@material-ui/core';
 import { exportToPublicPEM, createFingerprint, exportToPrivatePEM } from 'src/Api/wca';
 import { addPublicHeaderFooter, addPrivateHeaderFooter } from 'src/Api/wca/pemManagement';
 import { getRSAPSSPrivateKey, getRSAPSSPublicKey } from 'src/Api/localforage';
-import savePEM from 'src/Api/savePEM';
+import savePEM from 'src/Api/saveASC';
 import 'src/Assets/App.css';
 
 const RSAPSS: React.FC = () => {
@@ -60,22 +60,26 @@ const RSAPSS: React.FC = () => {
           </pre>
         </CardContent>
         <CardActions>
-          <Button
-            size="small"
-            color="primary"
-            onClick={(
-            ): void => savePEM(publicKey, 'publicKey')}
-          >
+          <Tooltip title="Export Public Key">
+            <Button
+              size="small"
+              color="primary"
+              onClick={(
+              ): void => savePEM(publicKey, 'publicKey')}
+            >
             Export Public Key
-          </Button>
-          <Button
-            size="small"
-            color="primary"
-            onClick={(
-            ): void => savePEM(privateKey, 'privateKey')}
-          >
+            </Button>
+          </Tooltip>
+          <Tooltip title="Export Private Key">
+            <Button
+              size="small"
+              color="primary"
+              onClick={(
+              ): void => savePEM(privateKey, 'privateKey')}
+            >
             Export Private Key
-          </Button>
+            </Button>
+          </Tooltip>
         </CardActions>
       </Card>
     </>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Grid, Paper, Typography, Button,
+  Grid, Paper, Typography, Button, Tooltip,
 } from '@material-ui/core';
 import LinkIcon from '@material-ui/icons/Link';
 import {
@@ -16,14 +16,16 @@ const Home: React.FC = () => {
   const renderLink = (
     link: string, title: string,
   ): React.ReactFragment => (
-    <Button
-      color="primary"
-      component={Link}
-      to={link}
-      startIcon={<LinkIcon />}
-    >
-      {title}
-    </Button>
+    <Tooltip title={title}>
+      <Button
+        color="primary"
+        component={Link}
+        to={link}
+        startIcon={<LinkIcon />}
+      >
+        {title}
+      </Button>
+    </Tooltip>
   );
 
   const renderPaper = (

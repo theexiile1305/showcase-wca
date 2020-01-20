@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import {
-  Grid, Typography, TextField, Button,
+  Grid, Typography, TextField, Button, Tooltip,
 } from '@material-ui/core';
 import { signUp } from 'src/Api/firebase/authentication';
 import { SIGN_IN, HOME } from 'src/Routes';
@@ -83,13 +83,15 @@ const SignUp: React.FC = () => {
           />
         </Grid>
         <Grid item xs={12}>
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-          >
+          <Tooltip title="Sign Up">
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+            >
         Sign Up
-          </Button>
+            </Button>
+          </Tooltip>
         </Grid>
         <Grid
           container

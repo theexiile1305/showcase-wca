@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {
-  Button, Card, CardActions, CardContent, Grid, TextField, Typography,
+  Button, Card, CardActions, CardContent, Grid, TextField, Typography, Tooltip,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import DoneIcon from '@material-ui/icons/Done';
@@ -85,9 +85,11 @@ const RSAPSSVerifying: React.FC = () => {
           </Grid>
         </CardContent>
         <CardActions>
-          <Button color="primary" type="submit">
+          <Tooltip title="Verify">
+            <Button color="primary" type="submit">
               Verify
-          </Button>
+            </Button>
+          </Tooltip>
         </CardActions>
       </form>
     </Card>

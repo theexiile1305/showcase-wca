@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import {
-  Typography, Grid, TextField, Button,
+  Typography, Grid, TextField, Button, Tooltip,
 } from '@material-ui/core';
 import { SIGN_UP, HOME } from 'src/Routes';
 import { signInWithEmailPassword } from 'src/Api/firebase/authentication';
@@ -66,13 +66,15 @@ const SignIn: React.FC = () => {
           />
         </Grid>
         <Grid item xs={12}>
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-          >
+          <Tooltip title="Sign In">
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+            >
           Sign In
-          </Button>
+            </Button>
+          </Tooltip>
         </Grid>
         <Grid
           container

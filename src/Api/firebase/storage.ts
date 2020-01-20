@@ -1,7 +1,6 @@
 /* eslint-disable import/no-cycle */
 import { storage } from './firebase';
 import { createFingerprint, buildContainer, destroyContainer } from '../wca';
-import { MIME_TYPES } from './constants';
 
 export const uploadBlob = (
   reference: firebase.storage.Reference, data: Blob, metadata?: firebase.storage.UploadMetadata,
@@ -13,9 +12,9 @@ export const saveKey = async (
 ): Promise<string> => Promise
   .resolve(createFingerprint(key))
   .then((fingerprint) => {
-    const keyBlob = new Blob([key], { type: MIME_TYPES.X_PEM_FILE });
+    const keyBlob = new Blob([key], { type: 'text/plain' });
     return uploadBlob(storage.child(fullPath), keyBlob, {
-      contentType: MIME_TYPES.X_PEM_FILE,
+      contentType: 'text/plain',
       customMetadata: { fingerprint },
     });
   });

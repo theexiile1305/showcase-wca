@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Button, Card, CardActions, CardContent, Grid, TextField, Typography,
+  Button, Card, CardActions, CardContent, Grid, TextField, Typography, Tooltip,
 } from '@material-ui/core';
 import { openSnackbar } from 'src/Store/ui/UIActions';
 import { useDispatch } from 'react-redux';
@@ -74,9 +74,11 @@ const RSAPSSSigning: React.FC = () => {
           </Grid>
         </CardContent>
         <CardActions>
-          <Button color="primary" type="submit">
+          <Tooltip title="Sign">
+            <Button color="primary" type="submit">
               Sign
-          </Button>
+            </Button>
+          </Tooltip>
         </CardActions>
       </form>
     </Card>

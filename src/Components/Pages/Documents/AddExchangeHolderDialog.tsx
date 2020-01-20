@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   Button, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText,
-  Grid, List, ListItem, ListItemIcon, ListItemText, Divider,
+  Grid, List, ListItem, ListItemIcon, ListItemText, Divider, Tooltip,
 } from '@material-ui/core';
 import PersonIcon from '@material-ui/icons/Person';
 import { ApplicationState } from 'src/Store/ApplicationState';
@@ -69,7 +69,7 @@ const AddExchangeHolderDialog: React.FC = () => {
       </DialogTitle>
       <DialogContent dividers>
         <DialogContentText>
-            To add an additional exchange holder, please enter the depending email.
+            To add an additional exchange holder, please select the depending email.
         </DialogContentText>
         <Grid container spacing={3}>
           <Grid item xs={12}>
@@ -96,13 +96,15 @@ const AddExchangeHolderDialog: React.FC = () => {
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button
-          onClick={(
-          ): CloseDialogAction => dispatch(closeDialog(DialogType.ADD_EXCHANGE_HOLDER))}
-          color="primary"
-        >
+        <Tooltip title="Cancel">
+          <Button
+            onClick={(
+            ): CloseDialogAction => dispatch(closeDialog(DialogType.ADD_EXCHANGE_HOLDER))}
+            color="primary"
+          >
             Cancel
-        </Button>
+          </Button>
+        </Tooltip>
       </DialogActions>
     </Dialog>
   );

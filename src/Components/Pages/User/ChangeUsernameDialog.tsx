@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-  Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, DialogContentText, Grid,
+  Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, DialogContentText, Grid, Tooltip,
 } from '@material-ui/core';
 import { ApplicationState } from 'src/Store/ApplicationState';
 import { closeDialog, CloseDialogAction } from 'src/Store/ui/UIActions';
@@ -73,21 +73,25 @@ const ChangeUsernameDialog: React.FC = () => {
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button
-          onClick={(
-          ): CloseDialogAction => dispatch(closeDialog(DialogType.CHANGE_USERNAME))}
-          color="primary"
-        >
+        <Tooltip title="Cancel">
+          <Button
+            onClick={(
+            ): CloseDialogAction => dispatch(closeDialog(DialogType.CHANGE_USERNAME))}
+            color="primary"
+          >
             Cancel
-        </Button>
-        <Button
-          color="primary"
-          onClick={(
-            event,
-          ): void => handleChangeUsernameAccount(event)}
-        >
+          </Button>
+        </Tooltip>
+        <Tooltip title="Confirm">
+          <Button
+            color="primary"
+            onClick={(
+              event,
+            ): void => handleChangeUsernameAccount(event)}
+          >
             Confirm
-        </Button>
+          </Button>
+        </Tooltip>
       </DialogActions>
     </Dialog>
   );

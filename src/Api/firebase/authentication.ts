@@ -215,8 +215,8 @@ export const changeEmail = (
     .then(async (userCredential) => {
       const { user } = userCredential;
       if (user != null) {
-        await user.updateEmail(newEmail);
-        await user.sendEmailVerification();
+        await user.updateEmail(newEmail)
+          .then(() => user.sendEmailVerification());
         auth.onAuthStateChanged((currentUser) => {
           if (currentUser) {
             dispatch(storeUser(currentUser));

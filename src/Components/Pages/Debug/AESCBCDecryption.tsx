@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {
-  Button, Card, CardActions, CardContent, Grid, TextField, Typography,
+  Button, Card, CardActions, CardContent, Grid, TextField, Typography, Tooltip,
 } from '@material-ui/core';
 import { decryptWithAESCBC } from 'src/Api/wca';
 import { openSnackbar } from 'src/Store/ui/UIActions';
@@ -74,9 +74,11 @@ const AESCBCDecryption: React.FC = () => {
           </Grid>
         </CardContent>
         <CardActions>
-          <Button color="primary" type="submit">
+          <Tooltip title="Decrypt">
+            <Button color="primary" type="submit">
               Decrypt
-          </Button>
+            </Button>
+          </Tooltip>
         </CardActions>
       </Card>
     </form>

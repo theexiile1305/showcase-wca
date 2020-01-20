@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   Button, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText, Grid,
-  List, ListItem, ListItemIcon, ListItemText, Divider,
+  List, ListItem, ListItemIcon, ListItemText, Divider, Tooltip,
 } from '@material-ui/core';
 import PersonIcon from '@material-ui/icons/Person';
 import { ApplicationState } from 'src/Store/ApplicationState';
@@ -62,7 +62,7 @@ const RevokeExchangeHolderDialog: React.FC = () => {
       </DialogTitle>
       <DialogContent dividers>
         <DialogContentText>
-            To revoke the existing exchange holder, please enter the depending email.
+            To revoke the existing exchange holder, please select the depending email.
         </DialogContentText>
         <Grid container spacing={3}>
           <Grid item xs={12}>
@@ -89,13 +89,15 @@ const RevokeExchangeHolderDialog: React.FC = () => {
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button
-          onClick={(
-          ): CloseDialogAction => dispatch(closeDialog(DialogType.REVOKE_EXCHANGE_HOLDER))}
-          color="primary"
-        >
+        <Tooltip title="Cancel">
+          <Button
+            onClick={(
+            ): CloseDialogAction => dispatch(closeDialog(DialogType.REVOKE_EXCHANGE_HOLDER))}
+            color="primary"
+          >
             Cancel
-        </Button>
+          </Button>
+        </Tooltip>
       </DialogActions>
     </Dialog>
   );

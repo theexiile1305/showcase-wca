@@ -196,14 +196,18 @@ export const listDocumentReferences = (
 ): Promise<void> => firestore
   .collection(USERS).doc(userID).get()
   .then((doc) => doc.get('documents'))
-  .then((documents) => documents.map((document: string) => firestore
-    .collection(DOCUMENTS).doc(document).get()
-    .then(async (doc) => {
-      const filename = await decryptWithDataNameKey(doc.get('filename'));
-      dispatch(
-        storeDocument(document, filename, doc.get('path'), doc.get('shared')),
-      );
-    })));
+  .then((documents) => {
+    if (documents !== undefined) {
+      documents.map((document: string) => firestore
+        .collection(DOCUMENTS).doc(document).get()
+        .then(async (doc) => {
+          const filename = await decryptWithDataNameKey(doc.get('filename'));
+          dispatch(
+            storeDocument(document, filename, doc.get('path'), doc.get('shared')),
+          );
+        }));
+    }
+  });
 
 
 export const getFileExtension = (

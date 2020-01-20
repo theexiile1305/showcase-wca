@@ -6,10 +6,6 @@ export const DOCUMENTS = 'documents';
 
 export const EXCHANGE = 'exchange';
 
-export enum MIME_TYPES {
-  X_PEM_FILE = 'application/x-pem-file'
-}
-
 export const RSA_OAEP_PEM = (
   userID: string,
 ): string => `/${PKI}/${userID}/rsaOAEP.pem`;
