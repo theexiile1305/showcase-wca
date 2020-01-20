@@ -1,10 +1,13 @@
 [![CircleCI](https://circleci.com/gh/theexiile1305/showcase-wca/tree/master.svg?style=svg)](https://circleci.com/gh/theexiile1305/showcase-wca/tree/master)
-[![Cypress.io tests](https://img.shields.io/badge/cypress.io-tests-green.svg?style=flat-square)](https://cypress.io)
-![Codecov](https://img.shields.io/codecov/c/github/theexiile1305/showcase-wca)
+[![Cypress.io tests](https://img.shields.io/badge/cypress.io-tests-green.svg?style=flat-square)](https://dashboard.cypress.io/projects/8c8a38/runs)
+![Snyk](https://img.shields.io/snyk/vulnerabilities/github/theexiile1305/showcase-wca)
 ![David](https://img.shields.io/david/theexiile1305/showcase-wca)
-![GitHub](https://img.shields.io/github/license/theexiile1305/showcase-wca?style=plastic)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftheexiile1305%2Fshowcase-wca.svg?type=small)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftheexiile1305%2Fshowcase-wca?ref=badge_small)
-![Website](https://img.shields.io/website?url=https%3A%2F%2Fshowcase-wca.web.app%2F)
+[![Website](https://img.shields.io/website?url=https%3A%2F%2Fshowcase-wca.web.app%2F)](https://showcase-wca.web.app/)
+[![GitHub](https://img.shields.io/github/license/theexiile1305/showcase-wca)](https://github.com/theexiile1305/showcase-wca/blob/master/LICENSE)
+
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
