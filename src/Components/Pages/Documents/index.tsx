@@ -24,8 +24,6 @@ import AddExchangeHolderDialog from './AddExchangeHolderDialog';
 import RevokeExchangeHolderDialog from './RevokeExchangeHolderDialog';
 import ExchangedURLDialog from './ExchangedURLDialog';
 
-Index;
-
 const Documents: React.FC = () => {
   const classes = style();
 
