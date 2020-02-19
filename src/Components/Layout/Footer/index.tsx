@@ -25,8 +25,6 @@ const Footer: React.FC = () => {
       {new Date().getFullYear()}
       {' '}
       <Link color="inherit" href="https://github.com/theexiile1305/">Michael Fuchs</Link>
-      {' // Many thanks for the good support from '}
-      <Link color="inherit" href="https://www.inovex.de/de/">inovex GmbH</Link>
     </Typography>
   );
 
