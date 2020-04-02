@@ -18,6 +18,8 @@ import { removeDocuments, addSelected } from 'src/Store/documents/DocumentAction
 import DialogType from 'src/Models/DialogType';
 import style from 'src/Styles';
 import { listDocumentReferences, uploadDocumentReferences, deleteDocumentReference } from 'src/Api/firebase/firestore';
+import { useHistory } from 'react-router-dom';
+import { HOME } from 'src/Routes';
 import AddExchangeHolderDialog from './AddExchangeHolderDialog';
 import RevokeExchangeHolderDialog from './RevokeExchangeHolderDialog';
 import ExchangedURLDialog from './ExchangedURLDialog';
@@ -26,6 +28,7 @@ const Documents: React.FC = () => {
   const classes = style();
 
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const documents = useSelector((state: ApplicationState) => state.documents.documents);
   const uid = useSelector((state: ApplicationState) => state.user.uid);
@@ -48,7 +51,7 @@ const Documents: React.FC = () => {
 
   const hanldeUpload = async (
     event: React.ChangeEvent<HTMLInputElement>,
-  ): Promise<OpenSnackbarAction> => Promise
+  ): Promise<void | OpenSnackbarAction> => Promise
     .resolve(dispatch(setUILoading()))
     .then(async () => {
       const { files } = event.target;
@@ -57,6 +60,7 @@ const Documents: React.FC = () => {
       }
     })
     .then(() => dispatch(openSnackbar('You`ve successfully uploaded the file.')))
+    .then(() => history.push(HOME))
     .catch((error) => dispatch(openSnackbar(error.message)))
     .finally(() => {
       setUpdated(true);
@@ -101,7 +105,7 @@ const Documents: React.FC = () => {
               className={classes.input}
               onChange={(
                 event: React.ChangeEvent<HTMLInputElement>,
-              ): Promise<OpenSnackbarAction> => {
+              ): Promise<void | OpenSnackbarAction> => {
                 event.persist();
                 return hanldeUpload(event);
               }}
