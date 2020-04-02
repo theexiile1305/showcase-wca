@@ -1,16 +1,11 @@
 version: 2.1
 orbs:
-    cypress: cypress-io/cypress@1
     sonarcloud: sonarsource/sonarcloud@1.0.1
 aliases:
     - &test_environment
         working_directory: ~/repo
         docker:
             - image:   circleci/node:12.9.1-browsers
-    - &cypress_enviroment
-        working_directory: ~/repo
-        docker:
-            - image: cypress/base:10
     - &docker_environment
         working_directory: ~/repo
         machine: true
@@ -51,10 +46,6 @@ aliases:
     -  &size_stage
         - *attach_workspace_stage
         - run: yarn size
-    - &cypress_stage
-        - *attach_workspace_stage
-        - run: yarn install --frozen-lockfile
-        - run: yarn ci:cypress-run
     - &deploy_docker_stage
         - *attach_workspace_stage
         - run: docker login docker.pkg.github.com -u theexiile1305 -p $TOKEN
@@ -80,9 +71,6 @@ jobs:
     size:
         <<: *test_environment
         steps: *size_stage
-    cypress:
-        <<: *cypress_enviroment
-        steps: *cypress_stage
     deploy_docker:
         <<: *docker_environment
         steps: *deploy_docker_stage
@@ -107,16 +95,12 @@ workflows:
             - size:
                 requires:
                     - build
-            - cypress:
-                requires:
-                    - build
             - deploy_docker:
                 requires:
                     - test
                     - eslint
                     - sonarcloud
                     - size
-                    - cypress
                 filters:
                     branches:
                         only:
@@ -127,7 +111,6 @@ workflows:
                     - eslint
                     - sonarcloud
                     - size
-                    - cypress
                 filters:
                     branches:
                         only:
