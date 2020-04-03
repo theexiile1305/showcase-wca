@@ -12,8 +12,8 @@ const AESCBCEncryption: React.FC = () => {
 
   const dispatch = useDispatch();
 
-  const [plaintext, setPlaintext] = useState();
-  const [ciphertext, setCiphertext] = useState();
+  const [plaintext, setPlaintext] = useState('');
+  const [ciphertext, setCiphertext] = useState('');
   const [defaultValue, setDefaultValue] = useState(' ');
 
   const handleSubmit = async (
