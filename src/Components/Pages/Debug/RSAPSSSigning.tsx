@@ -12,8 +12,8 @@ const RSAPSSSigning: React.FC = () => {
 
   const dispatch = useDispatch();
 
-  const [message, setMessage] = useState();
-  const [signature, setSignature] = useState();
+  const [message, setMessage] = useState('');
+  const [signature, setSignature] = useState('');
   const [defaultValue, setDefaultValue] = useState(' ');
 
   const handleSubmit = (

@@ -13,9 +13,9 @@ const RSAPSSVerifying: React.FC = () => {
   const classes = style();
 
   const dispatch = useDispatch();
-  const [message, setMessage] = useState();
-  const [signature, setSignature] = useState();
-  const [valid, setValid] = useState();
+  const [message, setMessage] = useState('');
+  const [signature, setSignature] = useState('');
+  const [valid, setValid] = useState(false);
 
   const handleSubmit = (
     event: React.FormEvent<HTMLFormElement>,
