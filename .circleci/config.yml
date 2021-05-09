@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-    sonarcloud: sonarsource/sonarcloud@1.0.1
+    sonarcloud: sonarsource/sonarcloud@1.0.2
 aliases:
     - &test_environment
         working_directory: ~/repo
